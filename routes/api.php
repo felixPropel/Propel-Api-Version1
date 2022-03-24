@@ -1,0 +1,47 @@
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
+|
+*/
+
+Route::middleware('auth:api')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+Route::group(['middleware' => ['cors', 'json.response'],'namespace'=>'App\Http\Controllers'], function () {
+    Route::post('/login', 'Auth\ApiAuthController@login')->name('login.api');
+    Route::post('/register','Auth\ApiAuthController@register')->name('register.api');
+    Route::get('/check_person','Auth\ApiAuthController@check_person')->name('check_person.api');
+    Route::get('/check_person_email','Auth\ApiAuthController@check_person_email')->name('check_person_email.api');
+    Route::get('/get_temp_status','Auth\ApiAuthController@get_temp_status')->name('get_temp_status.api');
+    Route::get('/check_user','Auth\ApiAuthController@check_user')->name('check_user.api');
+    Route::post('/temp_user_mobile','Auth\ApiAuthController@temp_user_mobile')->name('temp_user_mobile.api');
+    Route::post('/update_temp_user_email','Auth\ApiAuthController@update_temp_user_email')->name('update_temp_user_email.api');
+    Route::post('/get_stage','Auth\ApiAuthController@get_stage')->name('get_stage.api');
+    Route::post('/temp_update','Auth\ApiAuthController@temp_update')->name('temp_update.api');
+    Route::post('/check_confirmation','Auth\ApiAuthController@check_confirmation')->name('check_confirmation.api');
+    Route::post('/update_person_details','Auth\ApiAuthController@update_person_details')->name('update_person_details.api');
+    Route::post('/person_details_stage1','Auth\ApiAuthController@person_details_stage1')->name('person_details_stage1.api');
+    Route::post('/person_details_stage2','Auth\ApiAuthController@person_details_stage2')->name('person_details_stage2.api');
+    Route::post('/create_user','Auth\ApiAuthController@create_user')->name('create_user.api');
+    Route::post('/upload_pic','Auth\ApiAuthController@upload_pic')->name('upload_pic.api');
+    Route::post('/complete_profile','Auth\ApiAuthController@complete_profile')->name('complete_profile.api');
+    Route::post('/person_registration_otp','Auth\ApiAuthController@person_registration_otp')->name('person_registration_otp.api');
+    Route::post('/update_password','Auth\ApiAuthController@update_password')->name('update_password.api');
+});
+
+Route::middleware('auth:api')
+->namespace('App\Http\Controllers')
+->group(function () {
+    Route::post('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
+});
