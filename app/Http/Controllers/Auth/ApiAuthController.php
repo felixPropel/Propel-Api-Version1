@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use App\Models\Common;
 use Illuminate\Support\Facades\DB;
 use App\Models\BasicModels\Salutation;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Passport\HasApiTokens;
 
 class ApiAuthController extends Controller
@@ -532,6 +533,37 @@ class ApiAuthController extends Controller
             return response($response, 200);
         } else {
             $response = ["message" => 'Error Occured !!!'];
+            return response($response, 400);
+        }
+    }
+
+
+    function forgot_password(Request $request)
+    {
+        $uid = PersonMobile::where('mobile', $request->mobile)->first('uid');
+        $uuid = $uid->toArray();
+        $person_email = PersonEmail::where('uid', $uuid['uid'])->first('email');
+        $email = $person_email->toArray();
+        $otp = substr(str_shuffle("0123456789"), 0, 5);
+        $mail_email = $email['email'];
+
+        $affectedRows = User::where("uid", $uuid['uid'])->update(["email_otp" => $otp, "email_otp_verified" => 0]);
+
+        $template_data = ['email' => $email, 'otp' => $otp];
+        Mail::send(
+            ['html' => 'email.email_otp'],
+            $template_data,
+            function ($message) use ($mail_email) {
+                $message->to("dhivakarmm@gmail.com")
+                    ->from('propelsoft@gmail.com', 'Email OTP')
+                    ->subject('Password Reset');
+            }
+        );
+        if ($affectedRows) {
+            $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uuid['uid'], 'email' => $email['email']]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Mail Not Send'];
             return response($response, 400);
         }
     }

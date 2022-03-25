@@ -38,6 +38,7 @@ Route::group(['middleware' => ['cors', 'json.response'],'namespace'=>'App\Http\C
     Route::post('/complete_profile','Auth\ApiAuthController@complete_profile')->name('complete_profile.api');
     Route::post('/person_registration_otp','Auth\ApiAuthController@person_registration_otp')->name('person_registration_otp.api');
     Route::post('/update_password','Auth\ApiAuthController@update_password')->name('update_password.api');
+    Route::post('/forgot_password','Auth\ApiAuthController@forgot_password')->name('forgot_password.api');
 });
 
 Route::middleware('auth:api')
