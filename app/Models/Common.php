@@ -15,112 +15,120 @@ class Common extends Model
     public function check_temp_user_mobile($mobile)
     {
         $user = DB::table('temp_users')
-        ->where('mobile', '=', $mobile)
-        ->where('stage','!=','3')
-        ->first();
+            ->where('mobile', '=', $mobile)
+            ->where('stage', '!=', '3')
+            ->first();
         if ($user === null) {
             // user doesn't exist
-            $array=array(
-                'stage'=>0,
-                'mobile'=>0,
+            $array = array(
+                'stage' => 0,
+                'mobile' => 0,
             );
             return $array;
         } else {
-            $stage=DB::table('temp_users')->where('mobile', $mobile)->pluck('stage')->first();
-            $mobile=DB::table('temp_users')->where('mobile', $mobile)->pluck('mobile')->first();
+            $stage = DB::table('temp_users')->where('mobile', $mobile)->pluck('stage')->first();
+            $mobile = DB::table('temp_users')->where('mobile', $mobile)->pluck('mobile')->first();
 
-            $array=array(
-                'stage'=>$stage,
-                'mobile'=>$mobile,
+            $array = array(
+                'stage' => $stage,
+                'mobile' => $mobile,
             );
             return $array;
         }
     }
 
-    public function check_users_mobile($mobile){
+    public function check_users_mobile($mobile)
+    {
         $user_mobile = DB::table('person_mobile')
-        ->where('mobile', '=', $mobile)
-        ->where('status','=','1')
-        ->first();
-        if($user_mobile){
+            ->where('mobile', '=', $mobile)
+            ->where('status', '=', '1')
+            ->first();
+        if ($user_mobile) {
             return 1;
-        }else{
+        } else {
             return 0;
         }
     }
 
-    public function check_primary_user_mobile($mobile){
+    public function check_primary_user_mobile($mobile)
+    {
         $user_mobile = DB::table('users')
-        ->where('primary_mobile', '=', $mobile)
-        ->first();
-        if($user_mobile){
+            ->where('primary_mobile', '=', $mobile)
+            ->first();
+        if ($user_mobile) {
             return 1;
-        }else{
+        } else {
             return 0;
         }
     }
 
-    public function get_uuid_by_mobile($mobile){
+    public function get_uuid_by_mobile($mobile)
+    {
         $uuid = DB::table('users')
-        ->where('primary_mobile', '=', $mobile)
-        ->first();
-        if($uuid){
+            ->where('primary_mobile', '=', $mobile)
+            ->first();
+        if ($uuid) {
             return $uuid->uid;
-        }else{
+        } else {
             return 0;
         }
     }
 
-    public function get_person_uuid_by_mobile($mobile){
+    public function get_person_uuid_by_mobile($mobile)
+    {
         $uuid = DB::table('person_mobile')
-        ->where('mobile', '=', $mobile)
-        ->first();
-        if($uuid){
+            ->where('mobile', '=', $mobile)
+            ->first();
+        if ($uuid) {
             return $uuid->uid;
-        }else{
+        } else {
             return 0;
         }
     }
 
-    public function get_temp_mobile($ip){
-        $mobile=DB::table('temp_users')
-        ->where('ip_address', $ip)
-        ->where('stage','!=',"3")
-        ->pluck('mobile')->first();
+    public function get_temp_mobile($ip)
+    {
+        $mobile = DB::table('temp_users')
+            ->where('ip_address', $ip)
+            ->where('stage', '!=', "3")
+            ->pluck('mobile')->first();
         return $mobile;
     }
 
-    public function get_temp_email($ip){
-        $email=DB::table('temp_users')
-        ->where('ip_address', $ip)
-        ->where('stage',2)
-        ->pluck('email')->first();
+    public function get_temp_email($ip)
+    {
+        $email = DB::table('temp_users')
+            ->where('ip_address', $ip)
+            ->where('stage', 2)
+            ->pluck('email')->first();
         return $email;
     }
 
-    public function get_temp_email_by_mobile($mobile){
-        $email=DB::table('temp_users')
-        ->where('mobile', $mobile)
-        ->where('stage',2)
-        ->pluck('email')->first();
+    public function get_temp_email_by_mobile($mobile)
+    {
+        $email = DB::table('temp_users')
+            ->where('mobile', $mobile)
+            ->where('stage', 2)
+            ->pluck('email')->first();
         return $email;
     }
 
-    public function get_person_email($uuid){
-        $email=DB::table('person_email')
-        ->where('uid', $uuid)
-        ->where('status',1)
-        ->pluck('email')->first();
+    public function get_person_email($uuid)
+    {
+        $email = DB::table('person_email')
+            ->where('uid', $uuid)
+            ->where('status', 1)
+            ->pluck('email')->first();
         return $email;
     }
 
-    public function update_temp_user($mobile,$email){
-         $update=DB::table('temp_users')
-         ->where('mobile',$mobile)
-        //  ->where('stage', '1')
-        //  ->orWhere('stage','2')
-         ->update(['email' => $email,'stage'=>"2"]);
-         return $update;
+    public function update_temp_user($mobile, $email)
+    {
+        $update = DB::table('temp_users')
+            ->where('mobile', $mobile)
+            //  ->where('stage', '1')
+            //  ->orWhere('stage','2')
+            ->update(['email' => $email, 'stage' => "2"]);
+        return $update;
     }
-
 }

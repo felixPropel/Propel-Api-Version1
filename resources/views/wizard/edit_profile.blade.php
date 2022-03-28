@@ -22,7 +22,7 @@
                         <h6 class="mb-4">Profile</h6>
                         <form action="{{route('complete_profile')}}" class="frm-single" method="post" autocomplete="off" enctype="multipart/form-data">
                             @csrf
-                            
+
                             <div class="row form-group header_profile_pic">
                                 <div class="small-12 medium-2 large-2 columns">
                                     <div class="circle">
@@ -62,9 +62,9 @@
                                 <span>DOB</span>
                             </label>
                             @foreach ( $result[0]['person_address'] as $address)
-                                
+
                             @if ($address['address_type']==1)
-                        
+
                             <label class="form-group has-float-label mb-4">
                                 <input class="form-control" type="text" placeholder="home address" name="home_address" value="{{$address['address']}}" />
                                 <span class="text-danger">@error('home_address'){{ $message }}@enderror</span>

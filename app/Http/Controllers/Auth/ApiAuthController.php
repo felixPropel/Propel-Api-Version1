@@ -245,7 +245,7 @@ class ApiAuthController extends Controller
                         $temp_user->stage = 1;
                         $temp_user->save();
                         if ($temp_user->id > 0) {
-                            $response = ["message" => 'OK', 'route' => 'stage2', "param" =>['mobile' => $request['mobile']]];
+                            $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
                             return response($response, 200);
                         } else {
                             $response = ["message" => 'Something Went Wrong'];
