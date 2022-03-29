@@ -576,4 +576,5 @@ class ApiAuthController extends Controller
         $response = ['message' => 'You have been successfully logged out!'];
         return response($response, 200);
     }
+    
 }
