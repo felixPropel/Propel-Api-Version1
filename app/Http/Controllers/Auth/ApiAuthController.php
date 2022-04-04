@@ -568,6 +568,11 @@ class ApiAuthController extends Controller
         }
     }
 
+    public function get_user_data(Request $request){
+        $user=auth()->guard('api')->user();
+        return response($user, 200);
+    }
+
 
     public function logout(Request $request)
     {
