@@ -31,6 +31,7 @@ Route::group(['middleware' => ['cors', 'json.response'],'namespace'=>'App\Http\C
     Route::post('/temp_update','Auth\ApiAuthController@temp_update')->name('temp_update.api');
     Route::post('/check_confirmation','Auth\ApiAuthController@check_confirmation')->name('check_confirmation.api');
     Route::post('/update_person_details','Auth\ApiAuthController@update_person_details')->name('update_person_details.api');
+    Route::post('/person_details_update','Auth\ApiAuthController@person_details_update')->name('person_details_update.api');
     Route::post('/person_details_stage1','Auth\ApiAuthController@person_details_stage1')->name('person_details_stage1.api');
     Route::post('/person_details_stage2','Auth\ApiAuthController@person_details_stage2')->name('person_details_stage2.api');
     Route::post('/create_user','Auth\ApiAuthController@create_user')->name('create_user.api');

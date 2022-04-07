@@ -378,6 +378,32 @@ class ApiAuthController extends Controller
         }
     }
 
+    public function person_details_update(Request $request)
+    {
+        $affectedRows = PersonDetails::where("uid", $request['uid'])->update([
+            "saluation" => $request->saluation,
+            "first_name" => $request->first_name,
+            "middle_name" => $request->middle_name,
+            "last_name" => $request->last_name,
+            "nick_name" => $request->nick_name,
+            "gender" => $request->gender,
+            "dob" => $request->dob,
+            "blood_group" => $request->blood_group,
+            "martial_status" => $request->martial_status,
+            "aniversary_date" => $request->aniversary_date,
+            "mother_tongue" => $request->mother_tongue,
+            "other_language" => $request->other_language,
+            "profile_pic"=>$request->profile_pic,
+        ]);
+        if ($affectedRows > 0) {
+            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Update Error!'];
+            return response($response, 400);
+        }
+    }
+
 
     public function person_details_stage1(Request $request)
     {
@@ -568,8 +594,9 @@ class ApiAuthController extends Controller
         }
     }
 
-    public function get_user_data(Request $request){
-        $user=auth()->guard('api')->user();
+    public function get_user_data(Request $request)
+    {
+        $user = auth()->guard('api')->user();
         return response($user, 200);
     }
 
@@ -581,5 +608,4 @@ class ApiAuthController extends Controller
         $response = ['message' => 'You have been successfully logged out!'];
         return response($response, 200);
     }
-    
 }
