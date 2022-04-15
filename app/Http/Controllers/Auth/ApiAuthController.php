@@ -600,6 +600,17 @@ class ApiAuthController extends Controller
         return response($user, 200);
     }
 
+    public function store_mobile(Request $request){
+        if($request->mobile_type=='1'){
+            $affectedRows = User::where("uid", $request->uid)->update(["primary_mobile" => $request->mobile]);
+        }else if($request->mobile_type=='2'){
+            $affectedRows = PersonMobile::where("uid", $request->uid)->update(["mobile" => $request->mobile]);
+        }
+        if ($affectedRows > 0) {
+            $response = ["message" => 'OK'];
+            return response($response, 200);
+        }
+    }
 
     public function logout(Request $request)
     {
