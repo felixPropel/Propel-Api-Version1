@@ -41,6 +41,8 @@ Route::group(['middleware' => ['cors', 'json.response'],'namespace'=>'App\Http\C
     Route::post('/update_password','Auth\ApiAuthController@update_password')->name('update_password.api');
     Route::post('/forgot_password','Auth\ApiAuthController@forgot_password')->name('forgot_password.api');
     Route::post('/store_mobile','Auth\ApiAuthController@store_mobile')->name('store_mobile.api');
+    Route::post('/make_primary','Auth\ApiAuthController@make_primary')->name('make_primary.api');
+    Route::post('/delete_other','Auth\ApiAuthController@delete_other')->name('delete_other.api');
 });
 
 Route::middleware('auth:api')

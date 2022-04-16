@@ -393,7 +393,7 @@ class ApiAuthController extends Controller
             "aniversary_date" => $request->aniversary_date,
             "mother_tongue" => $request->mother_tongue,
             "other_language" => $request->other_language,
-            "profile_pic"=>$request->profile_pic,
+            "profile_pic" => $request->profile_pic,
         ]);
         if ($affectedRows > 0) {
             $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid]];
@@ -600,15 +600,49 @@ class ApiAuthController extends Controller
         return response($user, 200);
     }
 
-    public function store_mobile(Request $request){
-        if($request->mobile_type=='1'){
+    public function store_mobile(Request $request)
+    {
+        if ($request->mobile_type == '1') {
             $affectedRows = User::where("uid", $request->uid)->update(["primary_mobile" => $request->mobile]);
-        }else if($request->mobile_type=='2'){
+        } else if ($request->mobile_type == '2') {
             $affectedRows = PersonMobile::where("uid", $request->uid)->update(["mobile" => $request->mobile]);
         }
         if ($affectedRows > 0) {
             $response = ["message" => 'OK'];
             return response($response, 200);
+        }
+    }
+
+    public function make_primary(Request $request)
+    {
+        $uid = $request->uid;
+        $primary = $request->primary;
+        $other = $request->other;
+        if ($uid && $primary && $other) {
+            $affectedRows = User::where("uid", $request->uid)->update(["primary_mobile" => $other]);
+            $affectedRows1 = PersonMobile::where("uid", $request->uid)->update(["mobile" => $primary]);
+            if ($affectedRows > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            }
+        } else {
+            $response = ["message" => 'Parameter Missing'];
+            return response($response, 400);
+        }
+    }
+
+    public function delete_other(Request $request){
+        $uid = $request->uid;
+        $other = $request->other;
+        if ($uid && $other) {
+            $affectedRows = PersonMobile::where("uid", $request->uid)->update(["mobile" => ""]);
+            if ($affectedRows > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            }
+        } else {
+            $response = ["message" => 'Parameter Missing'];
+            return response($response, 400);
         }
     }
 
