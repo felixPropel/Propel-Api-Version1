@@ -252,7 +252,8 @@ class ApiAuthController extends Controller
                             return response($response, 400);
                         }
                     } else if ($uuid) {
-                        $response = ["message" => 'OK', 'route' => 'login', 'm' => $request['mobile']];
+                        // $response = ["message" => 'OK', 'route' => 'login', 'm' => $request['mobile']];
+                        $response = ["message" => 'OK', 'route' => '/login', "param" => ['m' => $request['mobile']]];
                         return response($response, 200);
                     } else if ($stage['stage'] == '1') {
                         $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
@@ -631,7 +632,38 @@ class ApiAuthController extends Controller
         }
     }
 
-    public function delete_other(Request $request){
+    public function make_email_primary(Request $request)
+    {
+        $uid = $request->uid;
+        $email = $request->email;
+        if ($uid && $email) {
+            $affectedRows = User::where("uid", $request->uid)->update(["primary_email" => $email, "email_otp_verified" => 1]);
+            if ($affectedRows > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            }
+        } else {
+            $response = ["message" => 'Parameter Missing'];
+            return response($response, 400);
+        }
+    }
+
+    public function make_email_secondary(Request $request)
+    {
+
+        $affectedRows = PersonEmail::where("uid", $request->uid)->update(["email" => $request->email]);
+
+        if ($affectedRows > 0) {
+            $response = ["message" => 'OK'];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Update error'];
+            return response($response, 400);
+        }
+    }
+
+    public function delete_other(Request $request)
+    {
         $uid = $request->uid;
         $other = $request->other;
         if ($uid && $other) {
