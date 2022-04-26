@@ -44,7 +44,9 @@ Route::group(['middleware' => ['cors', 'json.response'],'namespace'=>'App\Http\C
     Route::post('/make_primary','Auth\ApiAuthController@make_primary')->name('make_primary.api');
     Route::post('/make_email_primary','Auth\ApiAuthController@make_email_primary')->name('make_email_primary.api');
     Route::post('/make_email_secondary','Auth\ApiAuthController@make_email_secondary')->name('make_email_secondary.api');
+    Route::post('/make_email_primary_secondary','Auth\ApiAuthController@make_email_primary_secondary')->name('make_email_primary_secondary.api');
     Route::post('/delete_other','Auth\ApiAuthController@delete_other')->name('delete_other.api');
+    Route::post('/delete_other_email','Auth\ApiAuthController@delete_other_email')->name('delete_other_email.api');
 });
 
 Route::middleware('auth:api')

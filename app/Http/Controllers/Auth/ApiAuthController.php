@@ -648,6 +648,23 @@ class ApiAuthController extends Controller
         }
     }
 
+    public function make_email_primary_secondary(Request $request){
+        $uid = $request->uid;
+        $primary = $request->primary_email;
+        $other = $request->other_email;
+        if ($uid && $primary && $other) {
+            $affectedRows = User::where("uid", $request->uid)->update(["primary_email" => $other]);
+            $affectedRows1 = PersonEmail::where("uid", $request->uid)->update(["email" => $primary]);
+            if ($affectedRows > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            }
+        } else {
+            $response = ["message" => 'Parameter Missing'];
+            return response($response, 400);
+        }
+    }
+
     public function make_email_secondary(Request $request)
     {
 
@@ -667,7 +684,24 @@ class ApiAuthController extends Controller
         $uid = $request->uid;
         $other = $request->other;
         if ($uid && $other) {
+            $affectedRows1 = PersonMobile::where("uid", $request->uid)->update(["previous_mobile" => $other]);
             $affectedRows = PersonMobile::where("uid", $request->uid)->update(["mobile" => ""]);
+            if ($affectedRows > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            }
+        } else {
+            $response = ["message" => 'Parameter Missing'];
+            return response($response, 400);
+        }
+    }
+
+    public function delete_other_email(Request $request){
+        $uid = $request->uid;
+        $other = $request->other;
+        if ($uid && $other) {
+            $affectedRows1 = PersonEmail::where("uid", $request->uid)->update(["previous_email" => $other]);
+            $affectedRows = PersonEmail::where("uid", $request->uid)->update(["email" => ""]);
             if ($affectedRows > 0) {
                 $response = ["message" => 'OK'];
                 return response($response, 200);
