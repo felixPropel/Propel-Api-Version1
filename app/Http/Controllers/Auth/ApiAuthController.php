@@ -405,6 +405,30 @@ class ApiAuthController extends Controller
         }
     }
 
+    public function person_details_update_extra(Request $request)
+    {
+        $affectedRows = PersonDetails::where("uid", $request['uid'])->update([
+            "address_of" => $request->address_of,
+            "door_no" => $request->door_no,
+            "bilding_name" => $request->bilding_name,
+            "street" => $request->street,
+            "land_mark" => $request->land_mark,
+            "pincode" => $request->pincode,
+            "city" => $request->city,
+            "state" => $request->state,
+            "district" => $request->district,
+            "area" => $request->area,
+            "web_link"=>$request->web_link,
+        ]);
+        if ($affectedRows > 0) {
+            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Update Error!'];
+            return response($response, 400);
+        }
+    }
+
 
     public function person_details_stage1(Request $request)
     {
@@ -648,7 +672,8 @@ class ApiAuthController extends Controller
         }
     }
 
-    public function make_email_primary_secondary(Request $request){
+    public function make_email_primary_secondary(Request $request)
+    {
         $uid = $request->uid;
         $primary = $request->primary_email;
         $other = $request->other_email;
@@ -696,7 +721,8 @@ class ApiAuthController extends Controller
         }
     }
 
-    public function delete_other_email(Request $request){
+    public function delete_other_email(Request $request)
+    {
         $uid = $request->uid;
         $other = $request->other;
         if ($uid && $other) {
