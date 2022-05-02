@@ -496,7 +496,7 @@ class ApiAuthController extends Controller
         $user->save();
         $user_id = $user->id;
         if ($user_id > 0) {
-            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid]];
+            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid,'mobile'=>$mobile->mobile,'password'=>$request->password]];
             return response($response, 200);
         } else {
             $response = ["message" => 'Error Occured!!!'];
@@ -546,7 +546,7 @@ class ApiAuthController extends Controller
                     $person_address->save();
                 }
 
-                $response = ["message" => 'OK', 'route' => 'account', 'param' => ['uid' => $request->uid]];
+                $response = ["message" => 'OK', 'route' => 'organisation', 'param' => ['uid' => $request->uid]];
                 return response($response, 200);
             }
         } else {
