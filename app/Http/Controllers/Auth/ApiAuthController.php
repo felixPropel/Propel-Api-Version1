@@ -418,7 +418,7 @@ class ApiAuthController extends Controller
             "state" => $request->state,
             "district" => $request->district,
             "area" => $request->area,
-            "web_link"=>$request->web_link,
+            "web_link" => $request->web_link,
         ]);
         if ($affectedRows > 0) {
             $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid]];
@@ -496,7 +496,7 @@ class ApiAuthController extends Controller
         $user->save();
         $user_id = $user->id;
         if ($user_id > 0) {
-            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid,'mobile'=>$mobile->mobile,'password'=>$request->password]];
+            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid, 'mobile' => $mobile->mobile, 'password' => $request->password]];
             return response($response, 200);
         } else {
             $response = ["message" => 'Error Occured!!!'];
@@ -692,15 +692,39 @@ class ApiAuthController extends Controller
 
     public function make_email_secondary(Request $request)
     {
+        $email = PersonEmail::where(['uid' => $request->uid, "status" => 2])->pluck('email')->toArray();
+        if ($email[0] != '') {
 
-        $affectedRows = PersonEmail::where("uid", $request->uid)->update(["email" => $request->email]);
+            $affectedRows = PersonEmail::where(["uid" => $request->uid, "status" => 2, "email" => $email[0]])->update(["email" => $request->email]);
+            if ($affectedRows > 0) {
 
-        if ($affectedRows > 0) {
-            $response = ["message" => 'OK'];
-            return response($response, 200);
+                $person_email = new PersonEmail();
+                $person_email->email = $email[0];
+                $person_email->uid = $request->uid;
+                $person_email->status = 0;
+                $person_email->save();
+                $id = $person_email->id();
+
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            } else {
+                $response = ["message" => 'Update error'];
+                return response($response, 400);
+            }
         } else {
-            $response = ["message" => 'Update error'];
-            return response($response, 400);
+            $person_email = new PersonEmail();
+            $person_email->email = $request->email;
+            $person_email->uid = $request->uid;
+            $person_email->status = 2;
+            $person_email->save();
+            $id = $person_email->id();
+            if ($id > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            } else {
+                $response = ["message" => 'Update error'];
+                return response($response, 400);
+            }
         }
     }
 
@@ -726,8 +750,15 @@ class ApiAuthController extends Controller
         $uid = $request->uid;
         $other = $request->other;
         if ($uid && $other) {
-            $affectedRows1 = PersonEmail::where("uid", $request->uid)->update(["previous_email" => $other]);
-            $affectedRows = PersonEmail::where("uid", $request->uid)->update(["email" => ""]);
+            // $affectedRows1 = PersonEmail::where("uid", $request->uid)->update(["previous_email" => $other]);
+
+            $person_email = new PersonEmail();
+            $person_email->email = $other;
+            $person_email->uid = $uid;
+            $person_email->status = 0;
+            $person_email->save();
+
+            $affectedRows = PersonEmail::where(["uid" => $request->uid, "email" => $other])->update(["status" => 0]);
             if ($affectedRows > 0) {
                 $response = ["message" => 'OK'];
                 return response($response, 200);
