@@ -1,0 +1,609 @@
+.input-group-addon:last-child {
+    border-left: 0;
+    width: initial;
+}
+
+
+.wrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    min-height: 100%;
+    padding: 20px;
+}
+
+#formContent {
+    -webkit-border-radius: 10px 10px 10px 10px;
+    border-radius: 10px 10px 10px 10px;
+    background: #fff;
+    padding: 30px;
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+    padding: 0px;
+    -webkit-box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+#formFooter {
+    background-color: #f6f6f6;
+    border-top: 1px solid #dce8f1;
+    padding: 25px;
+    text-align: center;
+    -webkit-border-radius: 0 0 10px 10px;
+    border-radius: 0 0 10px 10px;
+}
+
+
+
+/* TABS */
+
+h2.inactive {
+    color: #cccccc;
+}
+
+h2.active {
+    color: #0d0d0d;
+    border-bottom: 2px solid #5fbae9;
+}
+
+
+
+/* FORM TYPOGRAPHY*/
+
+input[type=button],
+input[type=submit],
+input[type=reset] {
+    background-color: #16702d;
+    border: none;
+    color: white;
+    padding: 15px 80px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 13px;
+    -webkit-box-shadow: 0 10px 30px 0 rgba(95, 186, 233, 0.4);
+    box-shadow: 0 10px 30px 0 rgba(95, 186, 233, 0.4);
+    -webkit-border-radius: 5px 5px 5px 5px;
+    border-radius: 5px 5px 5px 5px;
+    margin: 5px 20px 40px 20px;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+
+input[type=button]:hover,
+input[type=submit]:hover,
+input[type=reset]:hover {
+    background-color: #c4221c;
+}
+
+input[type=button]:active,
+input[type=submit]:active,
+input[type=reset]:active {
+    -moz-transform: scale(0.95);
+    -webkit-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    transform: scale(0.95);
+}
+
+
+
+
+
+
+
+/* ANIMATIONS */
+
+/* Simple CSS3 Fade-in-down Animation */
+.fadeInDown {
+    -webkit-animation-name: fadeInDown;
+    animation-name: fadeInDown;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
+@-webkit-keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        -webkit-transform: translate3d(0, -100%, 0);
+        transform: translate3d(0, -100%, 0);
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: none;
+        transform: none;
+    }
+}
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        -webkit-transform: translate3d(0, -100%, 0);
+        transform: translate3d(0, -100%, 0);
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: none;
+        transform: none;
+    }
+}
+
+/* Simple CSS3 Fade-in Animation */
+@-webkit-keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@-moz-keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.fadeIn {
+    opacity: 0;
+    -webkit-animation: fadeIn ease-in 1;
+    -moz-animation: fadeIn ease-in 1;
+    animation: fadeIn ease-in 1;
+
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+
+    -webkit-animation-duration: 1s;
+    -moz-animation-duration: 1s;
+    animation-duration: 1s;
+}
+
+.fadeIn.first {
+    -webkit-animation-delay: 0.4s;
+    -moz-animation-delay: 0.4s;
+    animation-delay: 0.4s;
+}
+
+.fadeIn.second {
+    -webkit-animation-delay: 0.6s;
+    -moz-animation-delay: 0.6s;
+    animation-delay: 0.6s;
+}
+
+.fadeIn.third {
+    -webkit-animation-delay: 0.8s;
+    -moz-animation-delay: 0.8s;
+    animation-delay: 0.8s;
+}
+
+.fadeIn.fourth {
+    -webkit-animation-delay: 1s;
+    -moz-animation-delay: 1s;
+    animation-delay: 1s;
+}
+
+/* Simple CSS3 Fade-in Animation */
+.underlineHover:after {
+    display: block;
+    left: 0;
+    bottom: -10px;
+    width: 0;
+    height: 2px;
+    background-color: #56baed;
+    content: "";
+    transition: width 0.2s;
+}
+
+.underlineHover:hover {
+    color: #0d0d0d;
+}
+
+.underlineHover:hover:after {
+    width: 100%;
+}
+
+
+
+/* OTHERS */
+
+*:focus {
+    outline: none;
+}
+
+#icon {
+    width: 60%;
+}
+
+#pass_form {
+    margin: 10px;
+}
+
+
+
+input {
+    padding: 2px;
+    color: gray;
+}
+
+#passstrength {
+    border: 1px solid #f6f6f6;
+    width: 145px;
+    height: 10px;
+}
+
+#progress {
+    margin: 0px 87px;
+}
+
+#progress span,
+#progress div {
+    float: left;
+}
+
+#progress span {
+    margin: 0 5px;
+}
+
+#bar {
+    height: 10px;
+}
+
+.medium {
+    width: 75%;
+    background-color: orange;
+}
+
+.bad {
+    width: 25%;
+    background-color: red;
+}
+
+.strong {
+    width: 100%;
+    background-color: green;
+}
+
+.normal {
+    width: 50%;
+    background-color: yellow;
+}
+
+@import url(http://fonts.googleapis.com/css?family=Lobster);
+
+#page {
+    margin: 0 15px;
+    padding-top: 30px;
+}
+
+.btn-primary {
+    background-color: #fa1954;
+    border: 0;
+    margin: 10px 0;
+}
+
+.btn-primary:hover {
+    background-color: #db053d;
+}
+
+.form-group.error input {
+    border-color: #ee4141;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(238, 65, 65, .4);
+}
+
+.form-group.error label.error {
+    margin-top: 5px;
+    color: #ee4141;
+}
+
+.pod h3 {
+    text-align: center;
+    margin: 10px 0 30px;
+    font-family: 'Lobster', cursive;
+}
+
+#password-info {
+    margin: 20px 0;
+    overflow: hidden;
+    text-shadow: 0 1px 0 #fff;
+}
+
+#password-info ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#password-info ul li {
+    padding: 10px 10px 10px 50px;
+    margin-bottom: 1px;
+    background: #f4f4f4;
+    font-size: 12px;
+    transition: 250ms ease;
+    position: relative;
+}
+
+#password-info ul li .icon-container {
+    display: block;
+    width: 40px;
+    background: #92bce0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+}
+
+#password-info ul li .icon-container .fa {
+    color: white;
+    padding-top: 10px;
+    position: relative;
+    top: 2px;
+}
+
+#password-info ul li .tip {
+    color: #5ca6d5;
+    text-decoration: underline;
+}
+
+#password-info ul li.valid {
+    color: #129652;
+}
+
+#password-info ul li.valid .icon-container {
+    background-color: #18c36b;
+}
+
+#password-info ul li span.invalid {
+    color: #ff642e;
+}
+
+/*Profile*/
+
+
+/*profile*/
+.profile-sidebar {
+    float: left;
+    width: 300px;
+    margin-right: 20px
+}
+
+.profile-content {
+    overflow: hidden
+}
+
+.profile-sidebar-portlet {
+    padding: 30px 0 0!important;
+    text-align: center;
+}
+
+.profile-userpic img {
+    float: none;
+    margin: 0 auto;
+    width: 50%;
+    height: 50%;
+    -webkit-border-radius: 50%!important;
+    -moz-border-radius: 50%!important;
+    border-radius: 50%!important
+}
+
+.profile-userpic1 img {
+    float: none;
+    margin: 0 auto;
+    width: 20%;
+    height: 20%;
+    -webkit-border-radius: 50%!important;
+    -moz-border-radius: 50%!important;
+    border-radius: 50%!important
+}
+
+.profile-usertitle {
+    text-align: center;
+    margin-top: 20px
+}
+
+.profile-usertitle-name {
+    color: #5a7391;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 7px
+}
+
+.profile-usertitle-job {
+    text-transform: uppercase;
+    color: #5b9bd1;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 7px
+}
+
+.profile-userbuttons {
+    text-align: center;
+    margin-top: 10px
+}
+
+.profile-userbuttons .btn {
+    margin-right: 5px
+}
+
+.profile-userbuttons .btn:last-child {
+    margin-right: 0
+}
+
+.profile-userbuttons button {
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 15px
+}
+
+.profile-usermenu {
+    margin-top: 30px;
+    padding-bottom: 20px
+}
+
+.profile-usermenu ul li {
+    border-bottom: 1px solid #f0f4f7
+}
+
+.profile-usermenu ul li:last-child {
+    border-bottom: none
+}
+
+.profile-usermenu ul li a {
+    color: #93a3b5;
+    font-size: 16px;
+    font-weight: 400
+}
+
+.profile-usermenu ul li a i {
+    margin-right: 8px;
+    font-size: 16px
+}
+
+.profile-usermenu ul li a:hover {
+    background-color: #fafcfd;
+    color: #5b9bd1
+}
+
+.profile-usermenu ul li.active a {
+    color: #5b9bd1;
+    background-color: #f6f9fb;
+    border-left: 2px solid #5b9bd1;
+    margin-left: -2px
+}
+
+.profile-stat {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f4f7
+}
+
+.profile-stat-title {
+    color: #7f90a4;
+    font-size: 25px;
+    text-align: center
+}
+
+.profile-stat-text {
+    color: #5b9bd1;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center
+}
+
+.profile-desc-title {
+    color: #7f90a4;
+    font-size: 17px;
+    font-weight: 600
+}
+
+.profile-desc-text {
+    color: #7e8c9e;
+    font-size: 14px
+}
+
+.profile-desc-link i {
+    width: 22px;
+    font-size: 19px;
+    color: #abb6c4;
+    margin-right: 5px
+}
+
+.profile-desc-link a {
+    font-size: 14px;
+    font-weight: 600;
+    color: #5b9bd1
+}
+
+@media (max-width:991px) {
+    .profile-sidebar {
+        float: none;
+        width: 100%!important;
+        margin: 0
+    }
+    .profile-sidebar>.portlet {
+        margin-bottom: 20px
+    }
+    .profile-content {
+        overflow: visible
+    }
+}
+
+body {
+    background-color: #efefef;
+  }
+  
+  .profile-pic {
+      /* max-width: 200px; */
+      max-height: 200px;
+      display: block;
+  }
+  
+  .file-upload {
+      display: none;
+  }
+  .circle {
+      border-radius: 1000px !important;
+      overflow: hidden;
+      width: 128px;
+      height: 128px;
+      border: 8px solid rgba(255, 255, 255, 0.7);
+      position: absolute;
+      top: 72px;
+  }
+  img {
+      max-width: 100%;
+      height: auto;
+  }
+  .p-image {
+    position: absolute;
+    top: 167px;
+    right: 249px;
+    color: #666666;
+    transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+  }
+  .p-image:hover {
+    transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+  }
+  .upload-button {
+    font-size: 1.2em;
+  }
+  
+  .upload-button:hover {
+    transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+    color: #999;
+  }
+
+  .header_profile_pic{
+    margin : 0 auto;
+    width:50%;
+    clear:both; 
+  }
+
