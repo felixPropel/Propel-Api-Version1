@@ -188,12 +188,13 @@ class ApiAuthController extends Controller
     {
         $mobile = $request->mobile;
         if ($mobile) {
-            $stage = Common::check_temp_user_mobile($request['mobile']);
-            $person_mobile = Common::check_users_mobile($request['mobile']);
-            $user_mobile = Common::check_primary_user_mobile($request['mobile']);
+            $common = new Common();
+            $stage = $common->check_temp_user_mobile($request['mobile']);
+            $person_mobile = $common->check_users_mobile($request['mobile']);
+            $user_mobile = $common->check_primary_user_mobile($request['mobile']);
 
             if ($person_mobile != 0 && $user_mobile != 0) {
-                $uuid = Common::get_uuid_by_mobile($request['mobile']);
+                $uuid = $common->get_uuid_by_mobile($request['mobile']);
                 if ($stage['stage'] === 0 && $uuid === 0) {
                     $temp_user = new TempUsers();
 
@@ -222,10 +223,10 @@ class ApiAuthController extends Controller
                     return response($response, 200);
                 }
             } else {
-                $uuid = Common::get_person_uuid_by_mobile($request['mobile']);
+                $uuid = $common->get_person_uuid_by_mobile($request['mobile']);
 
                 if ($uuid) {
-                    $email = Common::get_person_email($uuid);
+                    $email = $common->get_person_email($uuid);
                     if ($email) {
                         $response = ["message" => 'OK', 'route' => 'person_confirmation', "param" => ['uid' => $uuid]];
                         return response($response, 200);
@@ -234,7 +235,7 @@ class ApiAuthController extends Controller
                         return response($response, 200);
                     }
                 } else {
-                    $uuid = Common::get_uuid_by_mobile($request['mobile']);
+                    $uuid = $common->get_uuid_by_mobile($request['mobile']);
 
                     if ($stage['stage'] === 0 && $uuid === 0) {
 
@@ -279,7 +280,8 @@ class ApiAuthController extends Controller
             $request->validate([
                 'email' => 'required|email',
             ]);
-            $update = Common::update_temp_user($request['mobile'], $request['email']);
+            $common = new Common();
+            $update = $common->update_temp_user($request['mobile'], $request['email']);
             if ($update) {
                 $response = ["message" => 'OK', 'route' => 'confirmation', 'param' => ['email' => $request['email'], 'mobile' => $request['mobile']]];
                 return response($response, 200);
@@ -296,7 +298,8 @@ class ApiAuthController extends Controller
     public function check_confirmation(Request $request)
     {
         $mobile = $request->mobile;
-        $email = Common::get_temp_email_by_mobile($mobile);
+        $common = new Common();
+        $email = $common->get_temp_email_by_mobile($mobile);
         if ($email) {
             $response = ["message" => 'OK', 'route' => 'confirmation', 'param' => ['email' => $email, 'mobile' => $request['mobile']]];
             return response($response, 200);
@@ -628,13 +631,82 @@ class ApiAuthController extends Controller
     public function store_mobile(Request $request)
     {
         if ($request->mobile_type == '1') {
+            // 
+            // if ($affectedRows > 0) {
+            //     $response = ["message" => 'OK'];
+            //     return response($response, 200);
+            // }
+
             $affectedRows = User::where("uid", $request->uid)->update(["primary_mobile" => $request->mobile]);
+            $mobile = PersonMobile::where(['uid' => $request->uid, "status" => 1])->pluck('mobile')->toArray();
+            if (!empty($mobile)) {
+                $affectedRows = PersonMobile::where(["uid" => $request->uid, "status" => 1, "mobile" => $mobile[0]])->update(["mobile" => $request->mobile]);
+                if ($affectedRows > 0) {
+
+                    $person_mobile = new PersonMobile();
+                    $person_mobile->mobile = $mobile[0];
+                    $person_mobile->uid = $request->uid;
+                    $person_mobile->status = 0;
+                    $person_mobile->save();
+                    $id = $person_mobile->id;
+                    $response = ["message" => 'OK'];
+
+                    return response($response, 200);
+                } else {
+                    $response = ["message" => 'Update error'];
+                    return response($response, 400);
+                }
+            } else {
+                $person_mobile = new PersonMobile();
+                $person_mobile->mobile = $request->mobile;
+                $person_mobile->uid = $request->uid;
+                $person_mobile->status = 1;
+                $person_mobile->save();
+                $id = $person_mobile->id;
+                if ($id > 0) {
+                    $response = ["message" => 'OK'];
+                    return response($response, 200);
+                } else {
+                    $response = ["message" => 'Update error'];
+                    return response($response, 400);
+                }
+            }
         } else if ($request->mobile_type == '2') {
-            $affectedRows = PersonMobile::where("uid", $request->uid)->update(["mobile" => $request->mobile]);
-        }
-        if ($affectedRows > 0) {
-            $response = ["message" => 'OK'];
-            return response($response, 200);
+
+            $mobile = PersonMobile::where(['uid' => $request->uid, "status" => 2])->pluck('mobile')->toArray();
+            if (!empty($mobile)) {
+                $affectedRows = PersonMobile::where(["uid" => $request->uid, "status" => 2, "mobile" => $mobile[0]])->update(["mobile" => $request->mobile]);
+                if ($affectedRows > 0) {
+
+                    $person_mobile = new PersonMobile();
+                    $person_mobile->mobile = $mobile[0];
+                    $person_mobile->uid = $request->uid;
+                    $person_mobile->status = 0;
+                    $person_mobile->save();
+                    $id = $person_mobile->id;
+                    $response = ["message" => 'OK'];
+
+                    return response($response, 200);
+                } else {
+                    $response = ["message" => 'Update error'];
+                    return response($response, 400);
+                }
+            } else {
+                $person_mobile = new PersonMobile();
+                $person_mobile->mobile = $request->mobile;
+                $person_mobile->uid = $request->uid;
+                $person_mobile->status = 2;
+                $person_mobile->save();
+                $id = $person_mobile->id;
+                if ($id > 0) {
+                    $response = ["message" => 'OK'];
+                    return response($response, 200);
+                } else {
+                    $response = ["message" => 'Update error'];
+                    return response($response, 400);
+                }
+            }
+            // $affectedRows = PersonMobile::where("uid", $request->uid)->update(["mobile" => $request->mobile]);
         }
     }
 
@@ -693,8 +765,7 @@ class ApiAuthController extends Controller
     public function make_email_secondary(Request $request)
     {
         $email = PersonEmail::where(['uid' => $request->uid, "status" => 2])->pluck('email')->toArray();
-        if ($email[0] != '') {
-
+        if (!empty($email)) {
             $affectedRows = PersonEmail::where(["uid" => $request->uid, "status" => 2, "email" => $email[0]])->update(["email" => $request->email]);
             if ($affectedRows > 0) {
 
@@ -703,7 +774,7 @@ class ApiAuthController extends Controller
                 $person_email->uid = $request->uid;
                 $person_email->status = 0;
                 $person_email->save();
-                $id = $person_email->id();
+                $id = $person_email->id;
 
                 $response = ["message" => 'OK'];
                 return response($response, 200);
@@ -717,7 +788,7 @@ class ApiAuthController extends Controller
             $person_email->uid = $request->uid;
             $person_email->status = 2;
             $person_email->save();
-            $id = $person_email->id();
+            $id = $person_email->id;
             if ($id > 0) {
                 $response = ["message" => 'OK'];
                 return response($response, 200);
