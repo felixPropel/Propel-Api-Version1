@@ -801,19 +801,33 @@ class ApiAuthController extends Controller
 
     public function delete_other(Request $request)
     {
-        $uid = $request->uid;
-        $other = $request->other;
-        if ($uid && $other) {
-            $affectedRows1 = PersonMobile::where("uid", $request->uid)->update(["previous_mobile" => $other]);
-            $affectedRows = PersonMobile::where("uid", $request->uid)->update(["mobile" => ""]);
+        // $uid = $request->uid;
+        // $other = $request->other;
+        // if ($uid && $other) {
+        //     $affectedRows1 = PersonMobile::where("uid", $request->uid)->update(["previous_mobile" => $other]);
+        //     $affectedRows = PersonMobile::where("uid", $request->uid)->update(["mobile" => ""]);
+        //     if ($affectedRows > 0) {
+        //         $response = ["message" => 'OK'];
+        //         return response($response, 200);
+        //     }
+        // } else {
+        //     $response = ["message" => 'Parameter Missing'];
+        //     return response($response, 400);
+        // }
+
+
+        $mobile = PersonMobile::where(['uid' => $request->uid, "status" => 2])->pluck('mobile')->toArray();
+        if (!empty($mobile)) {
+            $affectedRows = PersonMobile::where(["uid" => $request->uid, "status" => 2, "mobile" => $request->other])->update(["status" => 0]);
             if ($affectedRows > 0) {
                 $response = ["message" => 'OK'];
                 return response($response, 200);
+            } else {
+                $response = ["message" => 'Update error'];
+                return response($response, 400);
             }
-        } else {
-            $response = ["message" => 'Parameter Missing'];
-            return response($response, 400);
         }
+
     }
 
     public function delete_other_email(Request $request)
@@ -823,11 +837,11 @@ class ApiAuthController extends Controller
         if ($uid && $other) {
             // $affectedRows1 = PersonEmail::where("uid", $request->uid)->update(["previous_email" => $other]);
 
-            $person_email = new PersonEmail();
-            $person_email->email = $other;
-            $person_email->uid = $uid;
-            $person_email->status = 0;
-            $person_email->save();
+            // $person_email = new PersonEmail();
+            // $person_email->email = $other;
+            // $person_email->uid = $uid;
+            // $person_email->status = 0;
+            // $person_email->save();
 
             $affectedRows = PersonEmail::where(["uid" => $request->uid, "email" => $other])->update(["status" => 0]);
             if ($affectedRows > 0) {
