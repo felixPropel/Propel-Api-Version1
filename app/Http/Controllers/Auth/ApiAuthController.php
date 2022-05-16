@@ -10,6 +10,9 @@ use App\Models\PersonEmail;
 use App\Models\PersonMobile;
 use App\Models\PersonDetails;
 use App\Models\PersonAddress;
+use App\Models\Organisation;
+use App\Models\Organisation_address;
+use App\Models\Organisation_details;
 use App\Models\TempUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -827,7 +830,6 @@ class ApiAuthController extends Controller
                 return response($response, 400);
             }
         }
-
     }
 
     public function delete_other_email(Request $request)
@@ -850,6 +852,50 @@ class ApiAuthController extends Controller
             }
         } else {
             $response = ["message" => 'Parameter Missing'];
+            return response($response, 400);
+        }
+    }
+
+
+    public function submit_organisation(Request $request)
+    {
+
+        $organisation = new Organisation();
+        $organisation->uid = $request->uid;
+        $organisation->organisation_name = $request->organisation_name;
+        $organisation->organisation_email = $request->organisation_email;
+        $organisation->created_for = 1;
+        $organisation->save();
+        $id = $organisation->id;
+
+        if ($id > 0) {
+
+            $organisation_details= new Organisation_details();
+            
+            $organisation_details->organisation_id=$id;
+            $organisation_details->organisation_pan=$request->organisation_pan;
+            $organisation_details->organisation_gstin=$request->organisation_gstin;
+            $organisation_details->organisation_website=$request->organisation_website;
+            $organisation_details->save();
+
+            $organisation_address = new Organisation_address();
+
+            $organisation_address->organisation_id=$id;
+            $organisation_address->door_no=$request->door_no;
+            $organisation_address->building_name=$request->building_name;
+            $organisation_address->street=$request->street;
+            $organisation_address->landmark=$request->landmark;
+            $organisation_address->pincode=$request->pincode;
+            $organisation_address->state=$request->state;
+            $organisation_address->city=$request->city;
+            $organisation_address->district=$request->district;
+            $organisation_address->area=$request->area;
+            $organisation_address->save();
+
+            $response = ["message" => 'OK'];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Insert error'];
             return response($response, 400);
         }
     }
