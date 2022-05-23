@@ -13,6 +13,10 @@ use App\Models\PersonAddress;
 use App\Models\Organisation;
 use App\Models\Organisation_address;
 use App\Models\Organisation_details;
+use App\Models\OrganisationEmail;
+use App\Models\OrganisationPhone;
+use App\Models\OrganisationWebaddress;
+use App\Models\OrganisationIdentities;
 use App\Models\TempUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -887,9 +891,10 @@ class ApiAuthController extends Controller
 
         $organisation = new Organisation();
         $organisation->uid = $request->uid;
-        $organisation->organisation_name = $request->organisation_name;
-        $organisation->organisation_email = $request->organisation_email;
-        $organisation->created_for = 1;
+        $organisation->authorization = 1;
+        $organisation->status = 1;
+        $organisation->created_by = $request->uid;
+        $organisation->last_modified_by = $request->uid;
         $organisation->save();
         $id = $organisation->id;
 
@@ -897,25 +902,83 @@ class ApiAuthController extends Controller
 
             $organisation_details = new Organisation_details();
 
-            $organisation_details->organisation_id = $id;
-            $organisation_details->organisation_pan = $request->organisation_pan;
-            $organisation_details->organisation_gstin = $request->organisation_gstin;
-            $organisation_details->organisation_website = $request->organisation_website;
+            $organisation_details->oid = $id;
+            $organisation_details->uid = $request->uid;
+            $organisation_details->organisation_name = $request->organisation_name;
+            $organisation_details->status = 1;
             $organisation_details->save();
 
             $organisation_address = new Organisation_address();
 
-            $organisation_address->organisation_id = $id;
+            $organisation_address->oid = $id;
+            $organisation_address->uid = $request->uid;
             $organisation_address->door_no = $request->door_no;
-            $organisation_address->building_name = $request->building_name;
+            $organisation_address->bld_name = $request->building_name;
             $organisation_address->street = $request->street;
             $organisation_address->landmark = $request->landmark;
             $organisation_address->pincode = $request->pincode;
+            $organisation_address->phone = $request->phone;
+            $organisation_address->google_location = $request->google_location;
             $organisation_address->state = $request->state;
             $organisation_address->city = $request->city;
-            $organisation_address->district = $request->district;
+            $organisation_address->created_by = $request->uid;
+            $organisation_address->last_modified_by = $request->uid;
+            // $organisation_address->district = $request->district;
             $organisation_address->area = $request->area;
             $organisation_address->save();
+
+            if ($request->email) {
+                $organisation_email = new OrganisationEmail();
+                $organisation_email->oid = $id;
+                $organisation_email->uid = $request->uid;
+                $organisation_email->email = $request->email;
+                $organisation_email->email_verification = 1;
+                $organisation_email->status = 1;
+                $organisation_email->created_by = $request->uid;
+                $organisation_email->last_modified_by = $request->uid;
+                $organisation_email->save();
+            }
+
+
+            if ($request->phone_no) {
+                $organisation_phone = new OrganisationPhone();
+                $organisation_phone->oid = $id;
+                $organisation_phone->uid = $request->phone;
+                $organisation_phone->country_code = $request->country_code;
+                $organisation_phone->std_code = $request->std_code;
+                $organisation_phone->phone_no = $request->phone_no;
+                $organisation_phone->status = 1;
+                $organisation_phone->created_by = $request->uid;
+                $organisation_phone->last_modified_by = $request->uid;
+                $organisation_phone->save();
+            }
+
+            if($request->organisation_website){
+                $organisation_webaddress=new OrganisationWebaddress();
+                $organisation_webaddress->oid=$id;
+                $organisation_webaddress->uid=$request->uid;
+                $organisation_webaddress->web_address=$request->web_address;
+                $organisation_webaddress->status=1;
+                $organisation_webaddress->created_by=$request->uid;
+                $organisation_webaddress->last_modified_by=$request->uid;
+                $organisation_webaddress->save();
+            }
+
+            if($request->doc_type){
+                $organisation_identities=new OrganisationIdentities();
+                $organisation_identities->oid=$id;
+                $organisation_identities->uid=$request->uid;
+                $organisation_identities->doc_type=$request->doc_type;
+                $organisation_identities->doc_no=$request->doc_no;
+                $organisation_identities->doc_validity=$request->doc_validity;
+                $organisation_identities->attachment=$request->attachment;
+                $organisation_identities->status=1;
+                $organisation_identities->created_by=$request->uid;
+                $organisation_identities->last_modified_by=$request->uid;
+                $organisation_identities->save();
+
+            }
+
 
             $response = ["message" => 'OK'];
             return response($response, 200);
