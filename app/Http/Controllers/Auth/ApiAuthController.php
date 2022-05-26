@@ -17,6 +17,7 @@ use App\Models\OrganisationEmail;
 use App\Models\OrganisationPhone;
 use App\Models\OrganisationWebaddress;
 use App\Models\OrganisationIdentities;
+use App\Models\OrganisationAdmin;
 use App\Models\TempUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -906,6 +907,8 @@ class ApiAuthController extends Controller
             $organisation_details->uid = $request->uid;
             $organisation_details->organisation_name = $request->organisation_name;
             $organisation_details->status = 1;
+            $organisation_details->organisation_gst = $request->organisation_gstin;
+            $organisation_details->organisation_pan = $request->organisation_pan;
             $organisation_details->save();
 
             $organisation_address = new Organisation_address();
@@ -953,30 +956,42 @@ class ApiAuthController extends Controller
                 $organisation_phone->save();
             }
 
-            if($request->organisation_website){
-                $organisation_webaddress=new OrganisationWebaddress();
-                $organisation_webaddress->oid=$id;
-                $organisation_webaddress->uid=$request->uid;
-                $organisation_webaddress->web_address=$request->web_address;
-                $organisation_webaddress->status=1;
-                $organisation_webaddress->created_by=$request->uid;
-                $organisation_webaddress->last_modified_by=$request->uid;
+            if ($request->organisation_website) {
+                $organisation_webaddress = new OrganisationWebaddress();
+                $organisation_webaddress->oid = $id;
+                $organisation_webaddress->uid = $request->uid;
+                $organisation_webaddress->web_address = $request->organisation_website;
+                $organisation_webaddress->status = 1;
+                $organisation_webaddress->created_by = $request->uid;
+                $organisation_webaddress->last_modified_by = $request->uid;
                 $organisation_webaddress->save();
             }
 
-            if($request->doc_type){
-                $organisation_identities=new OrganisationIdentities();
-                $organisation_identities->oid=$id;
-                $organisation_identities->uid=$request->uid;
-                $organisation_identities->doc_type=$request->doc_type;
-                $organisation_identities->doc_no=$request->doc_no;
-                $organisation_identities->doc_validity=$request->doc_validity;
-                $organisation_identities->attachment=$request->attachment;
-                $organisation_identities->status=1;
-                $organisation_identities->created_by=$request->uid;
-                $organisation_identities->last_modified_by=$request->uid;
+            if ($request->doc_type) {
+                $organisation_identities = new OrganisationIdentities();
+                $organisation_identities->oid = $id;
+                $organisation_identities->uid = $request->uid;
+                $organisation_identities->doc_type = $request->doc_type;
+                $organisation_identities->doc_no = $request->doc_no;
+                $organisation_identities->doc_validity = $request->doc_validity;
+                $organisation_identities->attachment = $request->attachment;
+                $organisation_identities->status = 1;
+                $organisation_identities->created_by = $request->uid;
+                $organisation_identities->last_modified_by = $request->uid;
                 $organisation_identities->save();
+            }
 
+            if ($request->organisation_admin==1) {
+                $organisation_administation = new OrganisationAdmin();
+                $organisation_administation->oid = $id;
+                $organisation_administation->pid = 0;
+                $organisation_administation->uid = $request->uid;
+                $organisation_administation->administration_type_id = 1;
+                $organisation_administation->administration_verification = 1;
+                $organisation_administation->status = 1;
+                $organisation_administation->created_by = $request->uid;
+                $organisation_administation->last_modified_by = $request->uid;
+                $organisation_administation->save();
             }
 
 
