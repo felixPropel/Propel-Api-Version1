@@ -19,6 +19,9 @@ use App\Models\OrganisationWebaddress;
 use App\Models\OrganisationIdentities;
 use App\Models\OrganisationAdmin;
 use App\Models\TempUsers;
+use App\Models\TempOrganisation;
+use App\Models\TempOrganisationEmail;
+use App\Models\TempOrganisation_address;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -832,22 +835,63 @@ class ApiAuthController extends Controller
         }
     }
 
+    public function temp_organisation_stage_one(Request $request)
+    {
+        $organisation_name = $request->organisation_name;
+        $organisation_email = $request->organisation_email;
+        $uid = $request->uid;
+        $temp_email = TempOrganisationEmail::where(['email' => $organisation_email, "status" => 1])->pluck('email')->toArray();
+        $email = OrganisationEmail::where(['email' => $organisation_email, "status" => 1])->pluck('email')->toArray();
+        if (empty($temp_email)) {
+            if (!empty($email)) {
+                $response = ["message" => 'Organisation Email Already Exists'];
+                return response($response, 400);
+            } else {
+                $temp_organisation = new TempOrganisation();
+                $temp_organisation->uid = $uid;
+                $temp_organisation->authorization = 1;
+                $temp_organisation->status = 1;
+                $temp_organisation->created_by = $uid;
+                $temp_organisation->last_modified_by = $uid;
+                $temp_organisation->save();
+                $id = $temp_organisation->id;
+
+                if ($id > 0) {
+
+                    $temp_organisation_email = new TempOrganisationEmail();
+                    $temp_organisation_email->oid = $id;
+                    $temp_organisation_email->uid = $uid;
+                    $temp_organisation_email->email = $organisation_email;
+                    $temp_organisation_email->email_verification = 1;
+                    $temp_organisation_email->status = 1;
+                    $temp_organisation_email->created_by = $uid;
+                    $temp_organisation_email->last_modified_by = $uid;
+                    $temp_organisation_email->save();
+
+                    $affectedRows = TempOrganisation::where(["uid" => $request->uid, "status" => 1, "email" =>$organisation_email])->update(["temp_stage" => 1]);
+
+                }
+
+                $response = ["message" => 'OK',"stage"=>0];
+                return response($response, 200);
+            }
+        } else {
+            if (!empty($email)) {
+                $response = ["message" => 'OK', "param" => $email, "stage" => "live"];
+                return response($response, 200);
+            } else {
+                $temp_stage = TempOrganisation::where(['uid' => $uid, "status" => 1])->pluck('temp_stage')->toArray();
+                $details = TempOrganisation::with('temp_mobile', 'temp_email', 'temp_details', 'temp_address', 'temp_identities', 'temp_web')->where("uid", $uid)->get();
+                $result = $details->toArray();
+                $response = ["message" => 'OK', "param" => ['email'=>$temp_email,"stage" => "temp",'temp_stage'=>$temp_stage,'result'=>$result], ];
+                return response($response, 200);
+            }
+        }
+    }
+
+
     public function delete_other(Request $request)
     {
-        // $uid = $request->uid;
-        // $other = $request->other;
-        // if ($uid && $other) {
-        //     $affectedRows1 = PersonMobile::where("uid", $request->uid)->update(["previous_mobile" => $other]);
-        //     $affectedRows = PersonMobile::where("uid", $request->uid)->update(["mobile" => ""]);
-        //     if ($affectedRows > 0) {
-        //         $response = ["message" => 'OK'];
-        //         return response($response, 200);
-        //     }
-        // } else {
-        //     $response = ["message" => 'Parameter Missing'];
-        //     return response($response, 400);
-        // }
-
 
         $mobile = PersonMobile::where(['uid' => $request->uid, "status" => 2])->pluck('mobile')->toArray();
         if (!empty($mobile)) {
@@ -981,7 +1025,7 @@ class ApiAuthController extends Controller
                 $organisation_identities->save();
             }
 
-            if ($request->organisation_admin==1) {
+            if ($request->organisation_admin == 1) {
                 $organisation_administation = new OrganisationAdmin();
                 $organisation_administation->oid = $id;
                 $organisation_administation->pid = 0;
@@ -1002,6 +1046,9 @@ class ApiAuthController extends Controller
             return response($response, 400);
         }
     }
+
+
+
 
     public function logout(Request $request)
     {

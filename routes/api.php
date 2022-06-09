@@ -49,6 +49,7 @@ Route::group(['middleware' => ['cors', 'json.response'],'namespace'=>'App\Http\C
     Route::post('/delete_other','Auth\ApiAuthController@delete_other')->name('delete_other.api');
     Route::post('/delete_other_email','Auth\ApiAuthController@delete_other_email')->name('delete_other_email.api');
     Route::post('/submit_organisation','Auth\ApiAuthController@submit_organisation')->name('submit_organisation.api');
+    Route::post('/temp_organisation_stage_one','Auth\ApiAuthController@temp_organisation_stage_one')->name('temp_organisation_stage_one.api');
 });
 
 Route::middleware('auth:api')
