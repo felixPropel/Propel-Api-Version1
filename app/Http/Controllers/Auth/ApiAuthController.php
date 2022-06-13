@@ -868,11 +868,10 @@ class ApiAuthController extends Controller
                     $temp_organisation_email->last_modified_by = $uid;
                     $temp_organisation_email->save();
 
-                    $affectedRows = TempOrganisation::where(["uid" => $request->uid, "status" => 1, "email" =>$organisation_email])->update(["temp_stage" => 1]);
-
+                    $affectedRows = TempOrganisation::where(["uid" => $request->uid, "status" => 1, "email" => $organisation_email])->update(["temp_stage" => 1]);
                 }
 
-                $response = ["message" => 'OK',"stage"=>0];
+                $response = ["message" => 'OK',"param" => ["temp_stage" => 0,'temp_id' => $id]];
                 return response($response, 200);
             }
         } else {
@@ -883,9 +882,38 @@ class ApiAuthController extends Controller
                 $temp_stage = TempOrganisation::where(['uid' => $uid, "status" => 1])->pluck('temp_stage')->toArray();
                 $details = TempOrganisation::with('temp_mobile', 'temp_email', 'temp_details', 'temp_address', 'temp_identities', 'temp_web')->where("uid", $uid)->get();
                 $result = $details->toArray();
-                $response = ["message" => 'OK', "param" => ['email'=>$temp_email,"stage" => "temp",'temp_stage'=>$temp_stage,'result'=>$result], ];
+                $response = ["message" => 'OK', "param" => ['email' => $temp_email, "stage" => "temp", 'temp_stage' => $temp_stage, 'result' => $result],];
                 return response($response, 200);
             }
+        }
+    }
+
+
+    public function temp_organisation_stage_two(Request $request)
+    {
+        $temp_organisation_address = new TempOrganisation_address();
+        $temp_organisation_address->oid = $request->temp_id;
+        $temp_organisation_address->uid = $request->uid;
+        $temp_organisation_address->door_no = $request->door_no;
+        $temp_organisation_address->building_name = $request->building_name;
+        $temp_organisation_address->street = $request->street;
+        $temp_organisation_address->landmark = $request->landmark;
+        $temp_organisation_address->pincode = $request->pincode;
+        $temp_organisation_address->state = $request->state;
+        $temp_organisation_address->city = $request->city;
+        $temp_organisation_address->district = $request->district;
+        $temp_organisation_address->area = $request->area;
+        $temp_organisation_address->district = $request->district;
+        $temp_organisation_address->district = $request->district;
+        $temp_organisation_address->save();
+        $id = $temp_organisation_address->id;
+
+        if ($id > 0) {
+            $response = ["message" => 'OK', "temp_stage" => 3];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error', "temp_stage" => 3];
+            return response($response, 400);
         }
     }
 
