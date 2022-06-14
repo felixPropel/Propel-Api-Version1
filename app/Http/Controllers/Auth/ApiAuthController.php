@@ -22,12 +22,14 @@ use App\Models\TempUsers;
 use App\Models\TempOrganisation;
 use App\Models\TempOrganisationEmail;
 use App\Models\TempOrganisation_address;
+use App\Models\TempOrganisationAdmin;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Models\Common;
 use Illuminate\Support\Facades\DB;
 use App\Models\BasicModels\Salutation;
+use App\Models\TempOrganisation_details;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Passport\HasApiTokens;
 
@@ -853,6 +855,7 @@ class ApiAuthController extends Controller
                 $temp_organisation->status = 1;
                 $temp_organisation->created_by = $uid;
                 $temp_organisation->last_modified_by = $uid;
+                $temp_organisation->temp_stage = 0;
                 $temp_organisation->save();
                 $id = $temp_organisation->id;
 
@@ -868,10 +871,10 @@ class ApiAuthController extends Controller
                     $temp_organisation_email->last_modified_by = $uid;
                     $temp_organisation_email->save();
 
-                    $affectedRows = TempOrganisation::where(["uid" => $request->uid, "status" => 1, "email" => $organisation_email])->update(["temp_stage" => 1]);
+                    $affectedRows = TempOrganisation::where(["uid" => $request->uid, "status" => 1, "id" => $id])->update(["temp_stage" => 1]);
                 }
 
-                $response = ["message" => 'OK',"param" => ["temp_stage" => 0,'temp_id' => $id]];
+                $response = ["message" => 'OK', "param" => ["temp_stage" => 1, 'temp_id' => $id]];
                 return response($response, 200);
             }
         } else {
@@ -895,7 +898,7 @@ class ApiAuthController extends Controller
         $temp_organisation_address->oid = $request->temp_id;
         $temp_organisation_address->uid = $request->uid;
         $temp_organisation_address->door_no = $request->door_no;
-        $temp_organisation_address->building_name = $request->building_name;
+        $temp_organisation_address->bld_name = $request->building_name;
         $temp_organisation_address->street = $request->street;
         $temp_organisation_address->landmark = $request->landmark;
         $temp_organisation_address->pincode = $request->pincode;
@@ -909,10 +912,76 @@ class ApiAuthController extends Controller
         $id = $temp_organisation_address->id;
 
         if ($id > 0) {
-            $response = ["message" => 'OK', "temp_stage" => 3];
+            $affectedRows = TempOrganisation::where(["uid" => $request->uid, "status" => 1, "id" => $request->temp_id])->update(["temp_stage" => 2]);
+            $response = ["message" => 'OK', 'param' => ["temp_stage" => 2, "temp_id" => $request->temp_id]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error', "temp_stage" => 1];
+            return response($response, 400);
+        }
+    }
+
+
+    public function temp_organisation_stage_three(Request $request)
+    {
+        $temp_organisation_admin = new TempOrganisationAdmin();
+        $temp_organisation_admin->oid = $request->temp_id;
+        $temp_organisation_admin->uid = $request->uid;
+        $temp_organisation_admin->pid = 0;
+        $temp_organisation_admin->administration_type_id = $request->organisation_admin;
+        $temp_organisation_admin->administration_verification = 0;
+        $temp_organisation_admin->status = 1;
+        $temp_organisation_admin->created_by = $request->uid;
+        $temp_organisation_admin->last_modified_by = $request->uid;
+        $temp_organisation_admin->save();
+        $id = $temp_organisation_admin->id;
+
+        if ($id > 0) {
+            $affectedRows = TempOrganisation::where(["uid" => $request->uid, "status" => 1, "id" => $request->temp_id])->update(["temp_stage" => 3]);
+            $response = ["message" => 'OK', 'param' => ["temp_stage" => 3, "temp_id" => $request->temp_id]];
             return response($response, 200);
         } else {
             $response = ["message" => 'Error', "temp_stage" => 3];
+            return response($response, 400);
+        }
+    }
+
+
+    public function temp_organisation_stage_five(Request $request)
+    {
+
+        $temp_organisation_details = new TempOrganisation_details();
+        $temp_organisation_details->oid = $request->temp_id;
+        $temp_organisation_details->uid=$request->uid;
+        $temp_organisation_details->organisation_name=$request->organisation_name;
+        $temp_organisation_details->organisation_gst=$request->gst;
+        $temp_organisation_details->organisation_pan=$request->pan;
+        $temp_organisation_details->created_by	=$request->uid;
+        $temp_organisation_details->last_modifed_by=$request->uid;
+     
+        $temp_organisation_details->save();
+        $id = $temp_organisation_details->id;
+
+        if ($id > 0) {
+            $affectedRows = TempOrganisation::where(["uid" => $request->uid, "status" => 1, "id" => $request->temp_id])->update(["temp_stage" => 5]);
+            $response = ["message" => 'OK', 'param' => ["temp_stage" => 5, "temp_id" => $request->temp_id]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error', "temp_stage" => 3];
+            return response($response, 400);
+        }
+    }
+
+
+    public function temp_organisation_stage_four(Request $request)
+    {
+
+        $affectedRows = TempOrganisation::where(["uid" => $request->uid, "status" => 1, "id" => $request->temp_id])->update(["temp_stage" => 6]);
+        if ($affectedRows > 0) {
+            $response = ["message" => 'OK', 'param' => ["temp_stage" => 6, "temp_id" => $request->temp_id]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error', "temp_stage" => 4];
             return response($response, 400);
         }
     }

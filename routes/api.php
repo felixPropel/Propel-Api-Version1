@@ -51,6 +51,9 @@ Route::group(['middleware' => ['cors', 'json.response'],'namespace'=>'App\Http\C
     Route::post('/submit_organisation','Auth\ApiAuthController@submit_organisation')->name('submit_organisation.api');
     Route::post('/temp_organisation_stage_one','Auth\ApiAuthController@temp_organisation_stage_one')->name('temp_organisation_stage_one.api');
     Route::post('/temp_organisation_stage_two','Auth\ApiAuthController@temp_organisation_stage_two')->name('temp_organisation_stage_two.api');
+    Route::post('/temp_organisation_stage_three','Auth\ApiAuthController@temp_organisation_stage_three')->name('temp_organisation_stage_three.api');
+    Route::post('/temp_organisation_stage_four','Auth\ApiAuthController@temp_organisation_stage_four')->name('temp_organisation_stage_four.api');
+    Route::post('/temp_organisation_stage_five','Auth\ApiAuthController@temp_organisation_stage_five')->name('temp_organisation_stage_five.api');
 });
 
 Route::middleware('auth:api')

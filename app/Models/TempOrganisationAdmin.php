@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class TempOrganisationAdmin extends Model
 {
     use HasFactory;
-    protected $table = 'temp_organisation_address';
+    protected $table = 'temp_organisation_administation';
 }
