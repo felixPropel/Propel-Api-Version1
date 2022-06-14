@@ -1002,7 +1002,7 @@ class ApiAuthController extends Controller
             }
         }
     }
-
+    
     public function delete_other_email(Request $request)
     {
         $uid = $request->uid;
