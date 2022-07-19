@@ -612,13 +612,23 @@ class ApiAuthController extends Controller
     {
         $mobile = PersonMobile::where('uid', $request->uid)->first();
         $email = PersonEmail::where('uid', $request->uid)->first('email');
-        $user = new User();
-        $user->uid = $request->uid;
-        $user->primary_email = $email->email;
-        $user->primary_mobile = $mobile->mobile;
-        $user->password = Hash::make($request->password);
-        $user->save();
-        $user_id = $user->id;
+        $user = User::where('uid', $request->uid)->first();
+        if ($user) {
+            $password = Hash::make($request->password);
+            $affectedRows = User::where("uid", $request->uid)->update(["password" => $password]);
+            if ($affectedRows > 0) {
+                $user_id = $request->uid;
+            }
+        } else {
+            $user = new User();
+            $user->uid = $request->uid;
+            $user->primary_email = $email->email;
+            $user->primary_mobile = $mobile->mobile;
+            $user->password = Hash::make($request->password);
+            $user->save();
+            $user_id = $user->id;
+        }
+
         if ($user_id > 0) {
             DB::table('temp_users')->where('mobile', $mobile->mobile)->delete();
             $response = ["message" => 'OK', 'route' => 'edit_profile', "param" => ['uid' => $request->uid]];
@@ -952,13 +962,13 @@ class ApiAuthController extends Controller
 
         $temp_organisation_details = new TempOrganisation_details();
         $temp_organisation_details->oid = $request->temp_id;
-        $temp_organisation_details->uid=$request->uid;
-        $temp_organisation_details->organisation_name=$request->organisation_name;
-        $temp_organisation_details->organisation_gst=$request->gst;
-        $temp_organisation_details->organisation_pan=$request->pan;
-        $temp_organisation_details->created_by	=$request->uid;
-        $temp_organisation_details->last_modifed_by=$request->uid;
-     
+        $temp_organisation_details->uid = $request->uid;
+        $temp_organisation_details->organisation_name = $request->organisation_name;
+        $temp_organisation_details->organisation_gst = $request->gst;
+        $temp_organisation_details->organisation_pan = $request->pan;
+        $temp_organisation_details->created_by    = $request->uid;
+        $temp_organisation_details->last_modifed_by = $request->uid;
+
         $temp_organisation_details->save();
         $id = $temp_organisation_details->id;
 
@@ -1002,7 +1012,7 @@ class ApiAuthController extends Controller
             }
         }
     }
-    
+
     public function delete_other_email(Request $request)
     {
         $uid = $request->uid;
