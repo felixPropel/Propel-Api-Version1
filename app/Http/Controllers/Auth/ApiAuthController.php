@@ -412,6 +412,7 @@ class ApiAuthController extends Controller
             "other_language" => $request->other_language,
             "profile_pic" => $request->profile_pic,
         ]);
+
         if ($affectedRows > 0) {
             $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid]];
             return response($response, 200);
@@ -424,9 +425,9 @@ class ApiAuthController extends Controller
     public function person_details_update_extra(Request $request)
     {
 
-        $person_address = PersonAddress::where(['uid' => $request['uid'], 'address_type' => 3, 'status' => 1])->first();
+        $person_address = PersonAddress::where(['uid' => $request['uid'], 'address' => $request->address_of, 'status' => 1])->first();
         if ($person_address) {
-            $affectedRows = PersonAddress::where(['uid' => $request['uid'], 'address_type' => 3, 'status' => 1])->update([
+            $affectedRows = PersonAddress::where(['uid' => $request['uid'], 'address' => $request->address_of, 'status' => 1])->update([
                 "address_type" => 3,
                 "address" => $request->address_of,
                 "door_no" => $request->door_no,
@@ -456,6 +457,7 @@ class ApiAuthController extends Controller
             $person_address->area = $request->area;
             $person_address->status = 1;
             $person_address->save();
+            $affectedRows=$person_address->id;
         }
 
         $affectedRows1 = PersonDetails::where("uid", $request['uid'])->update([
