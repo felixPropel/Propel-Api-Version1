@@ -411,6 +411,7 @@ class ApiAuthController extends Controller
             "mother_tongue" => $request->mother_tongue,
             "other_language" => $request->other_language,
             "profile_pic" => $request->profile_pic,
+            "birth_city"=>$request->birth_city,
         ]);
 
         if ($affectedRows > 0) {
