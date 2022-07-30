@@ -482,6 +482,7 @@ class ApiAuthController extends Controller
             $person_details->first_name = $request->first_name;
             $person_details->last_name = $request->last_name;
             $person_details->nick_name = $request->nick_name;
+            $person_details->middle_name=$request->middle_name;
             $person_details->uid = $request->uid;
             $person_details->save();
             $detais_id = $person_details->id;
