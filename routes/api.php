@@ -54,6 +54,8 @@ Route::group(['middleware' => ['cors', 'json.response'],'namespace'=>'App\Http\C
     Route::post('/temp_organisation_stage_three','Auth\ApiAuthController@temp_organisation_stage_three')->name('temp_organisation_stage_three.api');
     Route::post('/temp_organisation_stage_four','Auth\ApiAuthController@temp_organisation_stage_four')->name('temp_organisation_stage_four.api');
     Route::post('/temp_organisation_stage_five','Auth\ApiAuthController@temp_organisation_stage_five')->name('temp_organisation_stage_five.api');
+    include_once ('HRM/hrmMasterApi.php');
+
 });
 
 Route::middleware('auth:api')
