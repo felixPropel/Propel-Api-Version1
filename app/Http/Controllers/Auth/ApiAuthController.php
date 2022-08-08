@@ -564,6 +564,7 @@ class ApiAuthController extends Controller
     {
         if ($request->isMethod('post')) {
 
+           
             if ($request->file) {
                 $affectedRows1 = PersonDetails::where("uid", $request->uid)->update(["profile_pic" => $request->file]);
             }
@@ -574,10 +575,22 @@ class ApiAuthController extends Controller
             if ($affectedRows2 > 0) {
                 DB::table('person_address')->where('uid', $request->uid)->delete();
                 if ($request->home_address) {
+                    $address_array = explode(',', $request->home_address);
+
                     $person_address = new PersonAddress();
                     $person_address->uid = $request->uid;
                     $person_address->address_type = 1;
-                    $person_address->address = $request->home_address;
+                    $person_address->address = $request->home_address.'-'.$address_array[8];
+                    $person_address->door_no=$address_array[0];
+                    $person_address->bilding_name=$address_array[1];
+                    $person_address->land_mark=$address_array[2];
+                    $person_address->pincode=$address_array[7];
+                    $person_address->area=$address_array[3];
+                    $person_address->street="-";
+                    $person_address->district=$address_array[4];
+                    $person_address->city=$address_array[6];
+                    $person_address->state=$address_array[5];
+                    $person_address->country=101;
                     $person_address->status = 1;
                     $person_address->save();
                 }
