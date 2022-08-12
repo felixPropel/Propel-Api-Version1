@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\BasicModels\Gender;
+use App\Models\BasicModels\BloodGroup;
 use App\Models\Person;
+use App\Models\BasicModels\State;
 use App\Models\PersonEmail;
 use App\Models\PersonMobile;
 use App\Models\PersonDetails;
@@ -411,7 +414,7 @@ class ApiAuthController extends Controller
             "mother_tongue" => $request->mother_tongue,
             "other_language" => $request->other_language,
             "profile_pic" => $request->profile_pic,
-            "birth_city"=>$request->birth_city,
+            "birth_city" => $request->birth_city,
         ]);
 
         if ($affectedRows > 0) {
@@ -458,7 +461,7 @@ class ApiAuthController extends Controller
             $person_address->area = $request->area;
             $person_address->status = 1;
             $person_address->save();
-            $affectedRows=$person_address->id;
+            $affectedRows = $person_address->id;
         }
 
         $affectedRows1 = PersonDetails::where("uid", $request['uid'])->update([
@@ -482,7 +485,7 @@ class ApiAuthController extends Controller
             $person_details->first_name = $request->first_name;
             $person_details->last_name = $request->last_name;
             $person_details->nick_name = $request->nick_name;
-            $person_details->middle_name=$request->middle_name;
+            $person_details->middle_name = $request->middle_name;
             $person_details->uid = $request->uid;
             $person_details->save();
             $detais_id = $person_details->id;
@@ -564,7 +567,7 @@ class ApiAuthController extends Controller
     {
         if ($request->isMethod('post')) {
 
-           
+
             if ($request->file) {
                 $affectedRows1 = PersonDetails::where("uid", $request->uid)->update(["profile_pic" => $request->file]);
             }
@@ -580,17 +583,17 @@ class ApiAuthController extends Controller
                     $person_address = new PersonAddress();
                     $person_address->uid = $request->uid;
                     $person_address->address_type = 1;
-                    $person_address->address = $request->home_address.'-'.$address_array[8];
-                    $person_address->door_no=$address_array[0];
-                    $person_address->bilding_name=$address_array[1];
-                    $person_address->land_mark=$address_array[2];
-                    $person_address->pincode=$address_array[7];
-                    $person_address->area=$address_array[3];
-                    $person_address->street="-";
-                    $person_address->district=$address_array[4];
-                    $person_address->city=$address_array[6];
-                    $person_address->state=$address_array[5];
-                    $person_address->country=101;
+                    $person_address->address = $request->home_address . '-' . $address_array[8];
+                    $person_address->door_no = $address_array[0];
+                    $person_address->bilding_name = $address_array[1];
+                    $person_address->land_mark = $address_array[2];
+                    $person_address->pincode = $address_array[7];
+                    $person_address->area = $address_array[3];
+                    $person_address->street = "-";
+                    $person_address->district = $address_array[4];
+                    $person_address->city = $address_array[6];
+                    $person_address->state = $address_array[5];
+                    $person_address->country = 101;
                     $person_address->status = 1;
                     $person_address->save();
                 }
@@ -647,8 +650,11 @@ class ApiAuthController extends Controller
         }
 
         if ($user_id > 0) {
+            $details = PersonDetails::with('email', 'mobile', 'person', 'person_address')->where("uid", $request->uid)->get();
+            $result = $details->toArray();
+            $states = State::where('country_id', 101)->get();
             DB::table('temp_users')->where('mobile', $mobile->mobile)->delete();
-            $response = ["message" => 'OK', 'route' => 'edit_profile', "param" => ['uid' => $request->uid]];
+            $response = ["message" => 'OK', 'route' => 'edit_profile', "param" => ['uid' => $request->uid, 'result' => $result,"states"=>$states]];
             return response($response, 200);
         } else {
             $response = ["message" => 'Error Occured !!!'];
@@ -1187,6 +1193,44 @@ class ApiAuthController extends Controller
         }
     }
 
+    public function get_gender_and_blood_group(Request $request)
+    {
+        $gender = Gender::all();
+        $blood = BloodGroup::all();
+        if (!empty($gender) && !empty($blood)) {
+            $response = ["message" => 'OK', 'route' => 'registration_basic', 'param' => ['blood' => $blood, 'gender' => $gender]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error in getting Blood Group or Gender'];
+            return response($response, 400);
+        }
+    }
+
+    public function person_details_by_uid(Request $request)
+    {
+        $details = PersonDetails::with('email', 'mobile', 'person', 'person_address')->where("uid", $request->uid)->get();
+        $result = $details->toArray();
+        $states = State::where('country_id', 101)->get();
+        if (!empty($result) && !empty($states)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['result' => $result, 'states' => $states]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error in getting Person Details Or States'];
+            return response($response, 400);
+        }
+    }
+
+    public function get_states(Request $request)
+    {
+        $states = State::where('country_id', 101)->get();
+        if (!empty($result) && !empty($states)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['states' => $states]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error in getting States'];
+            return response($response, 400);
+        }
+    }
 
 
 
