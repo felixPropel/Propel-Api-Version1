@@ -27,6 +27,7 @@ use App\Models\TempOrganisation;
 use App\Models\TempOrganisationEmail;
 use App\Models\TempOrganisation_address;
 use App\Models\TempOrganisationAdmin;
+use App\Models\Address_of;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -1255,6 +1256,21 @@ class ApiAuthController extends Controller
         }
     }
 
+    public function get_account_details(Request $request)
+    {
+        $family_name = PersonDetails::where('uid', $request->uid)->first('family_name');
+        $first_name = PersonDetails::where('uid',  $request->uid)->first('first_name');
+        $mobile = PersonMobile::where('uid',  $request->uid)->first('mobile');
+        DB::table('temp_users')->where('mobile', $mobile->mobile)->delete();
+        if (!isset($family_name) && !isset($first_name)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['family_name' => $family_name, 'first_name' => $first_name, 'mobile' => $mobile]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error in Finding Account Details'];
+            return response($response, 400);
+        }
+    }
+
     public function get_states(Request $request)
     {
         $states = State::where('country_id', 101)->get();
@@ -1263,6 +1279,75 @@ class ApiAuthController extends Controller
             return response($response, 200);
         } else {
             $response = ["message" => 'Error in getting States'];
+            return response($response, 400);
+        }
+    }
+
+    public function check_for_email(Request $request)
+    {
+        $check_for_email = PersonEmail::where('email', $request->email)->first('email');
+        if (!empty($check_for_email)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['checked_email' => $check_for_email]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Email Not Found'];
+            return response($response, 400);
+        }
+    }
+
+    public function get_mobile(Request $request)
+    {
+        $mobile = PersonMobile::where('uid', $request->uid)->first();
+        if (!empty($mobile)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['mobile' => $mobile]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Mobile Not Found'];
+            return response($response, 400);
+        }
+    }
+
+    public function get_email(Request $request)
+    {
+        $person_email = PersonEmail::where('uid', $request->uid)->first('email');
+        if (!empty($person_email)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['email' => $person_email]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Email Not Found'];
+            return response($response, 400);
+        }
+    }
+
+    public function get_profile_details(Request $request)
+    {
+        $gender = Gender::all();
+        $blood = BloodGroup::all();
+        $saluation = Salutation::all();
+        $details = PersonDetails::with('email', 'mobile', 'person', 'user', 'person_address_profile')->where("uid", $request->uid)->first();
+        $address = PersonAddress::where("uid", $request->uid)->get()->toArray();
+        $result = $details;
+
+        $states = State::where('country_id', 101)->get();
+        $address_of = Address_of::all();
+        $addressData = $details->person_address_profile;
+        if (!empty($result)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['uid' => $request->uid, 'result' => $result, 'addressData' => $addressData, 'gender' => $gender, 'blood' => $blood, 'saluations' => $saluation, 'states' => $states, 'address_of' => $address_of, 'address' => $address]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Details Not Found'];
+            return response($response, 400);
+        }
+    }
+
+    public function update_otp(Request $request)
+    {
+        $affectedRows = User::where("uid", $request->uid)->update(["email_otp" => $request->otp, "email_otp_verified" => 0]);
+        if ($affectedRows) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ["email_otp" => $request->otp, "email_otp_verified" => 0]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Update Error!!!'];
             return response($response, 400);
         }
     }

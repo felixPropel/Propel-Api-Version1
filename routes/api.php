@@ -24,6 +24,12 @@ Route::group(['middleware' => ['cors', 'json.response'],'namespace'=>'App\Http\C
     Route::get('/get_gender_and_blood_group','Auth\ApiAuthController@get_gender_and_blood_group')->name('get_gender_and_blood_group.api');
     Route::post('/person_details_by_uid','Auth\ApiAuthController@person_details_by_uid')->name('person_details_by_uid.api');
     Route::get('/get_states','Auth\ApiAuthController@get_states')->name('get_states.api');
+    Route::get('/get_mobile','Auth\ApiAuthController@get_mobile')->name('get_mobile.api');
+    Route::get('/get_email','Auth\ApiAuthController@get_email')->name('get_email.api');
+    Route::post('/update_otp','Auth\ApiAuthController@update_otp')->name('update_otp.api');
+    Route::get('/get_profile_details','Auth\ApiAuthController@get_profile_details')->name('get_profile_details.api');
+    Route::post('/get_account_details','Auth\ApiAuthController@get_account_details')->name('get_account_details.api');
+    Route::post('/check_for_email','Auth\ApiAuthController@check_for_email')->name('check_for_email.api');
     Route::get('/check_person','Auth\ApiAuthController@check_person')->name('check_person.api');
     Route::get('/check_person_email','Auth\ApiAuthController@check_person_email')->name('check_person_email.api');
     Route::get('/get_temp_status','Auth\ApiAuthController@get_temp_status')->name('get_temp_status.api');
