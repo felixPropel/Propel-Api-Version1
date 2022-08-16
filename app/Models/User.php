@@ -10,6 +10,12 @@ use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
+    protected $connection;
+    
+    public function __construct(){
+        parent::__construct();
+        $this->connection = "mysql";
+    }
     use HasApiTokens, HasFactory, Notifiable;
 
 

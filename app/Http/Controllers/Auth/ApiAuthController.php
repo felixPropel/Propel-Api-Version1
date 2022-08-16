@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
+use Config;
+use Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -35,7 +36,7 @@ use App\Models\BasicModels\Salutation;
 use App\Models\TempOrganisation_details;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Passport\HasApiTokens;
-
+use Artisan;
 class ApiAuthController extends Controller
 {
 
@@ -654,7 +655,7 @@ class ApiAuthController extends Controller
             $result = $details->toArray();
             $states = State::where('country_id', 101)->get();
             DB::table('temp_users')->where('mobile', $mobile->mobile)->delete();
-            $response = ["message" => 'OK', 'route' => 'edit_profile', "param" => ['uid' => $request->uid, 'result' => $result,"states"=>$states]];
+            $response = ["message" => 'OK', 'route' => 'edit_profile', "param" => ['uid' => $request->uid, 'result' => $result, "states" => $states]];
             return response($response, 200);
         } else {
             $response = ["message" => 'Error Occured !!!'];
@@ -1079,7 +1080,8 @@ class ApiAuthController extends Controller
 
     public function submit_organisation(Request $request)
     {
-
+        Log::info('Inside submit_organisation' . json_encode($request->all()));
+      
         $organisation = new Organisation();
         $organisation->uid = $request->uid;
         $organisation->authorization = 1;
@@ -1088,11 +1090,25 @@ class ApiAuthController extends Controller
         $organisation->last_modified_by = $request->uid;
         $organisation->save();
         $id = $organisation->id;
-
+        
+        Log::info('submit_organisation DB Id' . $id);
+        $DbName = "Org_" . $id;
+        Log::info('submit_organisation DB Name' . json_encode($DbName));
+        $dbgenarate = $this->DBGenarate($DbName);
+        Log::info('submit_organisation DB Result ' . json_encode($dbgenarate));
+        Log::info('submit_organisation get DB Connections Result ' . json_encode(Config::get('database.connections')));
+        Artisan::call('cache:clear');
+        $ndb = DB::connection('mysql')->getDatabaseName();
+        Log::info('submit_organisation DB User Result ' . json_encode($ndb));
+  
+        $userD= User::where('uid',$request->uid)->first();
+      
+        Log::info('submit_organisation DB User Result ' . json_encode($userD));
+       
         if ($id > 0) {
 
             $organisation_details = new Organisation_details();
-
+            $organisation_details->setConnection('mysql');
             $organisation_details->oid = $id;
             $organisation_details->uid = $request->uid;
             $organisation_details->organisation_name = $request->organisation_name;
@@ -1184,13 +1200,32 @@ class ApiAuthController extends Controller
                 $organisation_administation->save();
             }
 
-
-            $response = ["message" => 'OK'];
+                $response = ["message" => 'OK'];
             return response($response, 200);
         } else {
             $response = ["message" => 'Insert error'];
             return response($response, 400);
         }
+    }
+    public function DBGenarate($DbName)
+    {
+        Log::info('Inside DBGenerate' . json_encode($DbName));
+        
+        $preDatabase = Config::get('database.connections.mysql.database');
+        Log::info('Inside DBGenerate main DB NAme ' . json_encode($preDatabase));
+        DB::statement("CREATE DATABASE IF NOT EXISTS $DbName");
+
+        $new = Config::set('database.connections.mysql.database', $DbName);
+        Log::info('Inside DBGenerate New DB NAme ' . json_encode($new));
+        DB::purge('mysql');
+        DB::reconnect('mysql');
+        \Artisan::call('migrate');
+        DB::disconnect('mysql');
+        Config::set('database.connections.mysql.database', $preDatabase);
+        Config::set('database.connections.mysql2.database', $DbName);
+        Artisan::call('cache:clear');
+        Log::info('Inside DbGenerate Return');
+        return true;
     }
 
     public function get_gender_and_blood_group(Request $request)
