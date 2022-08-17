@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Hrm\HrmMasters\Model;
+namespace App\Models;
 
 use App\Core\ObservantTrait;
 use App\Core\GlobalScope\OrganizationClause;
