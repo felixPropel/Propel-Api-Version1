@@ -18,6 +18,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('App\Interfaces\UserInterface','App\Repositories\UserRepository');
         $this->app->bind('App\Interfaces\HrmDepartmentInterface','App\Repositories\HRM\HrmDepartmentRepository');
         $this->app->bind('App\Interfaces\HrmHumanResourceTypeInterface','App\Repositories\HRM\HrmHumanResourceTypeRepository');
+        $this->app->bind('App\Interfaces\HrmDesignationInterface','App\Repositories\HRM\HrmDesignationRepository');
+
 
     }
 
