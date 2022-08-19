@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Services\HRM;
+
+use App\Interfaces\HrmDepartmentInterface;
 use App\Interfaces\HrmDesignationInterface;
+use App\Models\HrmDepartment;
 use App\Models\HrmDesignation;
 
 /**
@@ -11,15 +14,23 @@ use App\Models\HrmDesignation;
 class HrmDesignationService
 {
     protected $interface;
-    public function __construct(HrmDesignationInterface $interface)
+    public function __construct(HrmDesignationInterface $interface,HrmDepartmentInterface $deptInterface)
     {
+        $this->deptInterface = $deptInterface;
         $this->interface = $interface;
     }
-    public function index()
+    public function findAll()
     {
         
-        $models = $this->interface->index();
+        $models = $this->interface->findAll();
         return $models;
+    }
+    public function create()
+    {
+        
+        $departmentModels = $this->deptInterface->findAll();
+        return $departmentModels;
+
     }
     public function store($data, $id = false)
     {
@@ -38,8 +49,9 @@ class HrmDesignationService
         } else {
             $model = new HrmDesignation();
         }
+        $unAssignedDesId = $this->interface->findByName('Un-Assigned');
         $model->name = $data->name;
-        $model->dept_id = $data->dept_id;
+        $model->dept_id = ($data->dept_id)?$data->dept_id:$unAssignedDesId->id;
         $model->description = $data->description;
         $model->status = 1;
 

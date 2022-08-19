@@ -9,5 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HrmDepartment extends Model
 {
-    
+    public function hrmParentDept()
+    {
+        return $this->hasOne(HrmDepartment::class, 'id', 'parent_dept_id');
+    }
 }

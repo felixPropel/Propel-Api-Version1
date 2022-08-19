@@ -5,7 +5,7 @@ namespace App\Http\Controllers\HRM;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\HRM\HrmDesignationService;
-
+use Log;
 
 class HrmDesignationController extends Controller
 {
@@ -21,7 +21,7 @@ class HrmDesignationController extends Controller
      */
     public function index()
     {
-        $response = $this->service->index();
+        $response = $this->service->findAll();
         return $response;
     }
 
@@ -32,7 +32,10 @@ class HrmDesignationController extends Controller
      */
     public function create()
     {
-        //
+        Log::info('HrmDesignationController>Create Function>Inside.');
+        $response = $this->service->create();
+        Log::info('HrmDesignationController>Create Function>Inside.');
+        return $response;
     }
 
     /**

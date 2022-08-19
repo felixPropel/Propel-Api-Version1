@@ -17,11 +17,17 @@ class HrmDepartmentService
     {
         $this->interface = $interface;
     }
-    public function index()
+    public function findAll()
     {
-        $models = $this->interface->index();
+        $models = $this->interface->findAll();
         return $models;
     }
+    public function create()
+    {
+        $models = $this->interface->findAll();
+        return $models;
+    }
+   
     public function store($data, $id = false)
     {
         $model = $this->convertToModel($data, $id);
@@ -32,7 +38,9 @@ class HrmDepartmentService
     public function findById($id)
     {
         $response = $this->interface->findById($id);
-        return $response;
+        $responseParentDeptData = $this->interface->getParentDeptExceptThisId($id);
+        $responseArray = ['resposeModelData' => $response, 'responseParentDeptData' => $responseParentDeptData];
+        return $responseArray;
     }
 
 
@@ -55,7 +63,7 @@ class HrmDepartmentService
     }
     public function destroyById($id)
     {
-       
+
         $response = $this->interface->destroy($id);
         return $response;
     }

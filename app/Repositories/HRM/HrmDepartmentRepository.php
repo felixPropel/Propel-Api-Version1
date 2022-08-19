@@ -17,9 +17,9 @@ class HrmDepartmentRepository implements HrmDepartmentInterface
     {
         $this->model = $model;
     }
-    public function index()
+    public function findAll()
     {
-        $datas = $this->model::get();
+        $datas = $this->model::with('hrmParentDept')->whereNull('deleted_at')->get();
         return $datas;
     }
     public function store($data)
@@ -35,7 +35,11 @@ class HrmDepartmentRepository implements HrmDepartmentInterface
         $data = $this->model::where('id', $id)->first();
         return $data;
     }
-  
+    public function getParentDeptExceptThisId($id){
+       return $this->model::where('id','!=',$id)->whereNull('deleted_at')->get();
+       
+    }
+
     public function destroy($id)
     {
         $res = $this->model::findOrFail($id)->delete();

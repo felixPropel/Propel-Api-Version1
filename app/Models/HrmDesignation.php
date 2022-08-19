@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class HrmDesignation extends Model
 {
     use HasFactory;
+    public function hrmDesDept()
+    {
+        return $this->belongsTo(HrmDepartment::class,'dept_id');
+    }
 }
