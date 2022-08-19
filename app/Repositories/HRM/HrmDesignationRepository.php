@@ -17,11 +17,10 @@ class HrmDesignationRepository implements HrmDesignationInterface
     {
         $this->model = $model;
     }
-    public function index()
-   
+    public function findAll()
     {
-      
-        $datas = $this->model::get();
+        $datas = $this->model::with('hrmDesDept')->get();
+       
         return $datas;
     }
     public function store($data)
@@ -37,7 +36,13 @@ class HrmDesignationRepository implements HrmDesignationInterface
         $data = $this->model::where('id', $id)->first();
         return $data;
     }
-  
+    public function findByName($name)
+    {
+        $data = $this->model::where('name', $name)->first();
+        return $data;
+    }
+
+
     public function destroy($id)
     {
         $res = $this->model::findOrFail($id)->delete();
