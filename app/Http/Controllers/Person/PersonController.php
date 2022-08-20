@@ -22,4 +22,27 @@ class PersonController extends Controller
        $response=$this->person->get_stage($request->all());
         return $response;
     }
+
+    public function check_for_email(Request $request)
+    {
+        $response=$this->person->check_for_email($request->all());
+        return $response;
+    }
+
+    public function update_person_details(Request $request)
+    {
+        $response=$this->person->update_person_details($request->all());
+        return $response;
+    }
+
+    public function person_details_stage1(Request $request){
+        $response=$this->person->person_details_stage1($request->all());
+        return $response;
+    }
+
+    public function person_details_stage2(Request $request){
+        $response=$this->person->person_details_stage2($request->all());
+        return $response;
+    }
+
 }

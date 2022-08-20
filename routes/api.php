@@ -22,6 +22,10 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
 
     //Person//
     Route::post('/get_stage', 'Person\PersonController@get_stage')->name('get_stage.api');
+    Route::post('/check_for_email', 'Person\PersonController@check_for_email')->name('check_for_email.api');
+    Route::post('/update_person_details', 'Person\PersonController@update_person_details')->name('update_person_details.api');
+    Route::post('/person_details_stage1', 'Person\PersonController@person_details_stage1')->name('person_details_stage1.api');
+    Route::post('/person_details_stage2', 'Person\PersonController@person_details_stage2')->name('person_details_stage2.api');
     //Person//
 
     Route::post('/login', 'Auth\ApiAuthController@login')->name('login.api');
@@ -34,7 +38,7 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::post('/update_otp', 'Auth\ApiAuthController@update_otp')->name('update_otp.api');
     Route::get('/get_profile_details', 'Auth\ApiAuthController@get_profile_details')->name('get_profile_details.api');
     Route::post('/get_account_details', 'Auth\ApiAuthController@get_account_details')->name('get_account_details.api');
-    Route::post('/check_for_email', 'Auth\ApiAuthController@check_for_email')->name('check_for_email.api');
+
     Route::get('/check_person', 'Auth\ApiAuthController@check_person')->name('check_person.api');
     Route::get('/check_person_email', 'Auth\ApiAuthController@check_person_email')->name('check_person_email.api');
     Route::get('/get_temp_status', 'Auth\ApiAuthController@get_temp_status')->name('get_temp_status.api');
@@ -43,11 +47,11 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::post('/update_temp_user_email', 'Auth\ApiAuthController@update_temp_user_email')->name('update_temp_user_email.api');
     Route::post('/temp_update', 'Auth\ApiAuthController@temp_update')->name('temp_update.api');
     Route::post('/check_confirmation', 'Auth\ApiAuthController@check_confirmation')->name('check_confirmation.api');
-    Route::post('/update_person_details', 'Auth\ApiAuthController@update_person_details')->name('update_person_details.api');
+  
     Route::post('/person_details_update', 'Auth\ApiAuthController@person_details_update')->name('person_details_update.api');
     Route::post('/person_details_update_extra', 'Auth\ApiAuthController@person_details_update_extra')->name('person_details_update_extra.api');
-    Route::post('/person_details_stage1', 'Auth\ApiAuthController@person_details_stage1')->name('person_details_stage1.api');
-    Route::post('/person_details_stage2', 'Auth\ApiAuthController@person_details_stage2')->name('person_details_stage2.api');
+  
+
     Route::post('/create_user', 'Auth\ApiAuthController@create_user')->name('create_user.api');
     Route::post('/upload_pic', 'Auth\ApiAuthController@upload_pic')->name('upload_pic.api');
     Route::post('/complete_profile', 'Auth\ApiAuthController@complete_profile')->name('complete_profile.api');

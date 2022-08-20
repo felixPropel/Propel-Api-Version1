@@ -327,78 +327,7 @@ class ApiAuthController extends Controller
         }
     }
 
-    public function update_person_details(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'mobile' => 'required'
-        ]);
-        $uuid = Str::uuid();
-        $person = new Person();
-        $mobile_person_id = '';
-        $email_person_id = '';
-        $person_id = '';
-        $person_euid = '';
-        $person_uid = '';
-        if (PersonMobile::where(['mobile' => $request->mobile, 'status' => 1])->exists()) {
-            $person_m = PersonMobile::where('mobile', $request->mobile)->first('uid');
-            $person_uid = $person_m['uid'];
-            $check_person = Person::where('uid', $person_uid)->first('uid');
-            if ($check_person['uid'] == '') {
-                $person->uid = $person_uid;
-                $person->dependency = $request['dependency'] ? $request['dependency'] : 1;
-                $person->save();
-                $mobile_person_id = $person->id;
-            }
-        } else {
-            $person_mobile = new PersonMobile();
-            $person_mobile->mobile = $request['mobile'];
-            $person_mobile->uid = $uuid;
-            $person_mobile->status = 1;
-            $person_mobile->save();
-        }
-
-        if (PersonEmail::where(['email' => $request->email, 'status' => 1])->exists()) {
-            $person_e = PersonEmail::where('email', $request->email)->first('uid');
-            $person_euid = $person_e['uid'];
-            $check_person = Person::where('uid', $person_euid)->first('uid');
-            if ($check_person['uid'] == '') {
-                $person->uid = $person_euid;
-                $person->dependency = $request['dependency'] ? $request['dependency'] : 1;
-                $person->save();
-                $email_person_id = $person->id;
-            }
-        } else {
-            $person_email = new PersonEmail();
-            $person_email->email = $request['email'];
-            $person_email->uid = $uuid;
-            $person_email->status = 1;
-            $person_email->save();
-        }
-
-        if ($person_uid == '' || $person_euid == '') {
-            $person->uid = $uuid;
-            $person->dependency = $request['dependency'] ? $request['dependency'] : 1;
-            $person->save();
-            $person_id = $person->id;
-        }
-
-        if ($person_id > 0 || $person_uid != '' || $person_euid != '') {
-            if ($person_euid != '') {
-                $uid = $person_euid;
-            } else if ($person_uid != '') {
-                $uid = $person_uid;
-            } else {
-                $uid = $uuid;
-            }
-            $saluations = Salutation::all();
-            $response = ["message" => 'OK', 'route' => 'registration_account', 'param' => ['uid' => $uid, 'saluations' => $saluations]];
-            return response($response, 200);
-        } else {
-            $response = ["message" => 'Registration failed', 'route' => 'registration', 'param' => ['mobile' => $request['mobile'], 'email' => $request['email']]];
-            return response($response, 400);
-        }
-    }
+   
 
     public function person_details_update(Request $request)
     {
@@ -479,57 +408,6 @@ class ApiAuthController extends Controller
     }
 
 
-    public function person_details_stage1(Request $request)
-    {
-        if ($request->isMethod('post')) {
-            $person_details = new PersonDetails();
-            $person_details->saluation = $request->saluation;
-            $person_details->first_name = $request->first_name;
-            $person_details->last_name = $request->last_name;
-            $person_details->nick_name = $request->nick_name;
-            $person_details->middle_name = $request->middle_name;
-            $person_details->uid = $request->uid;
-            $person_details->save();
-            $detais_id = $person_details->id;
-            if ($detais_id > 0) {
-                $response = ["message" => 'OK', 'route' => 'registration_basic', 'param' => ['uid' => $request->uid]];
-                return response($response, 200);
-            } else {
-                $response = ["message" => 'Registration failed'];
-                return response($response, 400);
-            }
-        } else {
-            $response = ["message" => 'Inappropriate Submission'];
-            return response($response, 400);
-        }
-    }
-
-    public function person_details_stage2(Request $request)
-    {
-        if ($request->isMethod('post')) {
-            $request->validate([
-                'gender' => 'required',
-                'blood_group' => 'required',
-                'dob' => 'required',
-
-            ]);
-            $person_details = new PersonDetails();
-            $otp = rand(0, 99999);
-            $otp_update = Person::where("uid", $request['uid'])->update(["otp" => $otp]);
-            $affectedRows = PersonDetails::where("uid", $request['uid'])->update(["gender" => $request['gender'], "blood_group" => $request['blood_group'], "dob" => $request['dob']]);
-            if ($affectedRows > 0) {
-                $mobile = PersonMobile::where('uid', $request['uid'])->first();
-                $response = ["message" => 'OK', 'route' => 'registration_otp', 'param' => ['uid' => $request->uid, 'mobile' => $mobile]];
-                return response($response, 200);
-            } else {
-                $response = ["message" => 'Update Error!'];
-                return response($response, 400);
-            }
-        } else {
-            $response = ["message" => 'Inappropriate Submission'];
-            return response($response, 400);
-        }
-    }
 
     public function create_user(Request $request)
     {
@@ -1283,17 +1161,7 @@ class ApiAuthController extends Controller
         }
     }
 
-    public function check_for_email(Request $request)
-    {
-        $check_for_email = PersonEmail::where('email', $request->email)->first('email');
-        if (!empty($check_for_email)) {
-            $response = ["message" => 'OK', 'route' => '', 'param' => ['checked_email' => $check_for_email]];
-            return response($response, 200);
-        } else {
-            $response = ["message" => 'Email Not Found'];
-            return response($response, 400);
-        }
-    }
+   
 
     public function get_mobile(Request $request)
     {
