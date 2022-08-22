@@ -3,6 +3,8 @@
 namespace App\Services\HRM;
 use App\Interfaces\HrmHumanResourceTypeInterface;
 use App\Models\HrmHumanResourceType;
+use App\Repositories\HRM\Masters\HrmResourceTypeRepository;
+
 
 /**
  * Class HrmHumanResourceTypeService
@@ -40,7 +42,7 @@ class HrmHumanResourceTypeService
         }
         $model->name = $data->name;
         $model->description = $data->description;
-        $model->status = 1;
+        $model->status =  $data->status; 
 
         return $model;
     }

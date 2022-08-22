@@ -5,7 +5,7 @@ namespace App\Http\Controllers\HRM;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\HRM\HrmHumanResourceTypeService;
-
+use Log;
 class HrmHumanResourceTypeController extends Controller
 {
     protected $service;
@@ -31,7 +31,7 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -42,7 +42,9 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info(' Human Resource Type Store function Inside.' . json_encode($request->all()));
         $response = $this->service->store($request->all());
+        Log::info('Store function Return.' . json_encode($response));
         return $response;
     }
 
@@ -79,7 +81,10 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
+        Log::info(' Human Resource Type update function Inside.' . json_encode($request->all()));
+        Log::info('Update function Inside request id.' . json_encode($id));
         $response = $this->service->store($request->all(), $id);
+        Log::info('Update function Inside response.' . json_encode($response));
         return $response;
     }
 
