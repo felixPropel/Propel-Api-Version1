@@ -39,5 +39,25 @@ class PersonService
         return $response;
     }
     
+    public function create_user($data){
+        $response=$this->personInterface->create_user($data);
+        return $response;
+    }
+
+    public function upload_pic($data){
+        $response=$this->personInterface->upload_pic($data);
+        return $response;
+    }
+    
+    public function person_details_by_uid($data){
+        $response=$this->personInterface->person_details_by_uid($data);
+        return $response;
+    }
+
+    public function complete_profile($data){
+        $response=$this->personInterface->complete_profile($data);
+        return $response;
+    }
+    
  
 }

@@ -7,6 +7,7 @@ use App\Models\PersonDetails;
 use App\Interfaces\PersonInterface;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 //use Your Model
 use App\Models\Common;
@@ -17,7 +18,8 @@ use App\Models\PersonEmail;
 use App\Models\PersonAddress;
 use App\Models\PersonMobile;
 use App\Models\BasicModels\Salutation;
-
+use App\Models\BasicModels\State;
+use Illuminate\Support\Facades\DB;
 /**
  * Class PersonRepository.
  */
@@ -52,7 +54,7 @@ class PersonRepository implements PersonInterface
                     $temp_user->save();
                     if ($temp_user->id > 0) {
                         $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
-                        return response("dsa", 200);
+                        return response($response, 200);
                     } else {
                         $response = ["message" => 'Something Went Wrong'];
                         return response($response, 400);
@@ -240,4 +242,97 @@ class PersonRepository implements PersonInterface
             return response($response, 400);
         }
     }
+
+    public function create_user($request)
+    {
+        $mobile = PersonMobile::where('uid', $request['uid'])->first();
+        $email = PersonEmail::where('uid', $request['uid'])->first('email');
+        $user = new User();
+        $user->uid = $request['uid'];
+        $user->primary_email = $email->email;
+        $user->primary_mobile = $mobile->mobile;
+        $user->password = Hash::make($request['password']);
+        $user->save();
+        $user_id = $user->id;
+        if ($user_id > 0) {
+            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request['uid'], 'mobile' => $mobile->mobile, 'password' => $request['password']]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error Occured!!!'];
+            return response($response, 400);
+        }
+    }
+
+    public function upload_pic($request)
+    {
+        $person_details = new PersonDetails();
+        $person_details->profile_pic = $request['file'];
+        $affectedRows = PersonDetails::where("uid", $request['uid'])->update(["profile_pic" => $request['file']]);
+        if ($affectedRows > 0) {
+            $response = ["message" => 'OK', 'route' => 'edit_profile', 'param' => ['uid' => $request['uid']]];
+            return response($response, 200);
+        }
+    }
+
+    public function person_details_by_uid($request)
+    {
+        $details = PersonDetails::with('email', 'mobile', 'person', 'person_address')->where("uid", $request['uid'])->get();
+        $result = $details->toArray();
+        $states = State::where('country_id', 101)->get();
+        if (!empty($result) && !empty($states)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['result' => $result, 'states' => $states]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error in getting Person Details Or States'];
+            return response($response, 400);
+        }
+    }
+
+    public function complete_profile($request)
+    {
+            if ($request['file']) {
+                $affectedRows1 = PersonDetails::where("uid", $request['uid'])->update(["profile_pic" => $request['file']]);
+            }
+
+            $affectedRows2 = PersonDetails::where("uid", $request['uid'])->update(["first_name" => $request['first_name'], "dob" => $request['dob'], "family_name" => $request['family_name']]);
+            $affectedRows3 = PersonEmail::where("uid", $request['uid'])->update(["email" => $request['email']]);
+            $affectedRows4 = PersonMobile::where("uid", $request['uid'])->update(["mobile" => $request['mobile']]);
+            if ($affectedRows2 > 0) {
+                DB::table('person_address')->where('uid', $request['uid'])->delete();
+                if ($request['home_address']) {
+                    $address_array = explode(',', $request['home_address']);
+
+                    $person_address = new PersonAddress();
+                    $person_address->uid = $request['uid'];
+                    $person_address->address_type = 1;
+                    $person_address->address = $request['home_address'] . '-' . $address_array[8];
+                    $person_address->door_no = $address_array[0];
+                    $person_address->bilding_name = $address_array[1];
+                    $person_address->land_mark = $address_array[2];
+                    $person_address->pincode = $address_array[7];
+                    $person_address->area = $address_array[3];
+                    $person_address->street = "-";
+                    $person_address->district = $address_array[4];
+                    $person_address->city = $address_array[6];
+                    $person_address->state = $address_array[5];
+                    $person_address->country = 101;
+                    $person_address->status = 1;
+                    $person_address->save();
+                }
+
+                if ($request['office_address']) {
+                    $person_address = new PersonAddress();
+                    $person_address->uid = $request['uid'];
+                    $person_address->address_type = 2;
+                    $person_address->address = $request['office_address'];
+                    $person_address->status = 1;
+                    $person_address->save();
+                }
+
+                $response = ["message" => 'OK', 'route' => 'organisation', 'param' => ['uid' => $request['uid']]];
+                return response($response, 200);
+            }
+        
+    }
+
 }

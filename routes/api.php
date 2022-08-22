@@ -26,12 +26,16 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::post('/update_person_details', 'Person\PersonController@update_person_details')->name('update_person_details.api');
     Route::post('/person_details_stage1', 'Person\PersonController@person_details_stage1')->name('person_details_stage1.api');
     Route::post('/person_details_stage2', 'Person\PersonController@person_details_stage2')->name('person_details_stage2.api');
+    Route::post('/create_user', 'Person\PersonController@create_user')->name('create_user.api');
+    Route::post('/upload_pic', 'Person\PersonController@upload_pic')->name('upload_pic.api');
+    Route::post('/person_details_by_uid', 'Person\PersonController@person_details_by_uid')->name('person_details_by_uid.api');
+    Route::post('/complete_profile', 'Person\PersonController@complete_profile')->name('complete_profile.api');
     //Person//
 
     Route::post('/login', 'Auth\ApiAuthController@login')->name('login.api');
     Route::post('/register', 'Auth\ApiAuthController@register')->name('register.api');
     Route::get('/get_gender_and_blood_group', 'Auth\ApiAuthController@get_gender_and_blood_group')->name('get_gender_and_blood_group.api');
-    Route::post('/person_details_by_uid', 'Auth\ApiAuthController@person_details_by_uid')->name('person_details_by_uid.api');
+
     Route::get('/get_states', 'Auth\ApiAuthController@get_states')->name('get_states.api');
     Route::get('/get_mobile', 'Auth\ApiAuthController@get_mobile')->name('get_mobile.api');
     Route::get('/get_email', 'Auth\ApiAuthController@get_email')->name('get_email.api');
@@ -52,9 +56,9 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::post('/person_details_update_extra', 'Auth\ApiAuthController@person_details_update_extra')->name('person_details_update_extra.api');
   
 
-    Route::post('/create_user', 'Auth\ApiAuthController@create_user')->name('create_user.api');
-    Route::post('/upload_pic', 'Auth\ApiAuthController@upload_pic')->name('upload_pic.api');
-    Route::post('/complete_profile', 'Auth\ApiAuthController@complete_profile')->name('complete_profile.api');
+    
+  
+  
     Route::post('/person_registration_otp', 'Auth\ApiAuthController@person_registration_otp')->name('person_registration_otp.api');
     Route::post('/update_password', 'Auth\ApiAuthController@update_password')->name('update_password.api');
     Route::post('/forgot_password', 'Auth\ApiAuthController@forgot_password')->name('forgot_password.api');
