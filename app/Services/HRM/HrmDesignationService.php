@@ -50,17 +50,20 @@ class HrmDesignationService
             $model = new HrmDesignation();
         }
         $unAssignedDesId = $this->interface->findByName('Un-Assigned');
-        $model->name = $data->name;
-        $model->dept_id = ($data->dept_id)?$data->dept_id:$unAssignedDesId->id;
+        $model->name = $data->designation;
+        $model->dept_id =$data->dept_id;
         $model->description = $data->description;
-        $model->status = 1;
+        $model->status =1;
+
 
         return $model;
     }
     public function findById($id)
     {
-        $response = $this->interface->findById($id);
-        return $response;
+        $modelData = $this->interface->findById($id);    
+        $getDepartmentDatas = $this->deptInterface->findAll();
+        $response = ['modelData'=>$modelData,'depatmentData'=>$getDepartmentDatas];
+        return  $response; 
     }
     public function destroyById($id)
     {

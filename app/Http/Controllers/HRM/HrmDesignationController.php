@@ -46,7 +46,9 @@ class HrmDesignationController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('Store function Inside.' . json_encode($request->all()));
         $response = $this->service->store($request->all());
+        // Log::info('Store function Return.' . json_encode($response));
         return $response;
     }
 
@@ -82,7 +84,8 @@ class HrmDesignationController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
+    { 
+        Log::info('HrmDesignationController>Create Function>Inside.',($request->all()));
         $response = $this->service->store($request->all(), $id);
         return $response;
     }

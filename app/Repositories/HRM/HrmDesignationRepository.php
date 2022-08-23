@@ -33,7 +33,7 @@ class HrmDesignationRepository implements HrmDesignationInterface
     }
     public function findById($id)
     {
-        $data = $this->model::where('id', $id)->first();
+        $data = $this->model::with('hrmDesDept')->where('id', $id)->first();
         return $data;
     }
     public function findByName($name)
