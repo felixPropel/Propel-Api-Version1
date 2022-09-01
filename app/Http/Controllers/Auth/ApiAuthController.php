@@ -203,26 +203,7 @@ class ApiAuthController extends Controller
     }
 
 
-    function temp_update(Request $request)
-    {
-        if ($request['mobile'] && $request['email']) {
-            $request->validate([
-                'email' => 'required|email',
-            ]);
-            $common = new Common();
-            $update = $common->update_temp_user($request['mobile'], $request['email']);
-            if ($update) {
-                $response = ["message" => 'OK', 'route' => 'confirmation', 'param' => ['email' => $request['email'], 'mobile' => $request['mobile']]];
-                return response($response, 200);
-            } else {
-                $response = ["message" => 'This Email Already Exists,Try New One', 'route' => 'stage2', 'param' => ['mobile' => $request['mobile']]];
-                return response($response, 400);
-            }
-        } else {
-            $response = ["message" => 'Parameter Missing', 'route' => 'stage2'];
-            return response($response, 400);
-        }
-    }
+    
 
     public function check_confirmation(Request $request)
     {
@@ -930,18 +911,7 @@ class ApiAuthController extends Controller
         return true;
     }
 
-    public function get_gender_and_blood_group(Request $request)
-    {
-        $gender = Gender::all();
-        $blood = BloodGroup::all();
-        if (!empty($gender) && !empty($blood)) {
-            $response = ["message" => 'OK', 'route' => 'registration_basic', 'param' => ['blood' => $blood, 'gender' => $gender]];
-            return response($response, 200);
-        } else {
-            $response = ["message" => 'Error in getting Blood Group or Gender'];
-            return response($response, 400);
-        }
-    }
+    
 
   
 
@@ -974,17 +944,7 @@ class ApiAuthController extends Controller
 
    
 
-    public function get_mobile(Request $request)
-    {
-        $mobile = PersonMobile::where('uid', $request->uid)->first();
-        if (!empty($mobile)) {
-            $response = ["message" => 'OK', 'route' => '', 'param' => ['mobile' => $mobile]];
-            return response($response, 200);
-        } else {
-            $response = ["message" => 'Mobile Not Found'];
-            return response($response, 400);
-        }
-    }
+  
 
     public function get_email(Request $request)
     {
