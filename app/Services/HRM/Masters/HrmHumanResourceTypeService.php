@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\HRM;
+namespace App\Services\HRM\Masters;
 use App\Interfaces\HrmHumanResourceTypeInterface;
 use App\Models\HrmHumanResourceType;
 use App\Repositories\HRM\Masters\HrmResourceTypeRepository;

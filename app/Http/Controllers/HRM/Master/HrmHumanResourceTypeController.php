@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\HRM;
+namespace App\Http\Controllers\HRM\Master;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\HRM\HrmHumanResourceTypeService;
+use App\Services\HRM\Masters\HrmHumanResourceTypeService;
 use Log;
 class HrmHumanResourceTypeController extends Controller
 {
