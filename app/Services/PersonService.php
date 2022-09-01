@@ -11,7 +11,10 @@ use App\Models\PersonEmail;
 use App\Models\PersonAddress;
 use App\Models\PersonDetails;
 use App\Models\PersonMobile;
+use App\Models\User;
 use App\Models\BasicModels\Salutation;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class PersonService
 {
@@ -161,34 +164,93 @@ class PersonService
         return $person;
     }
 
-    public function convertToPersonMobileModel($person_datas)
+    public function convertToPersonMobileModel($person_datas, $uid = "")
     {
-        $person_mobile = new PersonMobile();
+        if ($uid) {
+            $person_mobile = $this->personInterface->getPersonMobileByUid($uid);
+        } else {
+            $person_mobile = new PersonMobile();
+        }
         $person_mobile->mobile = $person_datas['mobile'];
         $person_mobile->uid = $person_datas['uid'];
         return $person_mobile;
     }
 
-    public function convertToPersonDetailsModel($data)
+    public function convertToPersonDetailsModel($data, $id = "")
     {
-        $person_details = new PersonDetails();
-        $person_details->saluation = $data['saluation'];
-        $person_details->first_name = $data['first_name'];
-        $person_details->last_name = $data['last_name'];
-        $person_details->nick_name = $data['nick_name'];
-        $person_details->middle_name = $data['middle_name'];
-        $person_details->uid = $data['uid'];
+        if ($id) {
+            $person_details = $this->personInterface->getPersonDetailsBasicUid($id);
+            $person_details->uid = $data['uid'];
+            $person_details->profile_pic = $data['profile_pic'];
+        } else {
+            $person_details = new PersonDetails();
+            $person_details->saluation = $data['saluation'];
+            $person_details->first_name = $data['first_name'];
+            $person_details->last_name = $data['last_name'];
+            $person_details->nick_name = $data['nick_name'];
+            $person_details->middle_name = $data['middle_name'];
+        }
+
         return $person_details;
     }
 
-    public function convertToPersonDetailsModel1($data)
+    public function convertToPersonDetailsModel1($data, $id = "")
     {
-        $person_details = new PersonDetails();
-        $person_details->gender = $data['gender'];
-        $person_details->blood_group = $data['blood_group'];
-        $person_details->dob = $data['dob'];
-        $person_details->uid = $data['uid'];
+        if ($id) {
+            $person_details = $this->personInterface->getPersonDetailsBasicUid($id);
+            $person_details->first_name = $data['first_name'];
+            $person_details->dob = $data['dob'];
+            $person_details->family_name = $data['family_name'];
+            $person_details->first_name = $data['first_name'];
+        } else {
+            $person_details = new PersonDetails();
+            $person_details->gender = $data['gender'];
+            $person_details->blood_group = $data['blood_group'];
+            $person_details->dob = $data['dob'];
+            $person_details->uid = $data['uid'];
+        }
+
         return $person_details;
+    }
+
+    public function convertToUserModel($data)
+    {
+        $user = new User();
+        $user->uid = $data['uid'];
+        $user->primary_email = $data['primary_email'];
+        $user->primary_mobile = $data['primary_mobile'];
+        $user->password = $data['password'];
+        return $user;
+    }
+
+    public function convertToHomeAddressModel($data)
+    {
+        $person_address = new PersonAddress();
+        $person_address->uid = $data['uid'];
+        $person_address->address_type = 1;
+        $person_address->address = $data['address'];
+        $person_address->door_no = $data['door_no'];
+        $person_address->bilding_name =  $data['bilding_name'];
+        $person_address->land_mark =  $data['land_mark'];
+        $person_address->pincode =  $data['pincode'];
+        $person_address->area =  $data['area'];
+        $person_address->street =  $data['street'];
+        $person_address->district =  $data['district'];
+        $person_address->city =  $data['city'];
+        $person_address->state =  $data['state'];
+        $person_address->country =  $data['country'];
+        $person_address->status =  $data['status'];
+        return $person_address;
+    }
+
+    public function convertToOfficeAddressModel($data)
+    {
+        $person_address = new PersonAddress();
+        $person_address->uid = $data['uid'];
+        $person_address->address_type = $data['address_type'];
+        $person_address->address = $data['address'];
+        $person_address->status = $data['status'];
+        return $person_address;
     }
 
     public function check_for_email($data)
@@ -253,7 +315,7 @@ class PersonService
                 'uid' =>  $uuid
             );
 
-            $personMobileModel = $this->convertToPersonMobileModel($person_data);
+            $personMobileModel = $this->convertToPersonMobileModel($person_data, $uuid);
             $person = $this->personInterface->savePersonMobile($personMobileModel);
         }
         $check_person_email = $this->personInterface->check_person_exist_by_email($data['email']);
@@ -319,7 +381,7 @@ class PersonService
         }
     }
 
-    public function get_gender_and_blood_group()
+    public function get_gender_and_blood_group($data)
     {
         $gender = $this->personInterface->get_gender();
         $blood = $this->personInterface->get_blood();
@@ -359,7 +421,8 @@ class PersonService
         }
     }
 
-    public function get_person_mobile($data){
+    public function get_person_mobile($data)
+    {
         $mobile = $this->personInterface->getPersonMobileByUid($data['uid']);
         if (!empty($mobile)) {
             $response = ["message" => 'OK', 'route' => '', 'param' => ['mobile' => $mobile]];
@@ -372,25 +435,126 @@ class PersonService
 
     public function create_user($data)
     {
-        $response = $this->personInterface->create_user($data);
-        return $response;
+        $mobile = $this->personInterface->getPersonMobileByUid($data['uid']);
+        $email = $this->personInterface->getPersonEmailByUid($data['uid']);
+        $userArray = array(
+            'uid' => $data['uid'],
+            'primary_email' => $email->email,
+            'primary_mobile' => $mobile->mobile,
+            'password' => Hash::make($data['password']),
+        );
+        $userModel = $this->convertToUserModel($userArray);
+        $user = $this->personInterface->saveUser($userModel);
+        if ($user) {
+            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $data['uid'], 'mobile' => $mobile->mobile, 'password' => $data['password']]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error Occured!!!'];
+            return response($response, 400);
+        }
     }
 
     public function upload_pic($data)
     {
-        $response = $this->personInterface->upload_pic($data);
-        return $response;
+        $detailsArray = array(
+            'profile_pic' => $data['file'],
+            'uid' => $data['uid'],
+        );
+        $personDetailsModel = $this->convertToPersonDetailsModel($detailsArray, $data['uid']);
+        $person_details = $this->personInterface->savePersonDetails($personDetailsModel);
+        if ($person_details) {
+            $response = ["message" => 'OK', 'route' => 'edit_profile', 'param' => ['uid' => $data['uid']]];
+            return response($response, 200);
+        }
     }
 
     public function person_details_by_uid($data)
     {
-        $response = $this->personInterface->person_details_by_uid($data);
-        return $response;
+        $details = $this->personInterface->getFullPersonDetailsByUid($data['uid']);
+        $result = $details->toArray();
+        $states = $this->personInterface->getStates();
+        if (!empty($result) && !empty($states)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['result' => $result, 'states' => $states]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error in getting Person Details Or States'];
+            return response($response, 400);
+        }
+    }
+
+    public function get_cities_by_state($data)
+    {
+        $states = $this->personInterface->getCitiesByState($data);
+        if (!empty($states)) {
+            $response = ["message" => 'OK', 'route' => '', 'param' => ['states' => $states]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Error in getting  States'];
+            return response($response, 400);
+        }
     }
 
     public function complete_profile($data)
     {
-        $response = $this->personInterface->complete_profile($data);
-        return $response;
+        // $response = $this->personInterface->complete_profile($data);
+        // return $response;
+
+        if ($data['file']) {
+            $detailsArray = array(
+                'profile_pic' => $data['file'],
+                'uid' => $data['uid'],
+            );
+            $personDetailsModel = $this->convertToPersonDetailsModel($detailsArray, $data['uid']);
+            $person_details = $this->personInterface->savePersonDetails($personDetailsModel);
+        }
+
+        $detailsArray1 = array(
+            "first_name" => $data['first_name'],
+            "dob" => $data['dob'],
+            "family_name" => $data['family_name'],
+            'uid' => $data['uid'],
+        );
+        $personDetailsModel1 = $this->convertToPersonDetailsModel1($detailsArray1, $data['uid']);
+        $person_details1 = $this->personInterface->savePersonDetails($personDetailsModel1);
+
+        if ($person_details1) {
+            DB::table('person_address')->where('uid', $data['uid'])->delete();
+            if ($data['home_address']) {
+                $address_array = explode(',', $data['home_address']);
+
+                $homeAddress = array(
+                    'uid' => $data['uid'],
+                    'address_type' => 1,
+                    'address' => $data['home_address'] . '-' . $address_array[8],
+                    'door_no' => $address_array[0],
+                    'bilding_name' => $address_array[1],
+                    'land_mark' => $address_array[2],
+                    'pincode' => $address_array[7],
+                    'area' => $address_array[3],
+                    'street' => '-',
+                    'district' => $address_array[4],
+                    'city' => $address_array[6],
+                    'state' => $address_array[5],
+                    'country' => 101,
+                    'status' => 1,
+                );
+                $homeAddressModel = $this->convertToHomeAddressModel($homeAddress);
+                $home = $this->personInterface->saveHomeAddress($homeAddressModel);
+            }
+
+            if ($data['office_address']) {
+                $officeAddress = array(
+                    'uid' => $data['uid'],
+                    'address_type' => 2,
+                    'address' => $data['office_address'],
+                    'status' => 1,
+                );
+                $officeAddressModel = $this->convertToOfficeAddressModel($officeAddress);
+                $office = $this->personInterface->saveOfficeAddress($officeAddressModel);
+            }
+
+            $response = ["message" => 'OK', 'route' => 'organisation', 'param' => ['uid' => $data['uid']]];
+            return response($response, 200);
+        }
     }
 }

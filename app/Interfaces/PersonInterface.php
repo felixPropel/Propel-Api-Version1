@@ -6,10 +6,8 @@ interface PersonInterface
     // public function get_stage($data);
     public function check_for_email($data);
     public function check_for_mobile($data);
-    public function create_user($data);
-    public function upload_pic($data);
-    public function person_details_by_uid($data);
-    public function complete_profile($data);
+    public function getPersonDetailsBasicUid($uid);
+    Public function getFullPersonDetailsByUid($uid);
     public function getAllPersonDataWithEmailAndMobile($email,$mobile);
     public function findTempUserDataById($id);
     public function saveTempUser($model);
@@ -23,6 +21,12 @@ interface PersonInterface
     public function findTempUserDataByMobile($mobile);
     public function savePersonDetails($personDetailsModel);
     public function getPersonMobileByUid($uid);
+    public function getPersonEmailByUid($uid);
+    public function saveUser($userModel);
+    public function saveHomeAddress($homeAddressModel);
+    public function saveOfficeAddress($officeAddressModel);
+    public function getCitiesByState($data);
     public function get_gender();
     public function get_blood();
+    public function getStates();
 }

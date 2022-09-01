@@ -31,8 +31,10 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::post('/upload_pic', 'Person\PersonController@upload_pic')->name('upload_pic.api');
     Route::post('/person_details_by_uid', 'Person\PersonController@person_details_by_uid')->name('person_details_by_uid.api');
     Route::post('/complete_profile', 'Person\PersonController@complete_profile')->name('complete_profile.api');
-    Route::get('/get_gender_and_blood_group', '@get_gender_and_blood_group')->name('get_gender_and_blood_group.api');
+    Route::get('/get_gender_and_blood_group', 'Person\PersonController@get_gender_and_blood_group')->name('get_gender_and_blood_group.api');
     Route::get('/get_mobile', 'Person\PersonController@get_mobile')->name('get_mobile.api');
+    Route::post('/get_cities_by_state', 'Person\PersonController@get_cities_by_state')->name('get_cities_by_state.api');
+    
     //Person//
 
     Route::post('/login', 'Auth\ApiAuthController@login')->name('login.api');

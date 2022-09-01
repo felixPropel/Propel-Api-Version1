@@ -90,6 +90,11 @@ class PersonController extends Controller
         return $response;
     }
 
+    public function get_cities_by_state(Request $request){
+        $response = $this->person->get_cities_by_state($request->all());
+        return $response;
+    }
+
     public function complete_profile(Request $request)
     {
         $response = $this->person->complete_profile($request->all());
