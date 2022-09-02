@@ -164,9 +164,9 @@ class PersonService
         return $person;
     }
 
-    public function convertToPersonMobileModel($person_datas, $uid = "")
+    public function convertToPersonMobileModel($person_datas, $uid)
     {
-        if ($uid) {
+        if ($uid!="") {
             $person_mobile = $this->personInterface->getPersonMobileByUid($uid);
         } else {
             $person_mobile = new PersonMobile();
@@ -176,14 +176,15 @@ class PersonService
         return $person_mobile;
     }
 
-    public function convertToPersonDetailsModel($data, $id = "")
+    public function convertToPersonDetailsModel($data, $id)
     {
-        if ($id) {
+        if ($id!="") {
             $person_details = $this->personInterface->getPersonDetailsBasicUid($id);
             $person_details->uid = $data['uid'];
             $person_details->profile_pic = $data['profile_pic'];
         } else {
             $person_details = new PersonDetails();
+            $person_details->uid = $data['uid'];
             $person_details->saluation = $data['saluation'];
             $person_details->first_name = $data['first_name'];
             $person_details->last_name = $data['last_name'];
@@ -286,7 +287,7 @@ class PersonService
     public function update_person_details($data)
     {
         // $response = $this->personInterface->update_person_details($data);
-        // return $response;
+    
         $uuid = Str::uuid();
         $person = new Person();
         $mobile_person_id = '';
@@ -315,7 +316,7 @@ class PersonService
                 'uid' =>  $uuid
             );
 
-            $personMobileModel = $this->convertToPersonMobileModel($person_data, $uuid);
+            $personMobileModel = $this->convertToPersonMobileModel($person_data, "");
             $person = $this->personInterface->savePersonMobile($personMobileModel);
         }
         $check_person_email = $this->personInterface->check_person_exist_by_email($data['email']);
@@ -370,7 +371,7 @@ class PersonService
 
     public function person_details_stage1($data)
     {
-        $personDetailsModel = $this->convertToPersonDetailsModel($data);
+        $personDetailsModel = $this->convertToPersonDetailsModel($data,"");
         $personDetails = $this->personInterface->savePersonDetails($personDetailsModel);
         if ($personDetails) {
             $response = ["message" => 'OK', 'route' => 'registration_basic', 'param' => ['uid' => $data['uid']]];
