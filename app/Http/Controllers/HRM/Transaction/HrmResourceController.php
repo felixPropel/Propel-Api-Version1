@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\HRM\Major;
+namespace App\Http\Controllers\HRM\Transaction;
 
 use App\Http\Controllers\Controller;
-use App\Services\HRM\Majors\HrmResourceService;
+use App\Services\HRM\Transaction\HrmResourceService;
 use Illuminate\Http\Request;
 use Log;
 
@@ -14,6 +14,13 @@ class HrmResourceController extends Controller
     public function __construct(HrmResourceService $service)
     {
         $this->service = $service;
+    }
+
+
+    public function findResourceWithCredentials(Request $request)
+    {        
+        $response = $this->service->findResourceWithCredentials($request->all());
+        return $response;
     }
     /**
      * Display a listing of the resource.

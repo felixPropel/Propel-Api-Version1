@@ -15,7 +15,7 @@ use App\Models\User;
 use App\Models\BasicModels\Salutation;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-
+use Log;
 class PersonService
 {
     protected $personInterface;
@@ -166,7 +166,7 @@ class PersonService
 
     public function convertToPersonMobileModel($person_datas, $uid)
     {
-        if ($uid!="") {
+        if ($uid != "") {
             $person_mobile = $this->personInterface->getPersonMobileByUid($uid);
         } else {
             $person_mobile = new PersonMobile();
@@ -178,7 +178,7 @@ class PersonService
 
     public function convertToPersonDetailsModel($data, $id)
     {
-        if ($id!="") {
+        if ($id != "") {
             $person_details = $this->personInterface->getPersonDetailsBasicUid($id);
             $person_details->uid = $data['uid'];
             $person_details->profile_pic = $data['profile_pic'];
@@ -287,7 +287,7 @@ class PersonService
     public function update_person_details($data)
     {
         // $response = $this->personInterface->update_person_details($data);
-    
+
         $uuid = Str::uuid();
         $person = new Person();
         $mobile_person_id = '';
@@ -371,7 +371,7 @@ class PersonService
 
     public function person_details_stage1($data)
     {
-        $personDetailsModel = $this->convertToPersonDetailsModel($data,"");
+        $personDetailsModel = $this->convertToPersonDetailsModel($data, "");
         $personDetails = $this->personInterface->savePersonDetails($personDetailsModel);
         if ($personDetails) {
             $response = ["message" => 'OK', 'route' => 'registration_basic', 'param' => ['uid' => $data['uid']]];
@@ -558,4 +558,17 @@ class PersonService
             return response($response, 200);
         }
     }
+    //Written Dhana Function Started
+    //@developer Dhana
+    public function findExactPersonWithEmailAndMobile($datas)
+    {
+        Log::info('PersonService>findExactPersonWithEmailAndMobile Function>Inside. ');
+        $datas = (object)$datas;
+        $email = $datas->email;
+        $mobile = $datas->mobile;
+        $response = $this->personInterface->findExactPersonWithEmailAndMobile($email,$mobile);   
+        Log::info('PersonService>findExactPersonWithEmailAndMobile Function>Return.'.json_encode($response));     
+        return response($response, 200);
+    }
+    //Written Dhana Function Ended
 }

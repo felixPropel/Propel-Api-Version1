@@ -22,6 +22,7 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
 
     //Person//
     Route::post('/get_stage', 'Person\PersonController@get_stage')->name('get_stage.api');
+
     Route::post('/check_for_email', 'Person\PersonController@check_for_email')->name('check_for_email.api');
     Route::post('/temp_update', 'Person\PersonController@temp_update')->name('temp_update.api');
     Route::post('/update_person_details', 'Person\PersonController@update_person_details')->name('update_person_details.api');
@@ -34,12 +35,12 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::get('/get_gender_and_blood_group', 'Person\PersonController@get_gender_and_blood_group')->name('get_gender_and_blood_group.api');
     Route::get('/get_mobile', 'Person\PersonController@get_mobile')->name('get_mobile.api');
     Route::post('/get_cities_by_state', 'Person\PersonController@get_cities_by_state')->name('get_cities_by_state.api');
-    
+
     //Person//
 
     Route::post('/login', 'Auth\ApiAuthController@login')->name('login.api');
     Route::post('/register', 'Auth\ApiAuthController@register')->name('register.api');
-   
+
 
     Route::get('/get_states', 'Auth\ApiAuthController@get_states')->name('get_states.api');
 
@@ -56,10 +57,10 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::post('/update_temp_user_email', 'Auth\ApiAuthController@update_temp_user_email')->name('update_temp_user_email.api');
 
     Route::post('/check_confirmation', 'Auth\ApiAuthController@check_confirmation')->name('check_confirmation.api');
-  
+
     Route::post('/person_details_update', 'Auth\ApiAuthController@person_details_update')->name('person_details_update.api');
     Route::post('/person_details_update_extra', 'Auth\ApiAuthController@person_details_update_extra')->name('person_details_update_extra.api');
-  
+
     Route::post('/person_registration_otp', 'Auth\ApiAuthController@person_registration_otp')->name('person_registration_otp.api');
     Route::post('/update_password', 'Auth\ApiAuthController@update_password')->name('update_password.api');
     Route::post('/forgot_password', 'Auth\ApiAuthController@forgot_password')->name('forgot_password.api');
@@ -80,7 +81,8 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     //Repository Calls
     Route::get('show', [HomeController::class, 'index'])->name('show.api');
     //Repository Calls Ends//
-    include_once('HRM/hrmMasterApi.php');
+ 
+    include_once('Person/personApi.php');
 });
 
 Route::middleware('auth:api')
@@ -89,4 +91,7 @@ Route::middleware('auth:api')
 
         Route::post('/get_user_data', 'Auth\ApiAuthController@get_user_data')->name('get_user_data.api');
         Route::post('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
+
+        include_once('HRM/Masters/hrmMasterApi.php');
+        include_once('HRM/Transaction/hrmTransactionApi.php');
     });

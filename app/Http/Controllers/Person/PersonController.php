@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\PersonService;
 use App\Services\UserService;
-
+use Log;
 class PersonController extends Controller
 {
     protected $person;
@@ -28,7 +28,6 @@ class PersonController extends Controller
     {
         $response = $this->person->get_gender_and_blood_group($request->all());
         return $response;
-       
     }
 
     public function getAllPersonDataWithEmailAndMobile($email, $mobile)
@@ -45,7 +44,6 @@ class PersonController extends Controller
     {
         $response = $this->person->temp_update($request->all());
         return $response;
-       
     }
 
     public function update_person_details(Request $request)
@@ -90,7 +88,8 @@ class PersonController extends Controller
         return $response;
     }
 
-    public function get_cities_by_state(Request $request){
+    public function get_cities_by_state(Request $request)
+    {
         $response = $this->person->get_cities_by_state($request->all());
         return $response;
     }
@@ -100,4 +99,16 @@ class PersonController extends Controller
         $response = $this->person->complete_profile($request->all());
         return $response;
     }
+
+    //Written Dhana Function Started
+
+    //@developer Dhana
+    public function findExactPersonWithEmailAndMobile(Request $request)
+    {
+        Log::info('PersonController>findExactPersonWithEmailAndMobile Function>Inside. '.json_encode($request->all()));
+        $response = $this->person->findExactPersonWithEmailAndMobile($request->all());
+        Log::info('PersonController>findExactPersonWithEmailAndMobile Function>Return. '.json_encode($response));
+        return $response;
+    }
+    //Written Dhana Function Ended
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Interfaces;
 
 interface PersonInterface
@@ -7,8 +8,8 @@ interface PersonInterface
     public function check_for_email($data);
     public function check_for_mobile($data);
     public function getPersonDetailsBasicUid($uid);
-    Public function getFullPersonDetailsByUid($uid);
-    public function getAllPersonDataWithEmailAndMobile($email,$mobile);
+    public function getFullPersonDetailsByUid($uid);
+    public function getAllPersonDataWithEmailAndMobile($email, $mobile);
     public function findTempUserDataById($id);
     public function saveTempUser($model);
     public function checkPersonByMobile($mobile);
@@ -29,4 +30,12 @@ interface PersonInterface
     public function get_gender();
     public function get_blood();
     public function getStates();
+
+    //writen by dhanaraj
+    public function getDetailedAllPersonDataWithMobile($mobile);
+    public function getDetailedAllPersonDataWithEmail($email);
+    public function checkUserByUID($uid);
+    public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
+    public function findExactPersonWithEmailAndMobile($email, $mobile);
+    public function findUserWithInOrganization($uId,$orgId);
 }

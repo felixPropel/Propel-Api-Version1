@@ -22,7 +22,9 @@ use App\Models\BasicModels\Salutation;
 use App\Models\BasicModels\State;
 use App\Models\BasicModels\Gender;
 use App\Models\BasicModels\BloodGroup;
+use App\Models\UserAccount;
 use Illuminate\Support\Facades\DB;
+use Log;
 
 /**
  * Class PersonRepository.
@@ -53,13 +55,15 @@ class PersonRepository implements PersonInterface
         $model->save();
         return $model;
     }
-    
-    public function saveHomeAddress($homeAddressModel){
+
+    public function saveHomeAddress($homeAddressModel)
+    {
         $homeAddressModel->save();
         return $homeAddressModel;
     }
-    
-    public function saveOfficeAddress($officeAddressModel){
+
+    public function saveOfficeAddress($officeAddressModel)
+    {
         $officeAddressModel->save();
         return $officeAddressModel;
     }
@@ -156,12 +160,14 @@ class PersonRepository implements PersonInterface
         return $blood;
     }
 
-    public function getStates(){
+    public function getStates()
+    {
         $states = State::where('country_id', 101)->get();
         return $states;
     }
 
-    public function getCitiesByState($data){
+    public function getCitiesByState($data)
+    {
         $cities = City::where('state_id', $data)->get()->toArray();
         return $cities;
     }
@@ -174,7 +180,7 @@ class PersonRepository implements PersonInterface
 
     public function getPersonDetailsBasicUid($uid)
     {
-       return PersonDetails::where("uid", $uid)->first();
+        return PersonDetails::where("uid", $uid)->first();
     }
 
     public function getFullPersonDetailsByUid($uid)
@@ -182,5 +188,61 @@ class PersonRepository implements PersonInterface
         $details = PersonDetails::with('email', 'mobile', 'person', 'person_address')->where("uid", $uid)->get();
         return $details;
     }
+    //writen by dhanaraj
+    public function getDetailedAllPersonDataWithMobile($mobile)
+    {
+        $models = PersonMobile::with('PersonDetail')
+            ->where('person_mobile.mobile', $mobile)
+            ->whereIn('status', [1, 2])
+            ->get()->toArray();
+        return $models;
+    }
 
+    public function getDetailedAllPersonDataWithEmail($email)
+    {
+        $models = PersonEmail::with('PersonDetail')
+            ->where('email', $email)
+            ->whereIn('status', [1, 2])
+            ->get()->toArray();
+        return $models;
+    }
+    public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile)
+    {
+        $models = Person::select('person.id as personId', 'person_email.email As emailId', 'person_mobile.mobile as mobileId')
+            ->leftjoin('person_mobile', 'person_mobile.uid', 'person.uid')
+            ->leftjoin('person_email', 'person_email.uid', 'person.uid')            
+            ->where('person_mobile.mobile', $mobile)
+            ->OrWhere('person_email.email', $email)
+            ->whereIn('person_mobile.status', [1, 2])
+            ->whereIn('person_email.status', [1, 2])
+            ->get();
+
+        return $models;
+    }
+
+    public function checkUserByUID($uid)
+    {
+        return User::where("uid", $uid)->first();
+    }
+
+    public function findExactPersonWithEmailAndMobile($email, $mobile)
+    {
+        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.');
+
+        $model =  Person::select('*')
+            ->leftjoin('person_mobile', 'person_mobile.uid', 'person.uid')
+            ->leftjoin('person_email', 'person_email.uid', 'person.uid')            
+            ->where('person_mobile.mobile', $mobile)
+            ->Where('person_email.email', $email)
+            ->whereIn('person_mobile.status', [1, 2])
+            ->whereIn('person_email.status', [1, 2])
+            ->first();
+
+        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Return . ' . json_encode($model));
+        return $model;
+    }
+    public function findUserWithInOrganization($uId, $orgId)
+    {
+        return UserAccount::where('u_id', $uId)->where('organization_id', $orgId)->first();
+    }
 }

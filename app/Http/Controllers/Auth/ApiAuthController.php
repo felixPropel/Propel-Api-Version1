@@ -203,7 +203,7 @@ class ApiAuthController extends Controller
     }
 
 
-    
+
 
     public function check_confirmation(Request $request)
     {
@@ -219,7 +219,7 @@ class ApiAuthController extends Controller
         }
     }
 
-   
+
 
     public function person_details_update(Request $request)
     {
@@ -314,6 +314,7 @@ class ApiAuthController extends Controller
 
     public function update_password(Request $request)
     {
+        Log::info('ApiAuthController>update_password Function>Inside.');
         $mobile = PersonMobile::where('uid', $request->uid)->first();
         $email = PersonEmail::where('uid', $request->uid)->first('email');
         $user = User::where('uid', $request->uid)->first();
@@ -322,7 +323,7 @@ class ApiAuthController extends Controller
             $affectedRows = User::where("uid", $request->uid)->update(["password" => $password]);
             if ($affectedRows > 0) {
                 $user_id = $request->uid;
-            }
+           }
         } else {
             $user = new User();
             $user->uid = $request->uid;
@@ -331,9 +332,10 @@ class ApiAuthController extends Controller
             $user->password = Hash::make($request->password);
             $user->save();
             $user_id = $user->id;
+            Log::info('ApiAuthController>update_password Function>else .');
         }
 
-        if ($user_id > 0) {
+        if ($user_id) {
             $details = PersonDetails::with('email', 'mobile', 'person', 'person_address')->where("uid", $request->uid)->get();
             $result = $details->toArray();
             $states = State::where('country_id', 101)->get();
@@ -764,7 +766,7 @@ class ApiAuthController extends Controller
     public function submit_organisation(Request $request)
     {
         Log::info('Inside submit_organisation' . json_encode($request->all()));
-      
+
         $organisation = new Organisation();
         $organisation->uid = $request->uid;
         $organisation->authorization = 1;
@@ -773,7 +775,7 @@ class ApiAuthController extends Controller
         $organisation->last_modified_by = $request->uid;
         $organisation->save();
         $id = $organisation->id;
-        
+
         Log::info('submit_organisation DB Id' . $id);
         $DbName = "Org_" . $id;
         Log::info('submit_organisation DB Name' . json_encode($DbName));
@@ -783,11 +785,11 @@ class ApiAuthController extends Controller
         Artisan::call('cache:clear');
         $ndb = DB::connection('mysql')->getDatabaseName();
         Log::info('submit_organisation DB User Result ' . json_encode($ndb));
-  
+
         $userD= User::where('uid',$request->uid)->first();
-      
+
         Log::info('submit_organisation DB User Result ' . json_encode($userD));
-       
+
         if ($id > 0) {
 
             $organisation_details = new Organisation_details();
@@ -883,7 +885,7 @@ class ApiAuthController extends Controller
                 $organisation_administation->save();
             }
 
-                $response = ["message" => 'OK'];
+            $response = ["message" => 'OK'];
             return response($response, 200);
         } else {
             $response = ["message" => 'Insert error'];
@@ -893,7 +895,7 @@ class ApiAuthController extends Controller
     public function DBGenarate($DbName)
     {
         Log::info('Inside DBGenerate' . json_encode($DbName));
-        
+
         $preDatabase = Config::get('database.connections.mysql.database');
         Log::info('Inside DBGenerate main DB NAme ' . json_encode($preDatabase));
         DB::statement("CREATE DATABASE IF NOT EXISTS $DbName");
@@ -911,9 +913,9 @@ class ApiAuthController extends Controller
         return true;
     }
 
-    
 
-  
+
+
 
     public function get_account_details(Request $request)
     {
@@ -942,9 +944,9 @@ class ApiAuthController extends Controller
         }
     }
 
-   
 
-  
+
+
 
     public function get_email(Request $request)
     {
