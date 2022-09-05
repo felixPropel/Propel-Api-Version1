@@ -15,8 +15,8 @@ class CreateUserAccountsTable extends Migration
     {
         Schema::create('user_accounts', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('u_id','50');
-            $table->integer('organization_id');
+            $table->string('u_id','50')->nullable(false);
+            $table->integer('organization_id')->nullable(false);
             $table->timestamps();
         });
     }
