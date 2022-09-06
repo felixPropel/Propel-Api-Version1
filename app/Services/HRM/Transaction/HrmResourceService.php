@@ -2,6 +2,7 @@
 
 namespace App\Services\HRM\Transaction;
 
+use App\Interfaces\CommonInterface;
 use App\Interfaces\PersonInterface;
 
 /**
@@ -11,9 +12,10 @@ use App\Interfaces\PersonInterface;
 class HrmResourceService
 {
 
-    public function __construct(PersonInterface $personInterface)
+    public function __construct(PersonInterface $personInterface,CommonInterface $commonInterface)
     {
         $this->personInterface = $personInterface;
+        $this->commonInterface = $commonInterface;
     }
 
 
@@ -25,6 +27,9 @@ class HrmResourceService
         $email = $datas->email;
         
         $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email, $mobile);
+
+        $saluationLists = $this->commonInterface->getAllSalutions();
+        dd($saluationLists);
 
         if ($checkPerson) {
             $uId = $checkPerson->uid;
@@ -46,7 +51,8 @@ class HrmResourceService
             }
         } else {
             $getAllPersonByMobileAndEmail =  $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
-            if (count($getAllPersonByMobileAndEmail)) {
+            if (count($getAllPersonByMobileAndEmail))
+            {
                 $response = ['status' => "NotInSinglePerson", 'data' => $getAllPersonByMobileAndEmail];
             } else {
                 $response = ['status' => "FreshPerson", 'data' => ""];
