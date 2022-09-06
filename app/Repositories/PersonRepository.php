@@ -22,6 +22,7 @@ use App\Models\BasicModels\Salutation;
 use App\Models\BasicModels\State;
 use App\Models\BasicModels\Gender;
 use App\Models\BasicModels\BloodGroup;
+use App\Models\Address_of;
 use App\Models\UserAccount;
 use Illuminate\Support\Facades\DB;
 use Log;
@@ -188,6 +189,22 @@ class PersonRepository implements PersonInterface
         $details = PersonDetails::with('email', 'mobile', 'person', 'person_address')->where("uid", $uid)->get();
         return $details;
     }
+
+    public function GetCompletePersonByUid($uid){
+        $details=PersonDetails::with('email', 'mobile', 'person', 'user', 'person_address_profile')->where("uid", $uid)->first();
+        return $details;
+    }
+
+    public function getPersonAddressByUid($uid){
+        $address=PersonAddress::where("uid", $uid)->get()->toArray();
+        return $address;
+    }
+
+    public function getAddressOf(){
+        $address_off=Address_of::all();
+        return $address_off;
+    }
+
     //writen by dhanaraj
     public function getDetailedAllPersonDataWithMobile($mobile)
     {
@@ -227,19 +244,19 @@ class PersonRepository implements PersonInterface
 
     public function findExactPersonWithEmailAndMobile($email, $mobile)
     {
-        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.');
+        // Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.');
 
-        $model =  Person::select('*')
-            ->leftjoin('person_mobile', 'person_mobile.uid', 'person.uid')
-            ->leftjoin('person_email', 'person_email.uid', 'person.uid')            
-            ->where('person_mobile.mobile', $mobile)
-            ->Where('person_email.email', $email)
-            ->whereIn('person_mobile.status', [1, 2])
-            ->whereIn('person_email.status', [1, 2])
-            ->first();
+        // $model =  Person::select('*')
+        //     ->leftjoin('person_mobile', 'person_mobile.uid', 'person.uid')
+        //     ->leftjoin('person_email', 'person_email.uid', 'person.uid')            
+        //     ->where('person_mobile.mobile', $mobile)
+        //     ->Where('person_email.email', $email)
+        //     ->whereIn('person_mobile.status', [1, 2])
+        //     ->whereIn('person_email.status', [1, 2])
+        //     ->first();
 
-        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Return . ' . json_encode($model));
-        return $model;
+        // Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Return . ' . json_encode($model));
+        // return $model;
     }
     public function findUserWithInOrganization($uId, $orgId)
     {

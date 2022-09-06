@@ -41,7 +41,7 @@ class Common extends Model
     {
         $user_mobile = DB::table('person_mobile')
             ->where('mobile', '=', $mobile)
-            ->where('status', '=', '1')
+            ->where('status', '!=', '0')
             ->first();
         if ($user_mobile) {
             return 1;

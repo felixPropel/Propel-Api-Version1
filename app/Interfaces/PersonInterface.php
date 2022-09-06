@@ -9,6 +9,8 @@ interface PersonInterface
     public function check_for_mobile($data);
     public function getPersonDetailsBasicUid($uid);
     public function getFullPersonDetailsByUid($uid);
+    public function GetCompletePersonByUid($uid);
+    public function getPersonAddressByUid($uid);
     public function getAllPersonDataWithEmailAndMobile($email, $mobile);
     public function findTempUserDataById($id);
     public function saveTempUser($model);
@@ -16,7 +18,6 @@ interface PersonInterface
     public function check_person_exist_by_uid($uid);
     public function savePerson($personModel);
     public function savePersonEmail($personModel);
-    public function getAllSaluations();
     public function check_person_exist_by_email($email);
     public function savePersonMobile($personMobileModel);
     public function findTempUserDataByMobile($mobile);
@@ -30,7 +31,8 @@ interface PersonInterface
     public function get_gender();
     public function get_blood();
     public function getStates();
-
+    public function getAllSaluations();
+    public function getAddressOf();
     //writen by dhanaraj
     public function getDetailedAllPersonDataWithMobile($mobile);
     public function getDetailedAllPersonDataWithEmail($email);

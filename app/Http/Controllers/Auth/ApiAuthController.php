@@ -221,33 +221,7 @@ class ApiAuthController extends Controller
 
 
 
-    public function person_details_update(Request $request)
-    {
-        $affectedRows = PersonDetails::where("uid", $request['uid'])->update([
-            "saluation" => $request->saluation,
-            "first_name" => $request->first_name,
-            "middle_name" => $request->middle_name,
-            "last_name" => $request->last_name,
-            "nick_name" => $request->nick_name,
-            "gender" => $request->gender,
-            "dob" => $request->dob,
-            "blood_group" => $request->blood_group,
-            "martial_status" => $request->martial_status,
-            "aniversary_date" => $request->aniversary_date,
-            "mother_tongue" => $request->mother_tongue,
-            "other_language" => $request->other_language,
-            "profile_pic" => $request->profile_pic,
-            "birth_city" => $request->birth_city,
-        ]);
-
-        if ($affectedRows > 0) {
-            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid]];
-            return response($response, 200);
-        } else {
-            $response = ["message" => 'Update Error!'];
-            return response($response, 400);
-        }
-    }
+    
 
     public function person_details_update_extra(Request $request)
     {
@@ -960,27 +934,7 @@ class ApiAuthController extends Controller
         }
     }
 
-    public function get_profile_details(Request $request)
-    {
-        $gender = Gender::all();
-        $blood = BloodGroup::all();
-        $saluation = Salutation::all();
-        $details = PersonDetails::with('email', 'mobile', 'person', 'user', 'person_address_profile')->where("uid", $request->uid)->first();
-        $address = PersonAddress::where("uid", $request->uid)->get()->toArray();
-        $result = $details;
-
-        $states = State::where('country_id', 101)->get();
-        $address_of = Address_of::all();
-        $addressData = $details->person_address_profile;
-        if (!empty($result)) {
-            $response = ["message" => 'OK', 'route' => '', 'param' => ['uid' => $request->uid, 'result' => $result, 'addressData' => $addressData, 'gender' => $gender, 'blood' => $blood, 'saluations' => $saluation, 'states' => $states, 'address_of' => $address_of, 'address' => $address]];
-            return response($response, 200);
-        } else {
-            $response = ["message" => 'Details Not Found'];
-            return response($response, 400);
-        }
-    }
-
+  
     public function update_otp(Request $request)
     {
         $affectedRows = User::where("uid", $request->uid)->update(["email_otp" => $request->otp, "email_otp_verified" => 0]);

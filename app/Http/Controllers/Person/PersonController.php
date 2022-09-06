@@ -100,15 +100,28 @@ class PersonController extends Controller
         return $response;
     }
 
+    public function get_profile_details(Request $request)
+    {
+        $response = $this->person->getProfileDetails($request->all());
+        return $response;
+    }
+
+    public function person_details_update(Request $request)
+    {
+        $response = $this->person->PersonDetailsUpdate($request->all());
+        return $response;
+    }
+
+
     //Written Dhana Function Started
 
     //@developer Dhana
     public function findExactPersonWithEmailAndMobile(Request $request)
     {
-        Log::info('PersonController>findExactPersonWithEmailAndMobile Function>Inside. '.json_encode($request->all()));
-        $response = $this->person->findExactPersonWithEmailAndMobile($request->all());
-        Log::info('PersonController>findExactPersonWithEmailAndMobile Function>Return. '.json_encode($response));
-        return $response;
+        // Log::info('PersonController>findExactPersonWithEmailAndMobile Function>Inside. '.json_encode($request->all()));
+        // $response = $this->person->findExactPersonWithEmailAndMobile($request->all());
+        // Log::info('PersonController>findExactPersonWithEmailAndMobile Function>Return. '.json_encode($response));
+        // return $response;
     }
     //Written Dhana Function Ended
 }

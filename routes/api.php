@@ -35,7 +35,8 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::get('/get_gender_and_blood_group', 'Person\PersonController@get_gender_and_blood_group')->name('get_gender_and_blood_group.api');
     Route::get('/get_mobile', 'Person\PersonController@get_mobile')->name('get_mobile.api');
     Route::post('/get_cities_by_state', 'Person\PersonController@get_cities_by_state')->name('get_cities_by_state.api');
-
+    Route::get('/get_profile_details', 'Person\PersonController@get_profile_details')->name('get_profile_details.api');
+    Route::post('/person_details_update', 'Person\PersonController@person_details_update')->name('person_details_update.api');
     //Person//
 
     Route::post('/login', 'Auth\ApiAuthController@login')->name('login.api');
@@ -46,7 +47,7 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
 
     Route::get('/get_email', 'Auth\ApiAuthController@get_email')->name('get_email.api');
     Route::post('/update_otp', 'Auth\ApiAuthController@update_otp')->name('update_otp.api');
-    Route::get('/get_profile_details', 'Auth\ApiAuthController@get_profile_details')->name('get_profile_details.api');
+    
     Route::post('/get_account_details', 'Auth\ApiAuthController@get_account_details')->name('get_account_details.api');
 
     Route::get('/check_person', 'Auth\ApiAuthController@check_person')->name('check_person.api');
@@ -58,7 +59,7 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
 
     Route::post('/check_confirmation', 'Auth\ApiAuthController@check_confirmation')->name('check_confirmation.api');
 
-    Route::post('/person_details_update', 'Auth\ApiAuthController@person_details_update')->name('person_details_update.api');
+ 
     Route::post('/person_details_update_extra', 'Auth\ApiAuthController@person_details_update_extra')->name('person_details_update_extra.api');
 
     Route::post('/person_registration_otp', 'Auth\ApiAuthController@person_registration_otp')->name('person_registration_otp.api');
