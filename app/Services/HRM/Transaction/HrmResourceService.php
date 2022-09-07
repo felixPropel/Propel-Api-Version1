@@ -21,15 +21,19 @@ class HrmResourceService
 
     public function findResourceWithCredentials($datas)
     {
-        
-        $datas = (object)$datas;      
+      
+        $datas = (object)$datas; 
         $mobile = $datas->mobile;
         $email = $datas->email;
-        
-        $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email, $mobile);
-
+        $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email,$mobile);
         $saluationLists = $this->commonInterface->getAllSalutions();
-        dd($saluationLists);
+        $bloodGroupLists=$this->commonInterface->getAllBloodGroups();
+        $genderLists=$this->commonInterface->getAllGenders();
+        $maritalStatusLists=$this->commonInterface->getAllMaritalstatus();
+        $addressOfLists=$this->commonInterface->getAllAddressOfLists();
+        $hrmDepartmentLists=$this->commonInterface->getAllHrmDepartmentLists();
+        $hrmDesignationLists=$this->commonInterface->getAllHrmDesignationLists();
+        
 
         if ($checkPerson) {
             $uId = $checkPerson->uid;
@@ -40,25 +44,26 @@ class HrmResourceService
                 $userWithInOrganization = $this->personInterface->findUserWithInOrganization($uId, $orgId);               
                 if ($userWithInOrganization) 
                 {
-                    $response = ['status' => "SameOrganizationUser", 'data' => ""];
+                    $results = ['status' => "SameOrganizationUser", 'data' => ""];
                 } 
                 else
                 {
-                    $response = ['status' => "NotInSameOrganizationUser", 'data' => ""];
+                    $results = ['status' => "NotInSameOrganizationUser", 'data' => ""];
                 }
             } else {
-                $response = ['status' => "SinglePersonOnly", 'data' =>  $checkPerson];
+                $results = ['status' => "SinglePersonOnly", 'data' =>  $checkPerson];
             }
         } else {
             $getAllPersonByMobileAndEmail =  $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
             if (count($getAllPersonByMobileAndEmail))
             {
-                $response = ['status' => "NotInSinglePerson", 'data' => $getAllPersonByMobileAndEmail];
+                $results = ['status' => "NotInSinglePerson", 'data' => $getAllPersonByMobileAndEmail];
             } else {
-                $response = ['status' => "FreshPerson", 'data' => ""];
+                $results = ['status' => "FreshPerson", 'data' => ""];
             }
         }
-        return response($response, 400);
+        $response = ['results' =>$results ,'saluationLists' => $saluationLists,'bloodGroupLists' => $bloodGroupLists ,'genderLists' => $genderLists ,'addressOfLists' => $addressOfLists ,'hrmDepartmentLists' => $hrmDepartmentLists,'hrmDesignation'=>$hrmDesignationLists];
+        return   $response;
     }
 
     public function save($datas)
