@@ -15,7 +15,7 @@ use App\Models\User;
 use App\Models\BasicModels\Salutation;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class PersonService
 {
@@ -183,21 +183,20 @@ class PersonService
             $person_details->uid = $data['uid'];
             $person_details->profile_pic = $data['profile_pic'];
 
-            $person_details->saluation = $data['saluation']?$data['saluation']:"";
-            $person_details->first_name = $data['first_name']?$data['first_name']:"";
-            $person_details->middle_name = $data['middle_name']?$data['middle_name']:"";
-            $person_details->last_name = $data['last_name']?$data['last_name']:"";
-            $person_details->nick_name = $data['nick_name']?$data['nick_name']:"";
-            $person_details->gender = $data['gender']?$data['gender']:"";
-            $person_details->dob = $data['dob']?$data['dob']:"";
-            $person_details->blood_group = $data['blood_group']?$data['blood_group']:"";
-            $person_details->martial_status = $data['martial_status']?$data['martial_status']:"";
-            $person_details->aniversary_date = $data['aniversary_date']?$data['aniversary_date']:"";
-            $person_details->mother_tongue = $data['mother_tongue']?$data['mother_tongue']:"";
-            $person_details->other_language = $data['other_language']?$data['other_language']:"";
-            $person_details->profile_pic = $data['profile_pic']?$data['profile_pic']:"";
-            $person_details->birth_city = $data['birth_city']?$data['birth_city']:"";
-
+            $person_details->saluation = $data['saluation'] ? $data['saluation'] : "";
+            $person_details->first_name = $data['first_name'] ? $data['first_name'] : "";
+            $person_details->middle_name = $data['middle_name'] ? $data['middle_name'] : "";
+            $person_details->last_name = $data['last_name'] ? $data['last_name'] : "";
+            $person_details->nick_name = $data['nick_name'] ? $data['nick_name'] : "";
+            $person_details->gender = $data['gender'] ? $data['gender'] : "";
+            $person_details->dob = $data['dob'] ? $data['dob'] : "";
+            $person_details->blood_group = $data['blood_group'] ? $data['blood_group'] : "";
+            $person_details->martial_status = $data['martial_status'] ? $data['martial_status'] : "";
+            $person_details->aniversary_date = $data['aniversary_date'] ? $data['aniversary_date'] : "";
+            $person_details->mother_tongue = $data['mother_tongue'] ? $data['mother_tongue'] : "";
+            $person_details->other_language = $data['other_language'] ? $data['other_language'] : "";
+            $person_details->profile_pic = $data['profile_pic'] ? $data['profile_pic'] : "";
+            $person_details->birth_city = $data['birth_city'] ? $data['birth_city'] : "";
         } else {
             $person_details = new PersonDetails();
             $person_details->uid = $data['uid'];
@@ -594,8 +593,9 @@ class PersonService
         }
     }
 
-    public function PersonDetailsUpdate($data){
-        $details_array=array(
+    public function PersonDetailsUpdate($data)
+    {
+        $details_array = array(
             "saluation" => $data['saluation'],
             "first_name" => $data['first_name'],
             "middle_name" => $data['middle_name'],
@@ -610,9 +610,9 @@ class PersonService
             "other_language" => $data['other_language'],
             "profile_pic" => $data['profile_pic'],
             "birth_city" => $data['birth_city'],
-            "uid"=>$data['uid']
+            "uid" => $data['uid']
         );
-        $personDetailsModel=$this->convertToPersonDetailsModel($details_array,$data['uid']);
+        $personDetailsModel = $this->convertToPersonDetailsModel($details_array, $data['uid']);
         $person_details = $this->personInterface->savePersonDetails($personDetailsModel);
         if ($person_details) {
             $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $data['uid']]];
@@ -629,13 +629,13 @@ class PersonService
     //@developer Dhana
     public function findExactPersonWithEmailAndMobile($datas)
     {
-        // Log::info('PersonService>findExactPersonWithEmailAndMobile Function>Inside. ');
-        // $datas = (object)$datas;
-        // $email = $datas->email;
-        // $mobile = $datas->mobile;
-        // $response = $this->personInterface->findExactPersonWithEmailAndMobile($email, $mobile);
-        // Log::info('PersonService>findExactPersonWithEmailAndMobile Function>Return.' . json_encode($response));
-        // return response($response, 200);
+        Log::info('PersonService>findExactPersonWithEmailAndMobile Function>Inside. ');
+        $datas = (object)$datas;
+        $email = $datas->email;
+        $mobile = $datas->mobile;
+        $response = $this->personInterface->findExactPersonWithEmailAndMobile($email, $mobile);
+        Log::info('PersonService>findExactPersonWithEmailAndMobile Function>Return.' . json_encode($response));
+        return response($response, 200);
     }
     //Written Dhana Function Ended
 }
