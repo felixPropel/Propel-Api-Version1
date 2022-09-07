@@ -33,7 +33,7 @@ class PersonDetails extends Model
 
     public function person_address_profile()
     {
-        return $this->hasMany('App\Models\PersonAddress', 'uid', 'uid')->where('address_type', '=', 3);
+        return $this->hasMany('App\Models\PersonAddress', 'uid', 'uid')->where('status', '=', 1);
     }
 
     public function user()

@@ -221,59 +221,6 @@ class ApiAuthController extends Controller
 
 
 
-    
-
-    public function person_details_update_extra(Request $request)
-    {
-
-        $person_address = PersonAddress::where(['uid' => $request['uid'], 'address' => $request->address_of, 'status' => 1])->first();
-        if ($person_address) {
-            $affectedRows = PersonAddress::where(['uid' => $request['uid'], 'address' => $request->address_of, 'status' => 1])->update([
-                "address_type" => 3,
-                "address" => $request->address_of,
-                "door_no" => $request->door_no,
-                "bilding_name" => $request->bilding_name,
-                "street" => $request->street,
-                "land_mark" => $request->land_mark,
-                "pincode" => $request->pincode,
-                "city" => $request->city,
-                "state" => $request->state,
-                "district" => $request->district,
-                "area" => $request->area,
-                // "web_link" => $request->web_link,
-            ]);
-        } else {
-            $person_address = new PersonAddress();
-            $person_address->uid = $request['uid'];
-            $person_address->address_type = 3;
-            $person_address->address = $request->address_of;
-            $person_address->door_no = $request->door_no;
-            $person_address->bilding_name = $request->bilding_name;
-            $person_address->street = $request->street;
-            $person_address->land_mark = $request->land_mark;
-            $person_address->pincode = $request->pincode;
-            $person_address->city = $request->city;
-            $person_address->state = $request->state;
-            $person_address->district = $request->district;
-            $person_address->area = $request->area;
-            $person_address->status = 1;
-            $person_address->save();
-            $affectedRows = $person_address->id;
-        }
-
-        $affectedRows1 = PersonDetails::where("uid", $request['uid'])->update([
-            "web_link" => $request->web_link,
-        ]);
-        if ($affectedRows > 0) {
-            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $request->uid]];
-            return response($response, 200);
-        } else {
-            $response = ["message" => 'Update Error!'];
-            return response($response, 400);
-        }
-    }
-
-
     public function person_registration_otp(Request $request)
     {
         $mobile = PersonMobile::where('uid', $request['uid'])->first();

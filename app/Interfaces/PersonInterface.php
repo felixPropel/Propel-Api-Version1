@@ -11,6 +11,7 @@ interface PersonInterface
     public function getFullPersonDetailsByUid($uid);
     public function GetCompletePersonByUid($uid);
     public function getPersonAddressByUid($uid);
+    public function getPersonAddressByUidAndType($uid,$type);
     public function getAllPersonDataWithEmailAndMobile($email, $mobile);
     public function findTempUserDataById($id);
     public function saveTempUser($model);
@@ -22,11 +23,13 @@ interface PersonInterface
     public function savePersonMobile($personMobileModel);
     public function findTempUserDataByMobile($mobile);
     public function savePersonDetails($personDetailsModel);
+    public function savePersonAddress($addressModel);
     public function getPersonMobileByUid($uid);
     public function getPersonEmailByUid($uid);
     public function saveUser($userModel);
     public function saveHomeAddress($homeAddressModel);
     public function saveOfficeAddress($officeAddressModel);
+    public function updateWebLink($uid,$link);
     public function getCitiesByState($data);
     public function get_gender();
     public function get_blood();

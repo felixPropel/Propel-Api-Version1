@@ -200,9 +200,26 @@ class PersonRepository implements PersonInterface
         return $address;
     }
 
+    public function getPersonAddressByUidAndType($uid,$type){
+        $address=PersonAddress::where(['uid' => $uid, 'address_type' => $type, 'status' => 1])->first();
+        return $address;
+    }
+
     public function getAddressOf(){
         $address_off=Address_of::all();
         return $address_off;
+    }
+
+    public function savePersonAddress($addressModel){
+        $addressModel->save();
+        return $addressModel;
+    }
+
+    public function updateWebLink($uid,$link){
+        $affectedRows1 = PersonDetails::where("uid", $uid)->update([
+            "web_link" => $link,
+        ]);
+        return $affectedRows1;
     }
 
     //writen by dhanaraj

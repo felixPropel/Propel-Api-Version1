@@ -173,6 +173,7 @@ class PersonService
         }
         $person_mobile->mobile = $person_datas['mobile'];
         $person_mobile->uid = $person_datas['uid'];
+        $person_mobile->status = 1;
         return $person_mobile;
     }
 
@@ -266,6 +267,41 @@ class PersonService
         $person_address->address_type = $data['address_type'];
         $person_address->address = $data['address'];
         $person_address->status = $data['status'];
+        return $person_address;
+    }
+
+    public function convertToPersonAddressModel($data, $uid, $address_of)
+    {
+        if ($uid != "" && $address_of != "") {
+            $person_address = $this->personInterface->getPersonAddressByUidAndType($uid, $address_of);
+            $person_address->uid = $data['uid'];
+            $person_address->address_type = $address_of;
+            $person_address->address = $data['address'];
+            $person_address->door_no = $data['door_no'];
+            $person_address->bilding_name = $data['bilding_name'];
+            $person_address->street = $data['street'];
+            $person_address->land_mark = $data['land_mark'];
+            $person_address->pincode = $data['pincode'];
+            $person_address->city = $data['city'];
+            $person_address->state = $data['state'];
+            $person_address->district = $data['district'];
+            $person_address->area = $data['area'];
+        } else {
+            $person_address = new PersonAddress();
+            $person_address->uid = $data['uid'];
+            $person_address->address_type = 3;
+            $person_address->address = $data['address'];
+            $person_address->door_no = $data['door_no'];
+            $person_address->bilding_name = $data['bilding_name'];
+            $person_address->street = $data['street'];
+            $person_address->land_mark = $data['land_mark'];
+            $person_address->pincode = $data['pincode'];
+            $person_address->city = $data['city'];
+            $person_address->state = $data['state'];
+            $person_address->district = $data['district'];
+            $person_address->area = $data['area'];
+            $person_address->status = 1;
+        }
         return $person_address;
     }
 
@@ -615,6 +651,58 @@ class PersonService
         $personDetailsModel = $this->convertToPersonDetailsModel($details_array, $data['uid']);
         $person_details = $this->personInterface->savePersonDetails($personDetailsModel);
         if ($person_details) {
+            $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $data['uid']]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Update Error!'];
+            return response($response, 400);
+        }
+    }
+
+    public function PersonDetailsUpdateExtra($data)
+    {
+        $person_address = $this->personInterface->getPersonAddressByUidAndType($data['uid'], $data['address_of']);
+
+        if ($person_address) {
+            $address_array = array(
+                'uid' => $data['uid'],
+                "address_type" => 3,
+                "address" => $data['address_of'],
+                "door_no" => $data['door_no'],
+                "bilding_name" => $data['bilding_name'],
+                "street" => $data['street'],
+                "land_mark" => $data['land_mark'],
+                "pincode" => $data['pincode'],
+                "city" => $data['city'],
+                "state" => $data['state'],
+                "district" => $data['district'],
+                "area" => $data['area'],
+            );
+            $addressModel = $this->convertToPersonAddressModel($address_array, $data['uid'], $data['address_of']);
+           
+            $address = $this->personInterface->savePersonAddress($addressModel);
+        } else {
+            $address_array = array(
+                'uid' => $data['uid'],
+                "address_type" => 3,
+                "address" => $data['address_of'],
+                "door_no" => $data['door_no'],
+                "bilding_name" => $data['bilding_name'],
+                "street" => $data['street'],
+                "land_mark" => $data['land_mark'],
+                "pincode" => $data['pincode'],
+                "city" => $data['city'],
+                "state" => $data['state'],
+                "district" => $data['district'],
+                "area" => $data['area'],
+                "status" => 1,
+            );
+            $addressModel = $this->convertToPersonAddressModel($address_array, "", "");
+            $address = $this->personInterface->savePersonAddress($addressModel);
+        }
+        $affectedRows1 = $this->personInterface->updateWebLink($data['uid'], $data['web_link']);
+
+        if ($address) {
             $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $data['uid']]];
             return response($response, 200);
         } else {

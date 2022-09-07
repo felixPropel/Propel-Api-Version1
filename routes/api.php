@@ -37,6 +37,7 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::post('/get_cities_by_state', 'Person\PersonController@get_cities_by_state')->name('get_cities_by_state.api');
     Route::get('/get_profile_details', 'Person\PersonController@get_profile_details')->name('get_profile_details.api');
     Route::post('/person_details_update', 'Person\PersonController@person_details_update')->name('person_details_update.api');
+    Route::post('/person_details_update_extra', 'Person\PersonController@person_details_update_extra')->name('person_details_update_extra.api');
     //Person//
 
     Route::post('/login', 'Auth\ApiAuthController@login')->name('login.api');
@@ -49,7 +50,6 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
     Route::post('/update_otp', 'Auth\ApiAuthController@update_otp')->name('update_otp.api');
     
     Route::post('/get_account_details', 'Auth\ApiAuthController@get_account_details')->name('get_account_details.api');
-
     Route::get('/check_person', 'Auth\ApiAuthController@check_person')->name('check_person.api');
     Route::get('/check_person_email', 'Auth\ApiAuthController@check_person_email')->name('check_person_email.api');
     Route::get('/get_temp_status', 'Auth\ApiAuthController@get_temp_status')->name('get_temp_status.api');
@@ -59,8 +59,7 @@ Route::group(['middleware' => ['cors', 'json.response'], 'namespace' => 'App\Htt
 
     Route::post('/check_confirmation', 'Auth\ApiAuthController@check_confirmation')->name('check_confirmation.api');
 
- 
-    Route::post('/person_details_update_extra', 'Auth\ApiAuthController@person_details_update_extra')->name('person_details_update_extra.api');
+
 
     Route::post('/person_registration_otp', 'Auth\ApiAuthController@person_registration_otp')->name('person_registration_otp.api');
     Route::post('/update_password', 'Auth\ApiAuthController@update_password')->name('update_password.api');

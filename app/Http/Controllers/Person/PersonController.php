@@ -112,6 +112,12 @@ class PersonController extends Controller
         return $response;
     }
 
+    public function person_details_update_extra(Request $request)
+    {
+        $response = $this->person->PersonDetailsUpdateExtra($request->all());
+        return $response;
+    }
+
 
     //Written Dhana Function Started
 
