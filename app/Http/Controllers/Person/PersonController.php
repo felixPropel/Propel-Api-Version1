@@ -118,6 +118,48 @@ class PersonController extends Controller
         return $response;
     }
 
+    public function store_mobile(Request $request)
+    {
+        $response = $this->person->storeMobile($request->all());
+        return $response;
+    }
+
+    public function make_primary(Request $request)
+    {
+        $response = $this->person->makePrimary($request->all());
+        return $response;
+    }
+
+    public function make_email_primary(Request $request)
+    {
+        $response = $this->person->makeEmailPrimary($request->all());
+        return $response;
+    }
+
+    public function make_email_secondary(Request $request)
+    {
+        $response = $this->person->makeEmailSecondary($request->all());
+        return $response;
+    }
+
+    public function make_email_primary_secondary(Request $request){
+        $response = $this->person->makeEmailPrimarySecondary($request->all());
+        return $response;
+    }
+
+    public function delete_other(Request $request)
+    {
+        $response = $this->person->deleteOther($request->all());
+        return $response;
+       
+    }
+
+    public function delete_other_email(Request $request)
+    {
+        $response = $this->person->deleteOtherEmail($request->all());
+        return $response;
+    }
+
 
     //Written Dhana Function Started
 

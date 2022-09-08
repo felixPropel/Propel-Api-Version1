@@ -137,11 +137,16 @@ class PersonService
         return $temp_user;
     }
 
-    public function convertToPersonEmailModel($personData)
+    public function convertToPersonEmailModel($personData, $uid, $status, $email)
     {
-        $person_email = new PersonEmail();
+        if ($uid) {
+            $person_email = $this->personInterface->getPersonEmailByUid($uid, $status, $email);
+        } else {
+            $person_email = new PersonEmail();
+        }
         $person_email->email = $personData['email'];
         $person_email->uid = $personData['uid'];
+        $person_email->status = $personData['status'];
         return $person_email;
     }
 
@@ -164,16 +169,16 @@ class PersonService
         return $person;
     }
 
-    public function convertToPersonMobileModel($person_datas, $uid)
+    public function convertToPersonMobileModel($person_datas, $uid, $status, $mobile)
     {
         if ($uid != "") {
-            $person_mobile = $this->personInterface->getPersonMobileByUid($uid);
+            $person_mobile = $this->personInterface->getPersonMobileByUid($uid, $status, $mobile);
         } else {
             $person_mobile = new PersonMobile();
         }
         $person_mobile->mobile = $person_datas['mobile'];
         $person_mobile->uid = $person_datas['uid'];
-        $person_mobile->status = 1;
+        $person_mobile->status = $person_datas['status'] ? $person_datas['status'] : 0;
         return $person_mobile;
     }
 
@@ -230,13 +235,22 @@ class PersonService
         return $person_details;
     }
 
-    public function convertToUserModel($data)
+    public function convertToUserModel($data, $id, $type)
     {
-        $user = new User();
-        $user->uid = $data['uid'];
-        $user->primary_email = $data['primary_email'];
-        $user->primary_mobile = $data['primary_mobile'];
-        $user->password = $data['password'];
+        if ($id != '') {
+            $user = $this->personInterface->checkUserByUID($id);
+            if ($type == 1) {
+                $user->primary_mobile = $data['primary_mobile'];
+            } else if ($type == 1) {
+                $user->primary_mobile = $data['primary_mobile'];
+            }
+        } else {
+            $user = new User();
+            $user->uid = $data['uid'];
+            $user->primary_email = $data['primary_email'];
+            $user->primary_mobile = $data['primary_mobile'];
+            $user->password = $data['password'];
+        }
         return $user;
     }
 
@@ -367,7 +381,7 @@ class PersonService
                 'uid' =>  $uuid
             );
 
-            $personMobileModel = $this->convertToPersonMobileModel($person_data, "");
+            $personMobileModel = $this->convertToPersonMobileModel($person_data, "", "", "");
             $person = $this->personInterface->savePersonMobile($personMobileModel);
         }
         $check_person_email = $this->personInterface->check_person_exist_by_email($data['email']);
@@ -387,9 +401,10 @@ class PersonService
         } else {
             $person_email = array(
                 'email' => $data['email'],
-                'uid' => $uuid
+                'uid' => $uuid,
+                'status' => 1
             );
-            $personModel = $this->convertToPersonEmailModel($person_email);
+            $personModel = $this->convertToPersonEmailModel($person_email, "", "", "");
             $person = $this->personInterface->savePersonEmail($personModel);
         }
 
@@ -464,7 +479,7 @@ class PersonService
         $personDetailsModel = $this->convertToPersonDetailsModel1($detailsArray);
         $affectedRows = $this->personInterface->savePersonDetails($personDetailsModel);
         if ($affectedRows) {
-            $mobile = $this->personInterface->getPersonMobileByUid($data['uid']);
+            $mobile = $this->personInterface->getPersonMobileByUid($data['uid'], 1, "", "");
             $response = ["message" => 'OK', 'route' => 'registration_otp', 'param' => ['uid' => $data['uid'], 'mobile' => $mobile]];
             return response($response, 200);
         } else {
@@ -475,7 +490,7 @@ class PersonService
 
     public function get_person_mobile($data)
     {
-        $mobile = $this->personInterface->getPersonMobileByUid($data['uid']);
+        $mobile = $this->personInterface->getPersonMobileByUid($data['uid'], 1, "");
         if (!empty($mobile)) {
             $response = ["message" => 'OK', 'route' => '', 'param' => ['mobile' => $mobile]];
             return response($response, 200);
@@ -487,15 +502,15 @@ class PersonService
 
     public function create_user($data)
     {
-        $mobile = $this->personInterface->getPersonMobileByUid($data['uid']);
-        $email = $this->personInterface->getPersonEmailByUid($data['uid']);
+        $mobile = $this->personInterface->getPersonMobileByUid($data['uid'], 1, "");
+        $email = $this->personInterface->getPersonEmailByUid($data['uid'], "","");
         $userArray = array(
             'uid' => $data['uid'],
             'primary_email' => $email->email,
             'primary_mobile' => $mobile->mobile,
             'password' => Hash::make($data['password']),
         );
-        $userModel = $this->convertToUserModel($userArray);
+        $userModel = $this->convertToUserModel($userArray, "", "");
         $user = $this->personInterface->saveUser($userModel);
         if ($user) {
             $response = ["message" => 'OK', 'route' => 'profile', 'param' => ['uid' => $data['uid'], 'mobile' => $mobile->mobile, 'password' => $data['password']]];
@@ -679,7 +694,7 @@ class PersonService
                 "area" => $data['area'],
             );
             $addressModel = $this->convertToPersonAddressModel($address_array, $data['uid'], $data['address_of']);
-           
+
             $address = $this->personInterface->savePersonAddress($addressModel);
         } else {
             $address_array = array(
@@ -707,6 +722,232 @@ class PersonService
             return response($response, 200);
         } else {
             $response = ["message" => 'Update Error!'];
+            return response($response, 400);
+        }
+    }
+
+
+    public function storeMobile($data)
+    {
+        if ($data['mobile_type'] == '1') {
+            $mobile_array = array(
+                'uid' => $data['uid'],
+                'primary_mobile' => $data['mobile'],
+            );
+            $userModel = $this->convertToUserModel($mobile_array, $data['uid'], 1);
+            $user = $this->personInterface->saveUser($userModel);
+            $mobile = $this->personInterface->getPersonMobileByUid($data['uid'], 1, "");
+            return $mobile;
+
+            if (!empty($mobile)) {
+                $personMobileArr = array(
+                    "mobile" => $data['mobile'],
+                );
+                $mobileModel = $this->convertToPersonMobileModel($personMobileArr, $data['uid'], 1, $mobile[0]);
+                $personMobile = $this->personInterface->savePersonMobile($mobileModel);
+                if ($personMobile) {
+                    $personMobileArr1 = array(
+                        "uid" => $data['uid'],
+                        "mobile" => $mobile[0],
+                        "status" => 0,
+                    );
+                    $mobileModel = $this->convertToPersonMobileModel($personMobileArr1, "", "", "");
+                    $person = $this->personInterface->savePersonMobile($mobileModel);
+                    $response = ["message" => 'OK'];
+                    return response($response, 200);
+                } else {
+                    $response = ["message" => 'Update error'];
+                    return response($response, 400);
+                }
+            } else {
+                $personMobileArr2 = array(
+                    "uid" => $data['uid'],
+                    "mobile" => $data['mobile'],
+                    "status" => 1,
+                );
+                $mobileModel = $this->convertToPersonMobileModel($personMobileArr2, "", "", "");
+                $personMobile = $this->personInterface->savePersonMobile($mobileModel);
+                if ($personMobile) {
+                    $response = ["message" => 'OK'];
+                    return response($response, 200);
+                } else {
+                    $response = ["message" => 'Update error'];
+                    return response($response, 400);
+                }
+            }
+        } else if ($data['mobile_type'] == '2') {
+
+            $mobile = $this->personInterface->getPersonMobileByUid($data['uid'], 2, "");
+            if (!empty($mobile)) {
+                $personMobileArr = array(
+                    "mobile" =>  $data['mobile'],
+                );
+                $mobileModel = $this->convertToPersonMobileModel($personMobileArr, $data['uid'], 2, $mobile[0]);
+                $personMobile = $this->personInterface->savePersonMobile($mobileModel);
+                if ($personMobile) {
+                    $personMobileArr2 = array(
+                        "uid" => $data['uid'],
+                        "mobile" => $mobile[0],
+                        "status" => 0,
+                    );
+                    $mobileModel = $this->convertToPersonMobileModel($personMobileArr2, "", "", "");
+                    $personMobile = $this->personInterface->savePersonMobile($mobileModel);
+                    $response = ["message" => 'OK'];
+
+                    return response($response, 200);
+                } else {
+                    $response = ["message" => 'Update error'];
+                    return response($response, 400);
+                }
+            } else {
+                $personMobileArr2 = array(
+                    "uid" => $data['uid'],
+                    "mobile" => $data['mobile'],
+                    "status" => 2,
+                );
+                $mobileModel = $this->convertToPersonMobileModel($personMobileArr2, "", "", "");
+                $personMobile = $this->personInterface->savePersonMobile($mobileModel);
+                if ($personMobile) {
+                    $response = ["message" => 'OK'];
+                    return response($response, 200);
+                } else {
+                    $response = ["message" => 'Update error'];
+                    return response($response, 400);
+                }
+            }
+        }
+    }
+
+    public function makePrimary($data)
+    {
+        $uid = $data['uid'];
+        $primary = $data['primary'];
+        $other = $data['other'];
+        if ($uid && $primary && $other) {
+            $affectedRows = $this->personInterface->updateUserPrimaryMobile($data['uid'], $other);
+            $personMobileArr2 = array(
+                "uid" => $data['uid'],
+                "mobile" => $primary,
+                "status" => 1,
+            );
+            $mobileModel = $this->convertToPersonMobileModel($personMobileArr2, $data['uid'], 1, "");
+            $personMobile = $this->personInterface->savePersonMobile($mobileModel);
+            if ($personMobile) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            }
+        } else {
+            $response = ["message" => 'Parameter Missing'];
+            return response($response, 400);
+        }
+    }
+
+    public function makeEmailPrimary($data)
+    {
+        $uid = $data['uid'];
+        $email = $data['email'];
+        if ($uid && $email) {
+            $affectedRows = $this->personInterface->updateUserPrimaryEmail($data['uid'], $email);
+            if ($affectedRows > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            }
+        } else {
+            $response = ["message" => 'Parameter Missing'];
+            return response($response, 400);
+        }
+    }
+
+    public function makeEmailSecondary($data)
+    {
+        $email = $this->personInterface->getPersonEmailByUid($data['uid'], 2, "");
+        if (!empty($email)) {
+
+            $person_email = array(
+                "uid" => $data['uid'],
+                "status" => 2,
+                "email" => $data['email']
+            );
+            $personModel = $this->convertToPersonEmailModel($person_email, $data['uid'], 2, $email['email']);
+            $person_email = $this->personInterface->savePersonEmail($personModel);
+            if ($person_email) {
+                $person_email = array(
+                    "uid" => $data['uid'],
+                    "status" => 0,
+                    "email" => $email['email']
+                );
+                $personModel = $this->convertToPersonEmailModel($person_email, "", "", "");
+                $person_email = $this->personInterface->savePersonEmail($personModel);
+
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            } else {
+                $response = ["message" => 'Update error'];
+                return response($response, 400);
+            }
+        } else {
+
+            $person_email = array(
+                "uid" => $data['uid'],
+                "status" => 2,
+                "email" => $data['email']
+            );
+            $personModel = $this->convertToPersonEmailModel($person_email, "", "", "");
+            $person_email = $this->personInterface->savePersonEmail($personModel);
+
+            if ($person_email) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            } else {
+                $response = ["message" => 'Update error'];
+                return response($response, 400);
+            }
+        }
+    }
+
+    public function makeEmailPrimarySecondary($data){
+        $uid = $data['uid'];
+        $primary = $data['primary_email'];
+        $other = $data['other_email'];
+        if ($uid && $primary && $other) {
+            $affectedRows = $this->personInterface->updateUserPrimaryEmail($data['uid'], $other);
+            $affectedRows1 = $this->personInterface->updatePersonEmail($data['uid'], $primary);
+            if ($affectedRows > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            }
+        } else {
+            $response = ["message" => 'Parameter Missing'];
+            return response($response, 400);
+        }
+    }
+    
+
+    public function deleteOther($data){
+        $mobile = $this->personInterface->getPersonMobileByUid($data['uid'], 2, "");
+        if (!empty($mobile)) {
+            $affectedRows = $this->personInterface->makeMobileInactive($data['uid'], 2, $data['other']);
+            if ($affectedRows > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            } else {
+                $response = ["message" => 'Update error'];
+                return response($response, 400);
+            }
+        }
+    }
+
+    public function deleteOtherEmail($data){
+        $uid = $data['uid'];
+        $other = $data['other'];
+        if ($uid && $other) {
+            $affectedRows =  $affectedRows = $this->personInterface->makeEmailInactive($data['uid'],$other);
+            if ($affectedRows > 0) {
+                $response = ["message" => 'OK'];
+                return response($response, 200);
+            }
+        } else {
+            $response = ["message" => 'Parameter Missing'];
             return response($response, 400);
         }
     }

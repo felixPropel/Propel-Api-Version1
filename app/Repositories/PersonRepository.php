@@ -88,17 +88,46 @@ class PersonRepository implements PersonInterface
         return $check_for_mobile;
     }
 
-    public function getPersonMobileByUid($uid)
+    public function getPersonMobileByUid($uid, $status, $mobile)
     {
-        $model = PersonMobile::where('uid', $uid)->first();
+
+        $query = PersonMobile::query();
+
+        $query->when(request('uid', false), function ($q, $uid) {
+            return $q->where('uid', $uid);
+        });
+
+        $query->when(request('status', false), function ($q, $status) {
+            return $q->where('status', $status);
+        });
+
+        $query->when(request('mobile', false), function ($q, $mobile) {
+            return $q->where('mobile', $mobile);
+        });
+
+        $model = $query->first();
         return $model;
     }
 
 
 
-    public function getPersonEmailByUid($uid)
+    public function getPersonEmailByUid($uid, $status, $email)
     {
-        $model = PersonEmail::where('uid', $uid)->first();
+        $query = PersonEmail::query();
+
+        $query->when(request('uid', false), function ($q, $uid) {
+            return $q->where('uid', $uid);
+        });
+
+        $query->when(request('status', false), function ($q, $status) {
+            return $q->where('status', $status);
+        });
+
+        $query->when(request('email', false), function ($q, $email) {
+            return $q->where('email', $email);
+        });
+
+        $model = $query->first();
         return $model;
     }
 
@@ -190,32 +219,38 @@ class PersonRepository implements PersonInterface
         return $details;
     }
 
-    public function GetCompletePersonByUid($uid){
-        $details=PersonDetails::with('email', 'mobile', 'person', 'user', 'person_address_profile')->where("uid", $uid)->first();
+    public function GetCompletePersonByUid($uid)
+    {
+        $details = PersonDetails::with('email', 'mobile', 'person', 'user', 'person_address_profile')->where("uid", $uid)->first();
         return $details;
     }
 
-    public function getPersonAddressByUid($uid){
-        $address=PersonAddress::where("uid", $uid)->get()->toArray();
+    public function getPersonAddressByUid($uid)
+    {
+        $address = PersonAddress::where("uid", $uid)->get()->toArray();
         return $address;
     }
 
-    public function getPersonAddressByUidAndType($uid,$type){
-        $address=PersonAddress::where(['uid' => $uid, 'address_type' => $type, 'status' => 1])->first();
+    public function getPersonAddressByUidAndType($uid, $type)
+    {
+        $address = PersonAddress::where(['uid' => $uid, 'address_type' => $type, 'status' => 1])->first();
         return $address;
     }
 
-    public function getAddressOf(){
-        $address_off=Address_of::all();
+    public function getAddressOf()
+    {
+        $address_off = Address_of::all();
         return $address_off;
     }
 
-    public function savePersonAddress($addressModel){
+    public function savePersonAddress($addressModel)
+    {
         $addressModel->save();
         return $addressModel;
     }
 
-    public function updateWebLink($uid,$link){
+    public function updateWebLink($uid, $link)
+    {
         $affectedRows1 = PersonDetails::where("uid", $uid)->update([
             "web_link" => $link,
         ]);
@@ -244,7 +279,7 @@ class PersonRepository implements PersonInterface
     {
         $models = Person::select('person.id as personId', 'person_email.email As emailId', 'person_mobile.mobile as mobileId')
             ->leftjoin('person_mobile', 'person_mobile.uid', 'person.uid')
-            ->leftjoin('person_email', 'person_email.uid', 'person.uid')            
+            ->leftjoin('person_email', 'person_email.uid', 'person.uid')
             ->where('person_mobile.mobile', $mobile)
             ->OrWhere('person_email.email', $email)
             ->whereIn('person_mobile.status', [1, 2])
@@ -257,6 +292,29 @@ class PersonRepository implements PersonInterface
     public function checkUserByUID($uid)
     {
         return User::where("uid", $uid)->first();
+    }
+
+    public function updateUserPrimaryMobile($uid, $primary_mobile)
+    {
+        return User::where("uid", $uid)->update(["primary_mobile" => $primary_mobile]);
+    }
+
+    public function updateUserPrimaryEmail($uid, $email)
+    {
+        return User::where("uid", $uid)->update(["primary_email" => $email, "email_otp_verified" => 1]);
+    }
+
+    public function updatePersonEmail($uid, $primary)
+    {
+        return PersonEmail::where("uid", $uid)->update(["email" => $primary]);
+    }
+
+    public function makeMobileInactive($uid,$status,$mobile){
+       return PersonMobile::where(["uid" => $uid, "status" => $status, "mobile" => $mobile])->update(["status" => 0]);
+    }
+
+    public function makeEmailInactive($uid,$other){
+        return PersonEmail::where(["uid" => $uid, "email" => $other])->update(["status" => 0]);
     }
 
     public function findExactPersonWithEmailAndMobile($email, $mobile)
