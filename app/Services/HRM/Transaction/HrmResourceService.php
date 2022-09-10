@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Services\HRM\Transaction;
-
 use App\Interfaces\CommonInterface;
 use App\Interfaces\PersonInterface;
 
@@ -17,15 +15,12 @@ class HrmResourceService
         $this->personInterface = $personInterface;
         $this->commonInterface = $commonInterface;
     }
-
-
     public function findResourceWithCredentials($datas)
-    {
-      
+    { 
         $datas = (object)$datas; 
         $mobile = $datas->mobile;
         $email = $datas->email;
-        $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email,$mobile);
+        $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email,         $mobile); 
         $saluationLists = $this->commonInterface->getAllSalutions();
         $bloodGroupLists=$this->commonInterface->getAllBloodGroups();
         $genderLists=$this->commonInterface->getAllGenders();
@@ -33,6 +28,8 @@ class HrmResourceService
         $addressOfLists=$this->commonInterface->getAllAddressOfLists();
         $hrmDepartmentLists=$this->commonInterface->getAllHrmDepartmentLists();
         $hrmDesignationLists=$this->commonInterface->getAllHrmDesignationLists();
+        $hrmResourceTypeLists=$this->commonInterface->getAllHrmResourceTypeLists();
+      
         
 
         if ($checkPerson) {
@@ -59,13 +56,12 @@ class HrmResourceService
             {
                 $results = ['status' => "NotInSinglePerson", 'data' => $getAllPersonByMobileAndEmail];
             } else {
-                $results = ['status' => "FreshPerson", 'data' => ""];
+                $results = ['status' => "FreshPerson", 'data' => "newperosn"];
             }
         }
-        $response = ['results' =>$results ,'saluationLists' => $saluationLists,'bloodGroupLists' => $bloodGroupLists ,'genderLists' => $genderLists ,'addressOfLists' => $addressOfLists ,'hrmDepartmentLists' => $hrmDepartmentLists,'hrmDesignation'=>$hrmDesignationLists];
+        $response = ['results' =>$results ,'saluationLists' => $saluationLists,'bloodGroupLists' => $bloodGroupLists ,'genderLists' => $genderLists ,'addressOfLists' => $addressOfLists ,'hrmDepartmentLists' => $hrmDepartmentLists,'hrmDesignation'=>$hrmDesignationLists, 'hrmResourceTypeLists' => $hrmResourceTypeLists];
         return   $response;
     }
-
     public function save($datas)
     {
         dd("well save");
