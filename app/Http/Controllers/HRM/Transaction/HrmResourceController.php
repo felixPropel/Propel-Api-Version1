@@ -18,11 +18,19 @@ class HrmResourceController extends Controller
 
 
     public function findResourceWithCredentials(Request $request)
-    {        
+    {
         Log::info('HrmResourceController>Store Inside.' . json_encode($request->all()));
         $response = $this->service->findResourceWithCredentials($request->all());
         return $response;
         Log::info('HrmResourceController>Store Return.' . json_encode($response));
+    }
+
+    public function findDesignationByDepartmentId(Request $request)
+    {
+        Log::info('HrmResourceController>findDesignationByDepartmentId Inside.' . json_encode($request->all()));
+        $response = $this->service->findDesignationByDepartmentId($request->all());
+        return response($response, 200);
+        Log::info('HrmResourceController>findDesignationByDepartmentId Return.' . json_encode($response));
     }
     /**
      * Display a listing of the resource.

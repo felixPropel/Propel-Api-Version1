@@ -42,6 +42,11 @@ class HrmDesignationRepository implements HrmDesignationInterface
         return $data;
     }
 
+    public function findAllByDeptId($deptId)
+    {
+        $data = $this->model::where('dept_id', $deptId)->get();
+        return $data;
+    }
 
     public function destroy($id)
     {

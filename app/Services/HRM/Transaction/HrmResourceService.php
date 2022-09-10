@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\HRM\Transaction;
 use App\Interfaces\CommonInterface;
+use App\Interfaces\HrmDesignationInterface;
 use App\Interfaces\PersonInterface;
 
 /**
@@ -10,10 +11,11 @@ use App\Interfaces\PersonInterface;
 class HrmResourceService
 {
 
-    public function __construct(PersonInterface $personInterface,CommonInterface $commonInterface)
+    public function __construct(PersonInterface $personInterface,CommonInterface $commonInterface,HrmDesignationInterface $designationInterface)
     {
         $this->personInterface = $personInterface;
         $this->commonInterface = $commonInterface;
+        $this->designationInterface = $designationInterface;
     }
     public function findResourceWithCredentials($datas)
     { 
@@ -61,6 +63,14 @@ class HrmResourceService
         }
         $response = ['results' =>$results ,'saluationLists' => $saluationLists,'bloodGroupLists' => $bloodGroupLists ,'genderLists' => $genderLists ,'addressOfLists' => $addressOfLists ,'hrmDepartmentLists' => $hrmDepartmentLists,'hrmDesignation'=>$hrmDesignationLists, 'hrmResourceTypeLists' => $hrmResourceTypeLists];
         return   $response;
+    }
+    public function findDesignationByDepartmentId($datas){
+    
+         $datas = (object) $datas;        
+         $deptId = $datas->deptId;
+         $response = $this->designationInterface->findAllByDeptId($deptId);
+         return $response;
+        
     }
     public function save($datas)
     {

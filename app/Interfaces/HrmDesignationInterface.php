@@ -8,6 +8,7 @@ interface HrmDesignationInterface
     public function store($data);
     public function findById($id); 
     public function findByName($name);
+    public function findAllByDeptId($deptId);
     public function destroy($id);
    
 
