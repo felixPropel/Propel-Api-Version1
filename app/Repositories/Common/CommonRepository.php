@@ -9,6 +9,7 @@ use App\Models\BasicModels\Gender;
 use App\Models\Address_of;
 use App\Models\HrmDepartment;
 use App\Models\HrmDesignation;
+use App\Models\HrmHumanResourceType;
 
 
 
@@ -44,5 +45,8 @@ class CommonRepository implements CommonInterface
     }
     public function getAllHrmDesignationLists(){
         return HrmDesignation::get();
+    }
+    public function getAllHrmResourceTypeLists(){
+        return HrmHumanResourceType::get();
     }
 }

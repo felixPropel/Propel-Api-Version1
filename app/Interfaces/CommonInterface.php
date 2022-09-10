@@ -11,5 +11,6 @@ interface CommonInterface
     public function getAllAddressOfLists();
     public function getAllHrmDepartmentLists();
     public function getAllHrmDesignationLists();
+    public function getAllHrmResourceTypeLists();
 
 }
