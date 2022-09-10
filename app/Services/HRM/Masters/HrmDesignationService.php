@@ -52,6 +52,7 @@ class HrmDesignationService
         $unAssignedDesId = $this->interface->findByName('Un-Assigned');
         $model->name = $data->designation;
         $model->dept_id =$data->dept_id;
+        $model->no_of_posting =$data->no_of_posting;
         $model->description = $data->description;
         $model->status =1;
 
