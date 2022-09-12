@@ -737,18 +737,17 @@ class PersonService
             $userModel = $this->convertToUserModel($mobile_array, $data['uid'], 1);
             $user = $this->personInterface->saveUser($userModel);
             $mobile = $this->personInterface->getPersonMobileByUid($data['uid'], 1, "");
-            return $mobile;
 
             if (!empty($mobile)) {
                 $personMobileArr = array(
                     "mobile" => $data['mobile'],
                 );
-                $mobileModel = $this->convertToPersonMobileModel($personMobileArr, $data['uid'], 1, $mobile[0]);
+                $mobileModel = $this->convertToPersonMobileModel($personMobileArr, $data['uid'], 1, $mobile['mobile']);
                 $personMobile = $this->personInterface->savePersonMobile($mobileModel);
                 if ($personMobile) {
                     $personMobileArr1 = array(
                         "uid" => $data['uid'],
-                        "mobile" => $mobile[0],
+                        "mobile" => $mobile['mobile'],
                         "status" => 0,
                     );
                     $mobileModel = $this->convertToPersonMobileModel($personMobileArr1, "", "", "");
@@ -782,12 +781,12 @@ class PersonService
                 $personMobileArr = array(
                     "mobile" =>  $data['mobile'],
                 );
-                $mobileModel = $this->convertToPersonMobileModel($personMobileArr, $data['uid'], 2, $mobile[0]);
+                $mobileModel = $this->convertToPersonMobileModel($personMobileArr, $data['uid'], 2, $mobile['mobile']);
                 $personMobile = $this->personInterface->savePersonMobile($mobileModel);
                 if ($personMobile) {
                     $personMobileArr2 = array(
                         "uid" => $data['uid'],
-                        "mobile" => $mobile[0],
+                        "mobile" => $mobile['mobile'],
                         "status" => 0,
                     );
                     $mobileModel = $this->convertToPersonMobileModel($personMobileArr2, "", "", "");
