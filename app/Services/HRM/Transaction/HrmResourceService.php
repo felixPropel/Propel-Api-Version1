@@ -31,9 +31,12 @@ class HrmResourceService
         $hrmDepartmentLists=$this->commonInterface->getAllHrmDepartmentLists();
         $hrmDesignationLists=$this->commonInterface->getAllHrmDesignationLists();
         $hrmResourceTypeLists=$this->commonInterface->getAllHrmResourceTypeLists();
-      
-        
-
+        $languageLists=$this->commonInterface->getAllLanguageLists();
+        $idDocumentTypes=$this->commonInterface->getAllIdDocumnetTypes();
+        $bankAccountTypes=$this->commonInterface->getAllBankAccountTypes();
+   
+   
+    
         if ($checkPerson) {
             $uId = $checkPerson->uid;
             $checkUserWithUid =  $this->personInterface->checkUserByUID($uId);
@@ -61,7 +64,7 @@ class HrmResourceService
                 $results = ['status' => "FreshPerson", 'data' => "newperosn"];
             }
         }
-        $response = ['results' =>$results ,'saluationLists' => $saluationLists,'bloodGroupLists' => $bloodGroupLists ,'genderLists' => $genderLists ,'addressOfLists' => $addressOfLists ,'hrmDepartmentLists' => $hrmDepartmentLists,'hrmDesignation'=>$hrmDesignationLists, 'hrmResourceTypeLists' => $hrmResourceTypeLists];
+        $response = ['results' =>$results ,'saluationLists' => $saluationLists,'bloodGroupLists' => $bloodGroupLists ,'genderLists' => $genderLists ,'addressOfLists' => $addressOfLists ,'hrmDepartmentLists' => $hrmDepartmentLists,'hrmDesignation'=>$hrmDesignationLists, 'hrmResourceTypeLists' => $hrmResourceTypeLists ,'maritalStatusLists' => $maritalStatusLists, 'languageLists' => $languageLists, 'idDocumentTypes'=>$idDocumentTypes,'bankAccountTypes'=>$bankAccountTypes];
         return   $response;
     }
     public function findDesignationByDepartmentId($datas){

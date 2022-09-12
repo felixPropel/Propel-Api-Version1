@@ -12,5 +12,9 @@ interface CommonInterface
     public function getAllHrmDepartmentLists();
     public function getAllHrmDesignationLists();
     public function getAllHrmResourceTypeLists();
-
+   public function getAllLanguageLists();
+   public function getAllIdDocumnetTypes();
+   public function getAllBankAccountTypes();
+   
+    
 }

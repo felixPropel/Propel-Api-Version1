@@ -7,9 +7,13 @@ use App\Models\BasicModels\Salutation;
 use App\Models\BasicModels\BloodGroup;
 use App\Models\BasicModels\Gender;
 use App\Models\Address_of;
+use App\Models\MaritalStatue;
 use App\Models\HrmDepartment;
 use App\Models\HrmDesignation;
 use App\Models\HrmHumanResourceType;
+use App\Models\Language;
+use App\Models\IdDocumentType;
+use App\Models\BankAccountType;
 
 
 
@@ -35,7 +39,8 @@ class CommonRepository implements CommonInterface
         return Gender::get();
     }
     public function getAllMaritalstatus(){
-        return Gender::get();
+       
+         return MaritalStatue::get();
     }
     public function getAllAddressOfLists(){
         return Address_of::get();
@@ -48,5 +53,15 @@ class CommonRepository implements CommonInterface
     }
     public function getAllHrmResourceTypeLists(){
         return HrmHumanResourceType::get();
+    }
+    public function getAllLanguageLists(){
+        return Language::get();
+    }
+    public function getAllIdDocumnetTypes(){
+      return IdDocumentType::get();
+    }
+    public function getAllBankAccountTypes(){
+        return BankAccountType::get();
+        
     }
 }
