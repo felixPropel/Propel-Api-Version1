@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 // searchin Part Start
 //@Developer Dhana
-Route::post('findExactPersonWithEmailAndMobile', 'Person\PersonController@findExactPersonWithEmailAndMobile')->name('findExactPersonWithEmailAndMobile');
+Route::post('findExactPersonWithEmailAndMobile', 'App\Http\Controllers\Person\PersonController@findExactPersonWithEmailAndMobile')->name('findExactPersonWithEmailAndMobile');
 
 
 

@@ -1,0 +1,5 @@
+<?php
+use Illuminate\Support\Facades\Route;
+
+Route::post('/checkGstNumber', 'App\Http\Controllers\Organization\OrganizationCommonController@checkGstNumber')->name('checkGstNumber');
+Route::post('/organizationStore', 'App\Http\Controllers\Organization\OrganizationController@store')->name('organizationStore');
