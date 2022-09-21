@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
 use Config;
 use Log;
 use App\Http\Controllers\Controller;
@@ -38,6 +39,7 @@ use App\Models\TempOrganisation_details;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Passport\HasApiTokens;
 use Artisan;
+
 class ApiAuthController extends Controller
 {
 
@@ -244,7 +246,7 @@ class ApiAuthController extends Controller
             $affectedRows = User::where("uid", $request->uid)->update(["password" => $password]);
             if ($affectedRows > 0) {
                 $user_id = $request->uid;
-           }
+            }
         } else {
             $user = new User();
             $user->uid = $request->uid;
@@ -707,7 +709,7 @@ class ApiAuthController extends Controller
         $ndb = DB::connection('mysql')->getDatabaseName();
         Log::info('submit_organisation DB User Result ' . json_encode($ndb));
 
-        $userD= User::where('uid',$request->uid)->first();
+        $userD = User::where('uid', $request->uid)->first();
 
         Log::info('submit_organisation DB User Result ' . json_encode($userD));
 
@@ -834,6 +836,69 @@ class ApiAuthController extends Controller
         return true;
     }
 
+    //Dynamic DB Divakar//
+
+    public function GenerateDB(Request $request)
+    {
+       
+        $db_name=$_GET['db_name'];
+         
+        //Setting Dynamic Connection//
+        $path = config_path('database.php');
+        //GET Database Connection file 
+        $arr = include $path;
+        // load the array from the file
+        $new_connection = [
+            'driver'    => 'mysql',
+            'host'      => env('DB_HOST'),
+            'database'  => $db_name,
+            'username'  => env('COMMON_USERNAME'),
+            'password'  => env('COMMON_PASS'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+            'strict' => false
+        ];
+        // modify the array
+        $arr['connections'][$db_name] = $new_connection;
+        // write it back to the file
+        file_put_contents($path, "<?php  return " . var_export($arr, true) . ";");
+        //Setting Dynamic Env//
+        $path = base_path('.env');
+        $new_env="
+        DB_CONNECTION_$db_name=mysql
+        DB_HOST_$db_name=127.0.0.1
+        DB_PORT_$db_name=3306
+        DB_DATABASE_$db_name=$db_name,
+        DB_USERNAME_$db_name=".env('COMMON_USERNAME')."
+        DB_PASSWORD_$db_name=".env('COMMON_PASS')."
+
+        REPLACE_DB_HERE
+        ";
+        if (file_exists($path)) {
+            file_put_contents($path, str_replace(
+                'REPLACE_DB_HERE',
+                $new_env,
+                file_get_contents($path)
+            ));
+        }
+
+        //Creating Dynamic DB//
+
+        //$preDatabase = Config::get('database.connections.mysql.database');
+        DB::statement("CREATE DATABASE IF NOT EXISTS $db_name");
+
+        // $new = Config::set('database.connections.mysql.database', $db_name);
+        // DB::purge('mysql');
+        // DB::reconnect('mysql');
+        // \Artisan::call('migrate');
+
+        // Config::set('database.connections.mysql.database', $preDatabase);
+
+        //Test Return//
+        return dd('create database and user data');
+    }
+
 
 
 
@@ -881,7 +946,7 @@ class ApiAuthController extends Controller
         }
     }
 
-  
+
     public function update_otp(Request $request)
     {
         $affectedRows = User::where("uid", $request->uid)->update(["email_otp" => $request->otp, "email_otp_verified" => 0]);

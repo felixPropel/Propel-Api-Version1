@@ -72,7 +72,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/temp_organisation_stage_three', 'App\Http\Controllers\Auth\ApiAuthController@temp_organisation_stage_three')->name('temp_organisation_stage_three.api');
     Route::post('/temp_organisation_stage_four', 'App\Http\Controllers\Auth\ApiAuthController@temp_organisation_stage_four')->name('temp_organisation_stage_four.api');
     Route::post('/temp_organisation_stage_five', 'App\Http\Controllers\Auth\ApiAuthController@temp_organisation_stage_five')->name('temp_organisation_stage_five.api');
-
+    Route::get('/GenerateDB', 'App\Http\Controllers\Auth\ApiAuthController@GenerateDB')->name('GenerateDB.api');
     //Repository Calls
     Route::get('show', [HomeController::class, 'index'])->name('show.api');
     //Repository Calls Ends//
