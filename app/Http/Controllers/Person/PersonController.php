@@ -26,6 +26,7 @@ class PersonController extends Controller
 
     public function get_gender_and_blood_group(Request $request)
     {
+      
         $response = $this->person->get_gender_and_blood_group($request->all());
         return $response;
     }
@@ -54,6 +55,7 @@ class PersonController extends Controller
 
     public function person_details_stage1(Request $request)
     {
+       log::info('person_details_stage1->'.json_encode($request->all()));
         $response = $this->person->person_details_stage1($request->all());
         return $response;
     }
@@ -66,6 +68,7 @@ class PersonController extends Controller
 
     public function get_mobile(Request $request)
     {
+ 
         $response = $this->person->get_person_mobile($request->all());
         return $response;
     }
@@ -166,6 +169,7 @@ class PersonController extends Controller
     //@developer Dhana
     public function findExactPersonWithEmailAndMobile(Request $request)
     {
+        
         // Log::info('PersonController>findExactPersonWithEmailAndMobile Function>Inside. '.json_encode($request->all()));
         // $response = $this->person->findExactPersonWithEmailAndMobile($request->all());
         // Log::info('PersonController>findExactPersonWithEmailAndMobile Function>Return. '.json_encode($response));

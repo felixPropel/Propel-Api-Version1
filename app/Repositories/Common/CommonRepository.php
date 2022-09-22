@@ -43,6 +43,7 @@ class CommonRepository implements CommonInterface
          return MaritalStatue::get();
     }
     public function getAllAddressOfLists(){
+
         return Address_of::get();
     }
     public function getAllHrmDepartmentLists(){
@@ -58,6 +59,7 @@ class CommonRepository implements CommonInterface
         return Language::get();
     }
     public function getAllIdDocumnetTypes(){
+  
       return IdDocumentType::get();
     }
     public function getAllBankAccountTypes(){

@@ -4,6 +4,7 @@ namespace App\Repositories\Organization;
 
 use App\Interfaces\Organization\OrganizationInterface;
 use App\Models\Organization\OrganizationIdentities;
+use App\Models\Organization\Organization;
 
 //use Your Model
 
@@ -23,10 +24,11 @@ class OrganizationRepository implements OrganizationInterface
     {
 
         $data->save();
-        return [
-            'message' => "success",
-            'data' => $data
-        ];
+        return $data->id;
+        // return [
+        //     'message' => "success",   
+        //     'data' => $data
+        // ];
     }
     public function saveOrganizationDetailModel($data)
     {

@@ -19,10 +19,11 @@ class HrmResourceService
     }
     public function findResourceWithCredentials($datas)
     { 
+       
         $datas = (object)$datas; 
         $mobile = $datas->mobile;
         $email = $datas->email;
-        $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email,         $mobile); 
+        $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email,$mobile); 
         $saluationLists = $this->commonInterface->getAllSalutions();
         $bloodGroupLists=$this->commonInterface->getAllBloodGroups();
         $genderLists=$this->commonInterface->getAllGenders();
@@ -68,8 +69,8 @@ class HrmResourceService
         return   $response;
     }
     public function findDesignationByDepartmentId($datas){
-    
-         $datas = (object) $datas;        
+
+         $datas = (object) $datas;      
          $deptId = $datas->deptId;
          $response = $this->designationInterface->findAllByDeptId($deptId);
          return $response;

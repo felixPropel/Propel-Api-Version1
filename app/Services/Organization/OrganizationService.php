@@ -10,7 +10,7 @@ use App\Models\Organization\OrganizationEmail;
 use App\Models\Organization\OrganizationIdentity;
 use App\Models\Organization\OrganizationMobile;
 use App\Models\Organization\OrganizationWebAddress;
-
+use App\Interfaces\CommonInterface;
 /**
  * Class OrganizationService
  * @package App\Services
@@ -18,9 +18,10 @@ use App\Models\Organization\OrganizationWebAddress;
 class OrganizationService
 {
 
-    public function __construct(OrganizationInterface $interface)
+    public function __construct(OrganizationInterface $interface,CommonInterface $commonInterface)
     {
         $this->interface = $interface;
+        $this->commonInterface = $commonInterface;
     }
     public function checkGstNumber($gstNo)
     {
@@ -34,20 +35,17 @@ class OrganizationService
     }
     public function save($datas)
     {
-        $datas = (object) $datas;
-
-        $setOrganizationModel = $this->convertToOrganizationModel($datas);
-        $organizationModel = $this->interface->saveOrganizationModel($setOrganizationModel);
-        if ($organizationModel) {
+         $datas = (object) $datas;
+         $setOrganizationModel = $this->convertToOrganizationModel($datas);
+         $organizationModel = $this->interface->saveOrganizationModel($setOrganizationModel);
+         if ($organizationModel){
             $organizationId = $organizationModel['data']->id;
-
             $setOrgDetailModel = $this->convertToOrganizationDetailModel($datas, $organizationId);
             $setOrganizationMobileModel = $this->convertToOrganizationMobileModel($datas, $organizationId);
             $setOrganizationEmailModel = $this->convertToOrganizationEmailModel($datas, $organizationId);
             $setOrganizationWebAddressModel = $this->convertToOrganizationWebAddressModel($datas, $organizationId);
             $setOrganizationAddressModel = $this->convertToOrganizationAddressModel($datas, $organizationId);
             $setOrganizationIdentityModel = $this->convertToOrganizationIdentityModel($datas, $organizationId);
-
             $orgDetailModel = $this->interface->saveOrganizationDetailModel($setOrgDetailModel);
             $orgMobileModel = $this->interface->saveOrganizationMobileModel($setOrganizationMobileModel);
             $orgEmailModel = $this->interface->saveOrganizationEmailModel($setOrganizationEmailModel);
@@ -56,12 +54,12 @@ class OrganizationService
             $orgIdentityModel = $this->interface->saveOrganizationIdentityModel($setOrganizationIdentityModel);
         }
 
-        dd($organizationModel);
+        
     }
     public function convertToOrganizationModel($datas)
     {
         $model = new Organization();
-        $model->authorization_status = "1";
+        $model->authorization_status= "1";
         $model->status = "1";
         return $model;
     }
@@ -133,5 +131,13 @@ class OrganizationService
         $model->doc_validity = $datas->validTo;
         $model->status = '1';
         return $model;
+    }
+    public function organizationCommonData($datas)
+    {
+
+        $addressOfLists=$this->commonInterface->getAllAddressOfLists();
+        $idDocumentTypes=$this->commonInterface->getAllIdDocumnetTypes();
+        $response =['addressOfLists' => $addressOfLists,'idDocumentTypes' => $idDocumentTypes];
+         return $response;
     }
 }

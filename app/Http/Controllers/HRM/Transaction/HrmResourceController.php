@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\HRM\Transaction;
-
 use App\Http\Controllers\Controller;
 use App\Services\HRM\Transaction\HrmResourceService;
 use Illuminate\Http\Request;
@@ -19,7 +18,8 @@ class HrmResourceController extends Controller
 
     public function findResourceWithCredentials(Request $request)
     {
-        Log::info('HrmResourceController>Store Inside.' . json_encode($request->all()));
+    
+    Log::info('findResourceWithCredentials-> Store Inside.' . json_encode($request->all()));
         $response = $this->service->findResourceWithCredentials($request->all());
         return $response;
         Log::info('HrmResourceController>Store Return.' . json_encode($response));
@@ -60,7 +60,6 @@ class HrmResourceController extends Controller
      */
     public function store(Request $request)
     {
-    
         Log::info('HrmResourceController>Store in wizard forms Inside.' . json_encode($request->all()));
         $response = $this->service->save($request->all());
         // Log::info('HrmResourceController>Store Return.' . json_encode($response));

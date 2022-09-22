@@ -25,4 +25,13 @@ class OrganizationCommonController extends Controller
         Log::info('HrmDepartmentController>Index Function>Return' . json_encode($response));
         return response($response, 200);
     }
+    public function organizationCommonData(Request $request)
+    {
+    
+        $response = $this->service->organizationCommonData($request->all());
+        Log::info('organizationCommonData>datas' . json_encode($request->all()));
+        return response($response, 200);
+
+
+    }
 }

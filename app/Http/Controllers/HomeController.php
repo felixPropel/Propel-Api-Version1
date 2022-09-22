@@ -26,6 +26,7 @@ class HomeController extends Controller
      */
     public function index()
     {
+      
         $users = $this->user->index();
         dd($users);
        // return view('home');
