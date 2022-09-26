@@ -5,6 +5,9 @@ namespace App\Repositories\Organization;
 use App\Interfaces\Organization\OrganizationInterface;
 use App\Models\Organization\OrganizationIdentities;
 use App\Models\Organization\Organization;
+use App\Models\Organization\OrganizationSector;
+use App\Models\Organization\OrganizationSubset;
+use App\Models\Organization\OrganizationActivity;
 
 //use Your Model
 
@@ -84,4 +87,20 @@ class OrganizationRepository implements OrganizationInterface
             'data' => $data
         ];
     }
+    public function getOrganizationSector()
+    {
+     
+        return OrganizationSector::get();
+    }
+    public function getOrganizationSubSet()
+    {
+   
+        return OrganizationSubset::get();
+    }
+    // public function getOrganizationActivities()
+    // {
+
+    //     return OrganizationActivity::get();
+    // }
 }
+

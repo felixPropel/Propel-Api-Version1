@@ -13,4 +13,7 @@ interface OrganizationInterface
     public function saveOrganizationWebAddressModel($data);
     public function saveOrganizationAddressModel($data);
     public function saveOrganizationIdentityModel($data);
+    public function getOrganizationSector();
+    public function getOrganizationSubset();
+    // public function getOrganizationActivities();
 }

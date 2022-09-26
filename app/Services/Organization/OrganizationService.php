@@ -134,10 +134,12 @@ class OrganizationService
     }
     public function organizationCommonData($datas)
     {
-
         $addressOfLists=$this->commonInterface->getAllAddressOfLists();
         $idDocumentTypes=$this->commonInterface->getAllIdDocumnetTypes();
-        $response =['addressOfLists' => $addressOfLists,'idDocumentTypes' => $idDocumentTypes];
+        $organizationSector= $this->interface->getOrganizationSector();
+        $organizationSubset=$this->interface->getOrganizationSubset();
+        // $organizationActivities=$this->interface->getOrganizationActivities();
+        $response =['addressOfLists' => $addressOfLists,'idDocumentTypes' => $idDocumentTypes ,'organizationSector' => $organizationSector,'organizationSubset' => $organizationSubset];
          return $response;
     }
 }
