@@ -138,8 +138,10 @@ class OrganizationService
         $idDocumentTypes=$this->commonInterface->getAllIdDocumnetTypes();
         $organizationSector= $this->interface->getOrganizationSector();
         $organizationSubset=$this->interface->getOrganizationSubset();
-        // $organizationActivities=$this->interface->getOrganizationActivities();
-        $response =['addressOfLists' => $addressOfLists,'idDocumentTypes' => $idDocumentTypes ,'organizationSector' => $organizationSector,'organizationSubset' => $organizationSubset];
+        $organizationActivities=$this->interface->getOrganizationActivities();
+        $organizationOwnerShip=$this->interface->getOrganizationOwnerShip();
+        $organizationCategory=$this->interface->getOrganizationCategory();
+        $response =['addressOfLists' => $addressOfLists,'idDocumentTypes' => $idDocumentTypes ,'organizationSector' => $organizationSector,'organizationSubset' => $organizationSubset,'organizationActivities'=>$organizationActivities,'organizationCategory' => $organizationCategory,'organizationOwnerShip'=> $organizationOwnerShip];
          return $response;
     }
 }

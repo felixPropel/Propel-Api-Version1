@@ -15,5 +15,7 @@ interface OrganizationInterface
     public function saveOrganizationIdentityModel($data);
     public function getOrganizationSector();
     public function getOrganizationSubset();
-    // public function getOrganizationActivities();
+    public function getOrganizationActivities();
+    public function getOrganizationCategory();
+    public function getOrganizationOwnerShip();
 }

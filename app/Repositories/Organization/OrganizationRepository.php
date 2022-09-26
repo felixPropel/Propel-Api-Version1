@@ -7,7 +7,9 @@ use App\Models\Organization\OrganizationIdentities;
 use App\Models\Organization\Organization;
 use App\Models\Organization\OrganizationSector;
 use App\Models\Organization\OrganizationSubset;
-use App\Models\Organization\OrganizationActivity;
+use App\Models\Organization\OrganizationActivities;
+use App\Models\Organization\OrganizationCategory;
+use App\Models\Organization\OrganizationOwnership;
 
 //use Your Model
 
@@ -97,10 +99,18 @@ class OrganizationRepository implements OrganizationInterface
    
         return OrganizationSubset::get();
     }
-    // public function getOrganizationActivities()
-    // {
-
-    //     return OrganizationActivity::get();
-    // }
+    public function getOrganizationActivities()
+    {
+        return OrganizationActivities::get();
+    }
+    public function getOrganizationCategory()
+    {
+        return OrganizationCategory::get();
+    }
+    public function getOrganizationOwnerShip()
+    {
+        
+        return OrganizationOwnership::get();
+    }
 }
 
