@@ -840,9 +840,9 @@ class ApiAuthController extends Controller
 
     public function GenerateDB(Request $request)
     {
-       
-        $db_name=$_GET['db_name'];
-         
+
+        $db_name = $_GET['db_name'];
+
         //Setting Dynamic Connection//
         $path = config_path('database.php');
         //GET Database Connection file 
@@ -865,13 +865,13 @@ class ApiAuthController extends Controller
         file_put_contents($path, "<?php  return " . var_export($arr, true) . ";");
         //Setting Dynamic Env//
         $path = base_path('.env');
-        $new_env="
+        $new_env = "
         DB_CONNECTION_$db_name=mysql
         DB_HOST_$db_name=127.0.0.1
         DB_PORT_$db_name=3306
         DB_DATABASE_$db_name=$db_name,
-        DB_USERNAME_$db_name=".env('COMMON_USERNAME')."
-        DB_PASSWORD_$db_name=".env('COMMON_PASS')."
+        DB_USERNAME_$db_name=" . env('COMMON_USERNAME') . "
+        DB_PASSWORD_$db_name=" . env('COMMON_PASS') . "
 
         REPLACE_DB_HERE
         ";
@@ -897,6 +897,37 @@ class ApiAuthController extends Controller
 
         //Test Return//
         return dd('create database and user data');
+    }
+
+    public function GetGSTDetails()
+    {
+        $gst = $_GET['gst'];
+        //LIVE URL:https://kyc-api.aadhaarkyc.io/api/v1/corporate/gstin
+        //SAND BOX:https://sandbox.aadhaarkyc.io/api/v1/corporate/gstin
+        $response = $this->get_web_page("https://kyc-api.aadhaarkyc.io/api/v1/corporate/gstin",$gst);
+        $resArr = array();
+        $resArr = json_decode($response);
+        echo "<pre>";
+        print_r($resArr);
+        echo "</pre>";
+    }
+
+    function get_web_page($url,$gst)
+    {
+        $raw='{
+            "id_number": "30AAACR5055K1ZK",
+            "filing_status_get": true
+        }';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_POST,1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,$raw);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER,array('Authorization: Bearer application/json'));
+        $result = curl_exec($ch);
+
+        return $result;
     }
 
 
