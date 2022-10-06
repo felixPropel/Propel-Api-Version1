@@ -15,6 +15,9 @@ class CreateOrganizationSubsetsTable extends Migration
     {
         Schema::create('organization_subsets', function (Blueprint $table) {
             $table->id();
+            $table->integer('org_category_id');            
+            $table->string('name');
+            $table->integer('status')->default('1');
             $table->timestamps();
         });
     }

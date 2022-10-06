@@ -10,7 +10,7 @@ use App\Models\Organization\OrganizationSubset;
 use App\Models\Organization\OrganizationActivities;
 use App\Models\Organization\OrganizationCategory;
 use App\Models\Organization\OrganizationOwnership;
-
+use Illuminate\Support\Facades\Log;
 //use Your Model
 
 /**
@@ -29,7 +29,8 @@ class OrganizationRepository implements OrganizationInterface
     {
 
         $data->save();
-        return $data->id;
+        Log::info('OrganizationRepo > saveOrganizationModel After data. ' . json_encode($data));
+        return $data;
         // return [
         //     'message' => "success",   
         //     'data' => $data
@@ -39,6 +40,7 @@ class OrganizationRepository implements OrganizationInterface
     {
 
         $data->save();
+        Log::info('OrganizationRepo > saveOrganizationDetailModel After data. ' . json_encode($data));
         return [
             'message' => "success",
             'data' => $data
@@ -48,6 +50,7 @@ class OrganizationRepository implements OrganizationInterface
     {
 
         $data->save();
+        Log::info('OrganizationRepo > saveOrganizationMobileModel After data. ' . json_encode($data));
         return [
             'message' => "success",
             'data' => $data
@@ -57,6 +60,7 @@ class OrganizationRepository implements OrganizationInterface
     {
 
         $data->save();
+        Log::info('OrganizationRepo > saveOrganizationEmailModel After data. ' . json_encode($data));
         return [
             'message' => "success",
             'data' => $data
@@ -66,6 +70,7 @@ class OrganizationRepository implements OrganizationInterface
     {
 
         $data->save();
+        Log::info('OrganizationRepo > saveOrganizationWebAddressModel After data. ' . json_encode($data));
         return [
             'message' => "success",
             'data' => $data
@@ -75,6 +80,7 @@ class OrganizationRepository implements OrganizationInterface
     {
 
         $data->save();
+        Log::info('OrganizationRepo > saveOrganizationAddressModel After data. ' . json_encode($data));
         return [
             'message' => "success",
             'data' => $data
@@ -84,6 +90,7 @@ class OrganizationRepository implements OrganizationInterface
     {
 
         $data->save();
+        Log::info('OrganizationRepo > saveOrganizationIdentityModel After data. ' . json_encode($data));
         return [
             'message' => "success",
             'data' => $data
