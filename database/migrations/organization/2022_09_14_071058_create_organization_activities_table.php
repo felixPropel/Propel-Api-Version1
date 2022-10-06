@@ -15,6 +15,9 @@ class CreateOrganizationActivitiesTable extends Migration
     {
         Schema::create('organization_activities', function (Blueprint $table) {
             $table->id();
+            $table->integer('org_category_id');            
+            $table->string('name');
+            $table->integer('status')->default('1');
             $table->timestamps();
         });
     }
