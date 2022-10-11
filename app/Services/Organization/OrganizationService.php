@@ -12,6 +12,9 @@ use App\Models\Organization\OrganizationMobile;
 use App\Models\Organization\OrganizationWebAddress;
 use App\Interfaces\CommonInterface;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
 
 /**
  * Class OrganizationService
@@ -58,14 +61,14 @@ class OrganizationService
             //     $setOrganizationWebAddressModel = $this->convertToOrganizationWebAddressModel($orgdatas, $organizationId);
             //     $orgWebAddressModel = $this->interface->saveOrganizationWebAddressModel($setOrganizationWebAddressModel);
             // }
-         
+
             $setOrganizationAddressModel = $this->convertToOrganizationAddressModel($orgdatas, $organizationId);
             $setOrganizationIdentityModel = $this->convertToOrganizationIdentityModel($orgdatas, $organizationId);
 
-            
-           
-         
-        
+
+
+
+
             //$orgAddressModel = $this->interface->saveOrganizationAddressModel($setOrganizationAddressModel);
             Log::info('OrganizationService > Store After orgAddressModel. ' . json_encode($setOrganizationAddressModel));
             return true;
@@ -157,11 +160,11 @@ class OrganizationService
         for ($i = 0; $i < count($datas->idDocumentType); $i++) {
 
             $model[$i] = new OrganizationIdentity();
-            $model[$i] ->org_id = $organizationId;
-            $model[$i] ->doc_type_id = $datas->idDocumentType[$i];
-            $model[$i] ->doc_no = $datas->documentNumber[$i];
-            $model[$i] ->doc_validity = $datas->validTill[$i];
-            $model[$i] ->status = '1';
+            $model[$i]->org_id = $organizationId;
+            $model[$i]->doc_type_id = $datas->idDocumentType[$i];
+            $model[$i]->doc_no = $datas->documentNumber[$i];
+            $model[$i]->doc_validity = $datas->validTill[$i];
+            $model[$i]->status = '1';
             $model[$i]->save();
         }
 
@@ -178,5 +181,58 @@ class OrganizationService
         $organizationCategory = $this->interface->getOrganizationCategory();
         $response = ['addressOfLists' => $addressOfLists, 'idDocumentTypes' => $idDocumentTypes, 'organizationSector' => $organizationSector, 'organizationSubset' => $organizationSubset, 'organizationActivities' => $organizationActivities, 'organizationCategory' => $organizationCategory, 'organizationOwnerShip' => $organizationOwnerShip];
         return $response;
+    }
+
+    public function organizationDb($db_name)
+    {
+        //Setting Dynamic Connection//
+        $path = config_path('database.php');
+        //GET Database Connection file 
+        $arr = include $path;
+        // load the array from the file
+        $new_connection = [
+            'driver'    => 'mysql',
+            'host'      => env('DB_HOST'),
+            'database'  => $db_name,
+            'username'  => env('COMMON_USERNAME'),
+            'password'  => env('COMMON_PASS'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+            'strict' => false
+        ];
+        // modify the array
+        $arr['connections'][$db_name] = $new_connection;
+        // write it back to the file
+        file_put_contents($path, "<?php  return " . var_export($arr, true) . ";");
+        //Setting Dynamic Env//
+        $path = base_path('.env');
+        $new_env = "
+          DB_CONNECTION_$db_name=mysql
+          DB_HOST_$db_name=127.0.0.1
+          DB_PORT_$db_name=3306
+          DB_DATABASE_$db_name=$db_name,
+          DB_USERNAME_$db_name=" . env('COMMON_USERNAME') . "
+          DB_PASSWORD_$db_name=" . env('COMMON_PASS') . "
+  
+          REPLACE_DB_HERE
+          ";
+        if (file_exists($path)) {
+            file_put_contents($path, str_replace(
+                'REPLACE_DB_HERE',
+                $new_env,
+                file_get_contents($path)
+            ));
+        }
+
+        //Creating Dynamic DB//
+        $preDatabase = Config::get('database.connections.mysql.database');
+        DB::statement("CREATE DATABASE IF NOT EXISTS $db_name");
+        $new = Config::set('database.connections.mysql.database', $db_name);
+        DB::purge('mysql');
+        DB::reconnect('mysql');
+        \Artisan::call('migrate');
+        Config::set('database.connections.mysql.database', $preDatabase);
+        return true;
     }
 }
