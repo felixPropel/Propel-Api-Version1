@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDbNameInOrganizationTable extends Migration
+class AddDbName2 extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class AddDbNameInOrganizationTable extends Migration
      */
     public function up()
     {
-        Schema::table('organization', function (Blueprint $table) {
+        Schema::table('organisation', function (Blueprint $table) {
             $table->string('db_name');
         });
     }
@@ -25,7 +25,7 @@ class AddDbNameInOrganizationTable extends Migration
      */
     public function down()
     {
-        Schema::table('organization', function (Blueprint $table) {
+        Schema::table('organisation', function (Blueprint $table) {
             $table->dropColumn('db_name');
         });
     }
