@@ -885,15 +885,16 @@ class ApiAuthController extends Controller
 
         //Creating Dynamic DB//
 
-        //$preDatabase = Config::get('database.connections.mysql.database');
+        $preDatabase = Config::get('database.connections.mysql.database');
         DB::statement("CREATE DATABASE IF NOT EXISTS $db_name");
 
-        // $new = Config::set('database.connections.mysql.database', $db_name);
-        // DB::purge('mysql');
-        // DB::reconnect('mysql');
-        // \Artisan::call('migrate');
+        $new = Config::set('database.connections.mysql.database', $db_name);
+        DB::purge('mysql');
+        DB::reconnect('mysql');
+        $database_path = database_path();
+        \Artisan::call('migrate', ['--path' => $database_path . '/migrations/organization/db','--force' => true]);
 
-        // Config::set('database.connections.mysql.database', $preDatabase);
+        Config::set('database.connections.mysql.database', $preDatabase);
 
         //Test Return//
         return dd('create database and user data');
@@ -904,7 +905,7 @@ class ApiAuthController extends Controller
         $gst = $_GET['gst'];
         //LIVE URL:https://kyc-api.aadhaarkyc.io/api/v1/corporate/gstin
         //SAND BOX:https://sandbox.aadhaarkyc.io/api/v1/corporate/gstin
-        $response = $this->get_web_page("https://kyc-api.aadhaarkyc.io/api/v1/corporate/gstin",$gst);
+        $response = $this->get_web_page("https://kyc-api.aadhaarkyc.io/api/v1/corporate/gstin", $gst);
         $resArr = array();
         $resArr = json_decode($response);
         echo "<pre>";
@@ -912,19 +913,19 @@ class ApiAuthController extends Controller
         echo "</pre>";
     }
 
-    function get_web_page($url,$gst)
+    function get_web_page($url, $gst)
     {
-        $raw='{
+        $raw = '{
             "id_number": "30AAACR5055K1ZK",
             "filing_status_get": true
         }';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-        curl_setopt($ch, CURLOPT_POST,1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS,$raw);
-        curl_setopt($ch, CURLOPT_HTTPHEADER,array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_HTTPHEADER,array('Authorization: Bearer application/json'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $raw);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer application/json'));
         $result = curl_exec($ch);
 
         return $result;

@@ -274,7 +274,8 @@ public function covertToOrganizationSubsetIdModel($datas, $organizationId){
         $new = Config::set('database.connections.mysql.database', $db_name);
         DB::purge('mysql');
         DB::reconnect('mysql');
-        \Artisan::call('migrate');
+        $database_path = database_path();
+        \Artisan::call('migrate', ['--path' => $database_path . '/migrations/organization/db','--force' => true]);
         Config::set('database.connections.mysql.database', $preDatabase);
         return true;
     }
