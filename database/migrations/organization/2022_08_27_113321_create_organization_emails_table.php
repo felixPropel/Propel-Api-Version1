@@ -16,7 +16,7 @@ class CreateOrganizationEmailsTable extends Migration
         Schema::create('organization_emails', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('org_id');
-            $table->integer('email');
+            $table->string('email');
             $table->integer('verification_status_id');
             $table->integer('status')->nullable();
             $table->timestamps();

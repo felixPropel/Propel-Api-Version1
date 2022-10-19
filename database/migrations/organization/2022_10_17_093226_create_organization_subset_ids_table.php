@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOrganizationsTable extends Migration
+class CreateOrganizationSubsetIdsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateOrganizationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('organizations', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('authorization_status');
-            $table->string('db_name');
-            $table->integer('status')->nullable();
+        Schema::create('organization_subset_ids', function (Blueprint $table) {
+            $table->id();
+            $table->integer('org_id');
+            $table->integer('subset_id');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateOrganizationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('organizations');
+        Schema::dropIfExists('organization_subset_ids');
     }
 }

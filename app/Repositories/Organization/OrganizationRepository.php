@@ -10,6 +10,7 @@ use App\Models\Organization\OrganizationSubset;
 use App\Models\Organization\OrganizationActivities;
 use App\Models\Organization\OrganizationCategory;
 use App\Models\Organization\OrganizationOwnership;
+use App\Models\Organization\organizationAdminstrators;
 use Illuminate\Support\Facades\Log;
 //use Your Model
 
@@ -29,7 +30,7 @@ class OrganizationRepository implements OrganizationInterface
     {
 
         $data->save();
-        Log::info('OrganizationRepo > saveOrganizationModel After data. ' . json_encode($data));
+        Log::info('OrganizationRepo > saveOrganizationModel After data saved . ' . json_encode($data));
         return $data;
         // return [
         //     'message' => "success",   
@@ -58,7 +59,6 @@ class OrganizationRepository implements OrganizationInterface
     }
     public function saveOrganizationEmailModel($data)
     {
-
         $data->save();
         Log::info('OrganizationRepo > saveOrganizationEmailModel After data. ' . json_encode($data));
         return [
@@ -88,7 +88,6 @@ class OrganizationRepository implements OrganizationInterface
     }
     public function saveOrganizationIdentityModel($data)
     {
-
         $data->save();
         Log::info('OrganizationRepo > saveOrganizationIdentityModel After data. ' . json_encode($data));
         return [
@@ -96,9 +95,14 @@ class OrganizationRepository implements OrganizationInterface
             'data' => $data
         ];
     }
+    public function saveOrganizationAdministratorModel($data){
+   
+        $data->save();
+        Log::info('OrganizationRepo > saveOrganizationAdministratorModel After data. ' . json_encode($data));
+
+    }
     public function getOrganizationSector()
     {
-     
         return OrganizationSector::get();
     }
     public function getOrganizationSubSet()
