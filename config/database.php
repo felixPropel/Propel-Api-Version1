@@ -71,6 +71,30 @@
       'prefix' => '',
       'prefix_indexes' => true,
     ),
+    'divamoto' => 
+    array (
+      'driver' => 'mysql',
+      'host' => '127.0.0.1',
+      'database' => 'divamoto',
+      'username' => 'root',
+      'password' => '',
+      'charset' => 'utf8',
+      'collation' => 'utf8_unicode_ci',
+      'prefix' => '',
+      'strict' => false,
+    ),
+    'gsfgfdhb' => 
+    array (
+      'driver' => 'mysql',
+      'host' => '127.0.0.1',
+      'database' => 'gsfgfdhb',
+      'username' => 'root',
+      'password' => '',
+      'charset' => 'utf8',
+      'collation' => 'utf8_unicode_ci',
+      'prefix' => '',
+      'strict' => false,
+    ),
   ),
   'migrations' => 'migrations',
   'redis' => 

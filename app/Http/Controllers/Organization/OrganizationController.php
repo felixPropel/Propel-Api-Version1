@@ -16,11 +16,10 @@ class OrganizationController extends Controller
     }  
     public function store(Request $request)
     {
-        dd('weell');
         Log::info('OrganizationController > Store new data  function Inside.' . json_encode($request->all()));
         $response = $this->service->save($request->all());
         $dbResponse = $this->service->organizationDb($request->organizationName);
-        Log::info('OrganizationController>Store function Return.' . json_encode($response));
+        //Log::info('OrganizationController>Store function Return.' . json_encode($response));
         return response($response, 200);
     }
 }

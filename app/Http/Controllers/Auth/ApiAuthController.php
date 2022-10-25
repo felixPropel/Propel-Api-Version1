@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Config;
 use Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -38,7 +37,8 @@ use App\Models\BasicModels\Salutation;
 use App\Models\TempOrganisation_details;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Passport\HasApiTokens;
-use Artisan;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
 
 class ApiAuthController extends Controller
 {
@@ -696,6 +696,7 @@ class ApiAuthController extends Controller
         $organisation->status = 1;
         $organisation->created_by = $request->uid;
         $organisation->last_modified_by = $request->uid;
+        $organisation->db_name=$request->organisation_name;
         $organisation->save();
         $id = $organisation->id;
 
@@ -808,6 +809,52 @@ class ApiAuthController extends Controller
                 $organisation_administation->save();
             }
 
+            //Setting Dynamic Connection//
+            $path = config_path('database.php');
+            //GET Database Connection file 
+            $arr = include $path;
+            // load the array from the file
+            $db_name=$request->organisation_name;
+            $new_connection = [
+                'driver'    => 'mysql',
+                'host'      => env('DB_HOST'),
+                'database'  => $db_name,
+                'username'  => env('COMMON_USERNAME'),
+                'password'  => env('COMMON_PASS'),
+                'charset'   => 'utf8',
+                'collation' => 'utf8_unicode_ci',
+                'prefix'    => '',
+                'strict' => false
+            ];
+            // modify the array
+            $arr['connections'][$db_name] = $new_connection;
+            // write it back to the file
+            file_put_contents($path, "<?php  return " . var_export($arr, true) . ";");
+            //Setting Dynamic Env//
+            $path = base_path('.env');
+            $new_env = "
+          DB_CONNECTION_$db_name=mysql
+          DB_HOST_$db_name=127.0.0.1
+          DB_PORT_$db_name=3306
+          DB_DATABASE_$db_name=$db_name,
+          DB_USERNAME_$db_name=" . env('COMMON_USERNAME') . "
+          DB_PASSWORD_$db_name=" . env('COMMON_PASS') . "
+          REPLACE_DB_HERE";
+            if (file_exists($path)) {
+                file_put_contents($path, str_replace('REPLACE_DB_HERE', $new_env, file_get_contents($path)));
+            }
+
+            //Creating Dynamic DB//
+            $preDatabase = Config::get('database.connections.mysql.database');
+            DB::statement("CREATE DATABASE IF NOT EXISTS $db_name");
+            $new = Config::set('database.connections.mysql.database', $db_name);
+            DB::purge('mysql');
+            DB::reconnect('mysql');
+            $database_path = database_path();
+            \Artisan::call('migrate', ['--path' => $database_path . '/migrations/organization/db', '--force' => true]);
+            Config::set('database.connections.mysql.database', $preDatabase);
+            return true;
+
             $response = ["message" => 'OK'];
             return response($response, 200);
         } else {
@@ -892,7 +939,7 @@ class ApiAuthController extends Controller
         DB::purge('mysql');
         DB::reconnect('mysql');
         $database_path = database_path();
-        \Artisan::call('migrate', ['--path' => $database_path . '/migrations/organization/db','--force' => true]);
+        \Artisan::call('migrate', ['--path' => $database_path . '/migrations/organization/db', '--force' => true]);
 
         Config::set('database.connections.mysql.database', $preDatabase);
 

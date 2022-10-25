@@ -12,7 +12,7 @@ use App\Models\Organization\OrganizationIdentity;
 use App\Models\Organization\OrganizationMobile;
 use App\Models\Organization\OrganizationActivityId;
 use App\Models\Organization\OrganizationWebAddress;
-use App\Models\Organization\organizationAdministrators; 
+use App\Models\Organization\organizationAdministrators;
 use App\Models\Organization\OrganizationSubsetId;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -43,48 +43,54 @@ class OrganizationService
     }
     public function save($datas)
     {
-       Log::info('OrganizationService > Store new data  function Inside.' . json_encode($datas));
-         $datas = (object) $datas;
-         $orgdatas = (object) $datas;
     
-         Log::info('OrganizationService > Store After organizationName only data.' . json_encode($orgdatas));
-         Log::info('OrganizationService > Store After Convert Object.' . json_encode($orgdatas));
-        $setOrganizationModel = $this->convertToOrganizationModel($orgdatas);
+        Log::info('OrganizationService > Store new data  function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $orgdatas = (object) $datas;
+      
+        Log::info('OrganizationService > Store After organizationName only data.' . json_encode($orgdatas));
+        Log::info('OrganizationService > Store After Convert Object.' . json_encode($orgdatas));
+        $setOrganizationModel = $this->convertToOrganizationModel($datas);
+
         $organizationModel = $this->interface->saveOrganizationModel($setOrganizationModel);
-        if ($organizationModel) 
-        {
+        if ($organizationModel) {
             $organizationId = $organizationModel->id;
-            
+      
             $setOrgDetailModel = $this->convertToOrganizationDetailModel($orgdatas, $organizationId);
+          
             $orgDetailModel = $this->interface->saveOrganizationDetailModel($setOrgDetailModel);
+        
             // $setOrganizationActivityIdModel=$this->covertToOrganizationActivityIdModel($orgdatas, $organizationId);
             // $setOrganizationSubsetIdModel=$this->covertToOrganizationSubsetIdModel($orgdatas, $organizationId);
             $setOrganizationMobileModel = $this->convertToOrganizationMobileModel($orgdatas, $organizationId);
             $orgMobileModel = $this->interface->saveOrganizationMobileModel($setOrganizationMobileModel);
+           
             $setOrganizationEmailModel = $this->convertToOrganizationEmailModel($orgdatas, $organizationId);
+            
             $orgEmailModel = $this->interface->saveOrganizationEmailModel($setOrganizationEmailModel);
-            if($orgdatas->webLinks){
-             $setOrganizationWebAddressModel = $this->convertToOrganizationWebAddressModel($orgdatas, $organizationId);
-             $orgWebAddressModel = $this->interface->saveOrganizationWebAddressModel($setOrganizationWebAddressModel);
-             }
-
+        
+            if ($datas->webLinks) {
+                $setOrganizationWebAddressModel = $this->convertToOrganizationWebAddressModel($orgdatas, $organizationId);
+                //MULTIPLE ADDRESS//
+               // $orgWebAddressModel = $this->interface->saveOrganizationWebAddressModel($setOrganizationWebAddressModel);
+            }
             // $setOrganizationAddressModel = $this->convertToOrganizationAddressModel($orgdatas, $organizationId);
             $setOrganizationIdentityModel = $this->convertToOrganizationIdentityModel($orgdatas, $organizationId);
             // $orgAddressModel = $this->interface->saveOrganizationAddressModel($setOrganizationAddressModel);
             // Log::info('OrganizationService > Store After orgAddressModel. ' . json_encode($setOrganizationAddressModel));
-             return true;
             $orgIdentityModel = $this->interface->saveOrganizationIdentityModel($setOrganizationIdentityModel);
-            $setAdministratorModel=$this->convertToOrganizationAdminstratorModel($orgdatas,$organizationId);
-            $administratorModel=$this->interface->saveOrganizationAdministratorModel($setAdministratorModel);   
-                                      
-         }
+          
+            $setAdministratorModel = $this->convertToOrganizationAdminstratorModel($orgdatas, $organizationId);
+            $administratorModel = $this->interface->saveOrganizationAdministratorModel($setAdministratorModel);
+            return $organizationId;
+        }
     }
     public function convertToOrganizationModel($datas)
     {
-        
+
         $model = new Organization();
-        $model->authorization_status ="1";
-        $model->db_name=$datas->organizationName;
+        $model->authorization_status = "1";
+        $model->db_name = $datas->organizationName;
         $model->status = "1";
         return $model;
     }
@@ -92,41 +98,42 @@ class OrganizationService
     {
 
         $model = new OrganizationDetail();
-        $model->org_id=$organizationId;
-        $model->title_id = isset($datas->org_title_id) ? $datas->org_title_id : "";
-        $model->org_name =$datas->organizationName;
+        $model->org_id = $organizationId;
+        // $model->title_id = (isset($datas->org_title_id) ? $datas->org_title_id : "");
+        $model->org_name = $datas->organizationName;
         $model->alias = "";
-        // $model->started_date =""; 
+        $model->started_date =""; 
         $model->year_of_yestablishment = null;
-        $model->org_category_id = $datas->organizationCategory;
-        $model->org_ownership_id = $datas->ownerShip;
+        $model->org_category_id = (isset($datas->organizationCategory) ? $datas->organizationCategory : 0);
+        $model->org_ownership_id = (isset($datas->ownerShip) ? $datas->ownerShip : 0);
         $model->org_register_status = 1;
         $model->status = 1;
         return $model;
-        Log::info('convertToOrganizationDetailModel array'. json_encode($model));
+        Log::info('convertToOrganizationDetailModel array' . json_encode($model));
     }
     public function covertToOrganizationActivityIdModel($datas, $organizationId)
-{
-//    $activity= count($datas->activities);
-//    Log::info('covertToOrganizationActivityIdModel array'. json_encode($activity));
-//    for ( $i=0; $i < $activity; $i++){
+    {
+        //    $activity= count($datas->activities);
+        //    Log::info('covertToOrganizationActivityIdModel array'. json_encode($activity));
+        //    for ( $i=0; $i < $activity; $i++){
 
-//    $model[$i]= new OrganizationActivityId();
-//    $model[$i]->org_id=$organizationId;
-//    $model[$i]->activity_id= $datas->activities[$i];
-//    $model[$i]->save();
-//    }
-}
-public function covertToOrganizationSubsetIdModel($datas, $organizationId){
-//     $subset=count($datas->subset);
-//     Log::info('covertToOrganizationSubsetIdModel array  '.json_encode($subset));
-// for ($i=0; $i<$subset ; $i++){
-//     $model[$i]= new OrganizationSubsetId();
-//     $model[$i]->org_id=$organizationId;
-//     $model[$i]->subset_id=$datas->subset[$i];
-//     $model[$i]->save();
-}
-}
+        //    $model[$i]= new OrganizationActivityId();
+        //    $model[$i]->org_id=$organizationId;
+        //    $model[$i]->activity_id= $datas->activities[$i];
+        //    $model[$i]->save();
+        //    }
+    }
+    public function covertToOrganizationSubsetIdModel($datas, $organizationId)
+    {
+        //     $subset=count($datas->subset);
+        //     Log::info('covertToOrganizationSubsetIdModel array  '.json_encode($subset));
+        // for ($i=0; $i<$subset ; $i++){
+        //     $model[$i]= new OrganizationSubsetId();
+        //     $model[$i]->org_id=$organizationId;
+        //     $model[$i]->subset_id=$datas->subset[$i];
+        //     $model[$i]->save();
+    }
+
     public function convertToOrganizationEmailModel($datas, $organizationId)
     {
         $model = new OrganizationEmail();
@@ -157,7 +164,7 @@ public function covertToOrganizationSubsetIdModel($datas, $organizationId){
     public function convertToOrganizationAddressModel($datas, $organizationId)
     {
         //  $address=count($datas->address_of);
-  Log::info( 'organizationService address array   ' .json_encode($address));
+        Log::info('organizationService address array   ' . json_encode($address));
 
         //  for ($i = 0; $i < $address;  $i++) {    
         //     $model[$i] = new OrganizationAddress();
@@ -174,44 +181,42 @@ public function covertToOrganizationSubsetIdModel($datas, $organizationId){
         //     $model[$i]->location = " ";
         //     $model[$i]->status_id = '1';
         //     $model[$i]->save();
-            // Log::info('organizationServices> convertToOrganizationAddressModel  ' .json_encode($address[$i]));
-            // Log::info('OrganizationService > Store After doorNo.' . json_encode($doorNo[$i]));
-            // Log::info('OrganizationService > Store After buildingName.' . json_encode($buildingName[$i]));
-            // Log::info('OrganizationService > Store After street.' . json_encode($street[$i]));
-            // Log::info('OrganizationService > Store After area.' . json_encode($area[$i]));
-            // Log::info('OrganizationServicec > district. ' . json_encode($district[$i]));
-            // Log::info('OrganizationService > Store After city. ' . json_encode($city[$i]));
-            // Log::info('OrganizationService > Store After pinCode. ' . json_encode($pinCode[$i]));
-            // Log::info('OrganizationService > Store After landMark. ' . json_encode($landMark[$i]));
-            // Log::info('OrganizationService > Store After Model. ' . json_encode($model));
+        // Log::info('organizationServices> convertToOrganizationAddressModel  ' .json_encode($address[$i]));
+        // Log::info('OrganizationService > Store After doorNo.' . json_encode($doorNo[$i]));
+        // Log::info('OrganizationService > Store After buildingName.' . json_encode($buildingName[$i]));
+        // Log::info('OrganizationService > Store After street.' . json_encode($street[$i]));
+        // Log::info('OrganizationService > Store After area.' . json_encode($area[$i]));
+        // Log::info('OrganizationServicec > district. ' . json_encode($district[$i]));
+        // Log::info('OrganizationService > Store After city. ' . json_encode($city[$i]));
+        // Log::info('OrganizationService > Store After pinCode. ' . json_encode($pinCode[$i]));
+        // Log::info('OrganizationService > Store After landMark. ' . json_encode($landMark[$i]));
+        // Log::info('OrganizationService > Store After Model. ' . json_encode($model));
     }
-       
-}
+
+
     public function convertToOrganizationIdentityModel($datas, $organizationId)
     {
-      dd('well');
-            $model = new OrganizationIdentity();
-            $model->org_id = $organizationId;
-            $model->doc_type_id = $datas->DocumentType;
-            $model->doc_no = $datas->documentNumber;
-            $model->doc_validity = $datas->validTill;
-            $model->doc_attachment=$datas->attachments; 
-            $model->status = '1';
-            return $model;
-
-            Log::info(' OrganizationIdentity datas    '.json_encode($model)); 
-
-        }
-
-      public function convertToOrganizationAdminstratorModel($datas ,$organizationId)
-    { 
-        $model= new organizationAdministrators();
+        $model = new OrganizationIdentity();
         $model->org_id = $organizationId;
-        $model->u_id="1";
-        $model->administrator_type_id=$datas->administratorsType;
-        $model->verification_status_id="1";
+        $model->doc_type_id = (isset($datas->DocumentType) ? $datas->DocumentType : 0);
+        $model->doc_no = (isset($datas->documentNumber) ? $datas->documentNumber : 0);
+        $model->doc_validity = (isset($datas->validTill) ? $datas->validTill : 0);
+        $model->doc_attachment = (isset($datas->attachments) ? $datas->attachments : "");
+        $model->status = '1';
         return $model;
-        log::info(  'organizationService> Admin   '   .json_encode($model));
+
+        Log::info(' OrganizationIdentity datas    ' . json_encode($model));
+    }
+
+    public function convertToOrganizationAdminstratorModel($datas, $organizationId)
+    {
+        $model = new organizationAdministrators();
+        $model->org_id = $organizationId;
+        $model->u_id = "1";
+        $model->administrator_type_id = (isset($datas->administratorsType) ? $datas->administratorsType : 0);
+        $model->verification_status_id = "1";
+        return $model;
+        log::info('organizationService> Admin   '   . json_encode($model));
     }
     public function organizationCommonData($datas)
     {
@@ -257,14 +262,10 @@ public function covertToOrganizationSubsetIdModel($datas, $organizationId){
           DB_DATABASE_$db_name=$db_name,
           DB_USERNAME_$db_name=" . env('COMMON_USERNAME') . "
           DB_PASSWORD_$db_name=" . env('COMMON_PASS') . "
-  
           REPLACE_DB_HERE
           ";
         if (file_exists($path)) {
-            file_put_contents($path, str_replace(
-                'REPLACE_DB_HERE',
-                $new_env,
-                file_get_contents($path)
+            file_put_contents($path, str_replace('REPLACE_DB_HERE',$new_env,file_get_contents($path)
             ));
         }
 
@@ -275,7 +276,7 @@ public function covertToOrganizationSubsetIdModel($datas, $organizationId){
         DB::purge('mysql');
         DB::reconnect('mysql');
         $database_path = database_path();
-        \Artisan::call('migrate', ['--path' => $database_path . '/migrations/organization/db','--force' => true]);
+        \Artisan::call('migrate', ['--path' => $database_path . '/migrations/organization/db', '--force' => true]);
         Config::set('database.connections.mysql.database', $preDatabase);
         return true;
     }
