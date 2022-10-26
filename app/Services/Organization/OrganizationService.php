@@ -45,9 +45,11 @@ class OrganizationService
     {
     
         Log::info('OrganizationService > Store new data  function Inside.' . json_encode($datas));
+       
         $datas = (object) $datas;
         $orgdatas = (object) $datas;
-      
+        // return $datas;
+        // die();
         Log::info('OrganizationService > Store After organizationName only data.' . json_encode($orgdatas));
         Log::info('OrganizationService > Store After Convert Object.' . json_encode($orgdatas));
         $setOrganizationModel = $this->convertToOrganizationModel($datas);
@@ -69,10 +71,12 @@ class OrganizationService
             
             $orgEmailModel = $this->interface->saveOrganizationEmailModel($setOrganizationEmailModel);
         
-            if ($datas->webLinks) {
-                $setOrganizationWebAddressModel = $this->convertToOrganizationWebAddressModel($orgdatas, $organizationId);
+            if (!empty($datas->webLinks)) {
                 //MULTIPLE ADDRESS//
-               // $orgWebAddressModel = $this->interface->saveOrganizationWebAddressModel($setOrganizationWebAddressModel);
+                foreach($orgdatas->webLinks as $links){
+                    $setOrganizationWebAddressModel = $this->convertToOrganizationWebAddressModel($links, $organizationId);
+                     $orgWebAddressModel = $this->interface->saveOrganizationWebAddressModel($setOrganizationWebAddressModel);
+                }
             }
             // $setOrganizationAddressModel = $this->convertToOrganizationAddressModel($orgdatas, $organizationId);
             $setOrganizationIdentityModel = $this->convertToOrganizationIdentityModel($orgdatas, $organizationId);
@@ -152,12 +156,12 @@ class OrganizationService
         $model->mobile_no = $datas->primaryMobile;
         return $model;
     }
-    public function convertToOrganizationWebAddressModel($datas, $organizationId)
+    public function convertToOrganizationWebAddressModel($links, $organizationId)
     {
-        Log::info('OrganizationService > Store web links.' . json_encode($datas->webLinks));
+        Log::info('OrganizationService > Store web links.' . json_encode($links));
         $model = new OrganizationWebAddress();
         $model->org_id = $organizationId;
-        $model->web_address = $datas->webLinks;
+        $model->web_address = $links;
         $model->status = '1';
         return $model;
     }
