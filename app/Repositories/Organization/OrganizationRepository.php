@@ -11,6 +11,10 @@ use App\Models\Organization\OrganizationActivities;
 use App\Models\Organization\OrganizationCategory;
 use App\Models\Organization\OrganizationOwnership;
 use App\Models\Organization\organizationAdminstrators;
+use App\Models\Organization\OrganizationActivityId;
+use App\Models\Organization\OrganizationSubsetId;
+use App\Models\Organization\OrganizationAddress;
+
 use Illuminate\Support\Facades\Log;
 //use Your Model
 
@@ -101,6 +105,19 @@ class OrganizationRepository implements OrganizationInterface
         Log::info('OrganizationRepo > saveOrganizationAdministratorModel After data. ' . json_encode($data));
 
     }
+    public function saveOrganizationActivityModel($data)
+    {
+        $data->save();
+        log::info('organizationRepo > saveOrganizationActivityModel' .json_encode($data));
+    }
+    public function saveOrganizationSubsetModel($data){
+        $data->save();
+        log::info('organizationRepo > saveOrganizationSubsetModel' .json_encode($data));
+    }
+// public function saveToOrganizationAddreessModel($data){
+//     $data->save();
+//     log::info('organizationRepo > address  '.json_encode($data));
+// }
     public function getOrganizationSector()
     {
         return OrganizationSector::get();

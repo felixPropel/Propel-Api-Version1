@@ -19,4 +19,7 @@ interface OrganizationInterface
     public function getOrganizationCategory();
     public function getOrganizationOwnerShip();
     public function saveOrganizationAdministratorModel($data);
+    public function saveOrganizationActivityModel($data);
+    public function saveOrganizationSubsetModel($data);
+    // public function saveToOrganizationAddreessModel($data);
 }
