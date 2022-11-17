@@ -178,7 +178,7 @@ class PersonService
         }
         $person_mobile->mobile = $person_datas['mobile'];
         $person_mobile->uid = $person_datas['uid'];
-        $person_mobile->status = $person_datas['status'] ? $person_datas['status'] : 0;
+        $person_mobile->status = $person_datas['status'];
         return $person_mobile;
     }
 
@@ -318,7 +318,6 @@ class PersonService
         }
         return $person_address;
     }
-
     public function check_for_email($data)
     {
         $check_for_email = $this->personInterface->check_for_email($data);
@@ -360,9 +359,7 @@ class PersonService
         $person_id = '';
         $person_euid = '';
         $person_uid = '';
-
         $is_person = $this->personInterface->checkPersonByMobile($data['mobile']);
-
         if ($is_person) {
             $person_m = $this->personInterface->check_for_mobile($data['mobile']);
             $person_uid = $person_m['uid'];
@@ -374,13 +371,13 @@ class PersonService
                 );
                 $personModel = $this->convertToPersonModel($person_data);
                 $person = $this->personInterface->savePerson($personModel);
-            }
+            }      
         } else {
             $person_data = array(
                 'mobile' => $data['mobile'],
-                'uid' =>  $uuid
+                'uid' =>  $uuid,
+                 'status' => 1
             );
-
             $personMobileModel = $this->convertToPersonMobileModel($person_data, "", "", "");
             $person = $this->personInterface->savePersonMobile($personMobileModel);
         }
@@ -677,7 +674,6 @@ class PersonService
     public function PersonDetailsUpdateExtra($data)
     {
         $person_address = $this->personInterface->getPersonAddressByUidAndType($data['uid'], $data['address_of']);
-
         if ($person_address) {
             $address_array = array(
                 'uid' => $data['uid'],
@@ -694,7 +690,6 @@ class PersonService
                 "area" => $data['area'],
             );
             $addressModel = $this->convertToPersonAddressModel($address_array, $data['uid'], $data['address_of']);
-
             $address = $this->personInterface->savePersonAddress($addressModel);
         } else {
             $address_array = array(
@@ -950,9 +945,103 @@ class PersonService
             return response($response, 400);
         }
     }
+    public function profileDetailsUpdate($datas)
+    {
+        Log::info('PersonService   >  profileDetailsUpdate. ' . json_encode($datas['uid']));
+        $personUid=$datas['uid'];
+        $profileDetailsByUid=$this->personInterface->ProfileDetailByUid($personUid);
+        $personAddressDetailsByUid=$this->personInterface->PersonAddressDetailsByUid($personUid);
+        log::info('GetAddressByUid ' .json_encode($personAddressDetailsByUid));
+        $convertAddressByUid=$this->UpdateAddressByUid($personAddressDetailsByUid,$datas);
+        // $UpdatedAddress=$this->personInterface->UpdatedAddress($convertAddressByUid);
+        $convertProfileDetails=$this->convertprofileDetails($profileDetailsByUid,$datas);
+        $UpdateProfileDetails=$this->personInterface->UpdateProfileDetails($convertProfileDetails);
+        if(!empty($datas['otherMobile']))
+        {
+         if($personUid)
+         {
+            foreach($datas['otherMobile'] as $mobile)
+            {
+                log::info('serviceperson> othermobile  ' .json_encode($mobile));
+                $convertOtherMobile=$this->ConvertotherMobile($personUid,$mobile);
+                $saveOtherMobile=$this->personInterface->saveOtherMobileByUid($convertOtherMobile);
+            }
+         }
+       }
+          if($personUid)
+      {
+           foreach($datas['otherEmail'] as $email)
+           {
+              log::info('personServices > email ' .json_encode($email));
+              $convertOtherEmail=$this->ConvertOtherEmail($personUid ,$email);
+              $saveOtherEmail=$this->personInterface->saveOtherEmailByUId($convertOtherEmail);
+           }
+    }
+    }
+public function convertprofileDetails($profile,$datas){
+    Log::info('PersonService   > currentUid. ' . json_encode($datas));
+    Log::info('PersonService   > currentData. ' . json_encode($profile));
+    if($profile){
+        $profile->uid=$datas['uid'];
+        $profile->Saluation=$datas['Saluation']; 
+        $profile->first_name=$datas['firstName']; 
+        $profile->middle_name=$datas['middleName']; 
+        $profile->last_name=$datas['lastName']; 
+        $profile->nick_name=$datas['nickName'];
+        $profile->gender=$datas['gender'];
+        $profile->dob=$datas['dob'];
+        $profile->blood_group=$datas['bloodGroup'];
+        $profile->profile_pic=$datas['profilePhoto'];
+        $profile->martial_status=$datas['maritalStatus'];
+        $profile->aniversary_date=$datas['anniversaryDate'];
+        $profile->mother_tongue=$datas['motherTongue'];
+        $profile->other_language=$datas['otherLanguage'];
+        $profile->web_link=$datas['webLinks'];
+        return $profile; 
 
-
-
+    }
+}
+public function UpdateAddressByUid($address,$datas)
+{
+    $address=count($datas['addressOf']);
+    log::info('personService > count ' .json_encode( $address));
+if($address>0){
+    for ($i = 0; $i < $address;  $i++) {    
+    $address->uid=$datas['uid'];
+    $address->address_type=$datas['addressOf'][$i];  
+    log::info('personService > address_type ' .json_encode( $address->address_type[$i]) );
+    $address[$i]->door_no=$datas['doorNo'][$i];
+    log::info('personService > door_no ' .json_encode( $address->door_no[$i]));
+    $address[$i]->bilding_name=$datas['buildingName'][$i];
+    log::info('personService > bilding ' .json_encode( $address->bilding_name[$i]));
+    $address[$i]->lank_mark=$datas['landMark'][$i];
+    $address[$i]->pincode=$datas['pinCode'][$i];
+    $address[$i]->area=$datas['area'][$i];
+    $address[$i]->street=$datas['street'][$i];
+    $address[$i]->district=$datas['district'][$i];
+    $address[$i]->city=$datas['city'][$i];
+    $address[$i]->state=$datas['state'][$i];
+    $address[$i]->country=null;
+    $address[$i]->status='1';
+    $address[$i]->save();
+    }
+}
+}
+public function  ConvertotherMobile($personUid,$mobile){
+    $model= new PersonMobile();
+    $model->uid=$personUid;
+    $model->mobile=$mobile;
+    $model->previous_mobile=Null;
+    $model->status='2';
+    return $model;
+}
+public function  ConvertOtherEmail($personUid,$email){
+    $model= new PersonEmail();
+    $model->uid=$personUid;
+    $model->email=$email; 
+    $model->status='2';
+    return $model;
+}
     //Written Dhana Function Started
     //@developer Dhana
     public function findExactPersonWithEmailAndMobile($datas)
@@ -966,4 +1055,5 @@ class PersonService
         return response($response, 200);
     }
     //Written Dhana Function Ended
+
 }

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Interfaces;
-
+use Log;
 interface PersonInterface
 {
     // public function get_stage($data);
@@ -41,6 +41,12 @@ interface PersonInterface
     public function getStates();
     public function getAllSaluations();
     public function getAddressOf();
+    public function ProfileDetailByUid($data);
+    public function UpdateProfileDetails($data);
+    public function saveOtherMobileByUid($data);
+    public function saveOtherEmailByUId($data);
+    public function PersonAddressDetailsByUid($data);
+    // public function UpdatedAddress($data);
     //writen by dhanaraj
     public function getDetailedAllPersonDataWithMobile($mobile);
     public function getDetailedAllPersonDataWithEmail($email);
@@ -48,4 +54,5 @@ interface PersonInterface
     public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
     public function findExactPersonWithEmailAndMobile($email, $mobile);
     public function findUserWithInOrganization($uId,$orgId);
+    public function findExactDatasWithMobile($mobile,$email);
 }

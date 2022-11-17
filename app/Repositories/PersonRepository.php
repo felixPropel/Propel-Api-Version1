@@ -85,7 +85,7 @@ class PersonRepository implements PersonInterface
     public function check_for_mobile($mobile)
     {
         $check_for_mobile = PersonMobile::where('mobile', $mobile)->first();
-        return $check_for_mobile;
+        return $check_for_mobile;       
     }
 
     public function getPersonMobileByUid($uid, $status, $mobile)
@@ -217,6 +217,8 @@ class PersonRepository implements PersonInterface
     {
         $details = PersonDetails::with('email', 'mobile', 'person', 'person_address')->where("uid", $uid)->get();
         return $details;
+
+        
     }
 
     public function GetCompletePersonByUid($uid)
@@ -230,7 +232,30 @@ class PersonRepository implements PersonInterface
         $address = PersonAddress::where("uid", $uid)->get()->toArray();
         return $address;
     }
+    public function ProfileDetailByUid($uid)
+    {
+   
+$profile=PersonDetails::where('uid', $uid)->first();
+return $profile;
+    }
+    public function PersonAddressDetailsByUid($uid)
+    {
+        $person=PersonAddress::where('uid', $uid)->get();
+        return $person;
+    }
+    // public function UpdatedAddress($datas){
+       
+    //    $datas->save();
+    //    log::info(' PersonRepo > saved Addresss  ' .json_encode($datas)); 
+    //    return $datas;
+    // }
+public function UpdateProfileDetails($data){
+    log::info('PersonRepo-> before  saved '  .json_encode( $data));
+    $data->save();
+    return $data;
+    log::info('PersonRepo-> saved '  .json_encode( $data));
 
+}
     public function getPersonAddressByUidAndType($uid, $type)
     {
         $address = PersonAddress::where(['uid' => $uid, 'address_type' => $type, 'status' => 1])->first();
@@ -248,7 +273,16 @@ class PersonRepository implements PersonInterface
         $addressModel->save();
         return $addressModel;
     }
-
+public function saveOtherMobileByUid($data){
+    $data->save();
+    return $data;
+    log::info(' personrepo > savedOtherMobile ' . json_encode($data));
+}
+public function saveOtherEmailByUid($data){
+    $data->save();
+    return $data;
+    log::info(' personrepo > savedOtherEmail ' . json_encode($data));
+}
     public function updateWebLink($uid, $link)
     {
         $affectedRows1 = PersonDetails::where("uid", $uid)->update([
@@ -336,5 +370,15 @@ class PersonRepository implements PersonInterface
     public function findUserWithInOrganization($uId, $orgId)
     {
         return UserAccount::where('u_id', $uId)->where('organization_id', $orgId)->first();
+    }
+    public function findExactDatasWithMobile($mobile,$email)
+    {
+    $model=PersonMobile::select('person_mobile.uid','person_mobile.mobile','person_email.email','person_details.first_name as name')
+    ->leftjoin('person_email','person_email.uid','person_mobile.uid')
+    ->leftjoin('person_details','person_details.uid','person_mobile.uid')
+    ->where('mobile',$mobile)->orWhere('email' ,$email)
+    ->get();
+   
+    return $model;
     }
 }
