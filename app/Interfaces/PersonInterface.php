@@ -4,7 +4,7 @@ namespace App\Interfaces;
 use Log;
 interface PersonInterface
 {
-    // public function get_stage($data);
+    // public function get_stage($data); 
     public function check_for_email($data);
     public function check_for_mobile($data);
     public function getPersonDetailsBasicUid($uid);
@@ -46,6 +46,8 @@ interface PersonInterface
     public function saveOtherMobileByUid($data);
     public function saveOtherEmailByUId($data);
     public function PersonAddressDetailsByUid($data);
+  public function checkPersonByMobileNo($mobile);
+  public function checkPersonByEmail($email,$uid);
     // public function UpdatedAddress($data);
     //writen by dhanaraj
     public function getDetailedAllPersonDataWithMobile($mobile);

@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Str;
-use App\Interfaces\PersonInterface;
+use App\Interfaces\PersonInterface; 
 use App\Models\Common;
 use App\Models\TempUsers;
 use App\Models\Person;
@@ -41,12 +41,12 @@ class PersonService
             $stage = $common->check_temp_user_mobile($request['mobile']);
             $person_mobile = $common->check_users_mobile($request['mobile']);
             $user_mobile = $common->check_primary_user_mobile($request['mobile']);
-            if ($person_mobile != 0 && $user_mobile != 0) {
+            if ($person_mobile != 0 && $user_mobile != 0) {      
                 $uuid = $common->get_uuid_by_mobile($request['mobile']);
                 if ($stage['stage'] === 0 && $uuid === 0) {
                     $temp_user_model = $this->convertToTempUserModel($request);
                     $temp_user = $this->personInterface->saveTempUser($temp_user_model);
-                    if ($temp_user->id > 0) {
+                    if ($temp_user->id > 0) { 
                         $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
                         return response($response, 200);
                     } else {
@@ -56,36 +56,26 @@ class PersonService
                 } else if ($uuid) {
                     $response = ["message" => 'OK', 'route' => '/login', "param" => ['m' => $request['mobile']]];
                     return response($response, 200);
-                } else if ($stage['stage'] == '1') {
+                } else if ($stage['stage'] == '1') { //mobile only
                     $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
-                    return response($response, 200);
-                } else if ($stage['stage'] == '2') {
+                    return response($response, 200);     
+                } else if ($stage['stage'] == '2') { // mobile & email
                     $response = ["message" => 'OK', 'route' => 'stage3', "param" => ['mobile' => $request['mobile']]];
                     return response($response, 200);
-                } else if ($stage['stage'] == '3') {
+                } else if ($stage['stage'] == '3') {    
                     $response = ["message" => 'OK', 'route' => 'registration'];
                     return response($response, 200);
                 }
             } else {
-                $uuid = $common->get_person_uuid_by_mobile($request['mobile']);
-
-                if ($uuid) {
-                    $email = $common->get_person_email($uuid);
-                    if ($email) {
-                        $response = ["message" => 'OK', 'route' => 'person_confirmation', "param" => ['uid' => $uuid]];
-                        return response($response, 200);
-                    } else {
-                        $response = ["message" => 'OK', 'route' => 'person_email', 'uid' => $uuid];
-                        return response($response, 200);
-                    }
-                } else {
+                $mobile = $common->get_person_uuid_by_mobile($request['mobile']);
+                           if ($mobile) {
+                     $response = ["message" => 'OK', 'route' => 'check_email', "param" => ['mobile' => $mobile]];
+                        return response($response, 200);  
+                               } else {
                     $uuid = $common->get_uuid_by_mobile($request['mobile']);
-
                     if ($stage['stage'] === 0 && $uuid === 0) {
-
                         $temp_user_model = $this->convertToTempUserModel($request);
                         $temp_user = $this->personInterface->saveTempUser($temp_user_model);
-
                         if ($temp_user->id > 0) {
                             $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
                             return response($response, 200);
@@ -94,7 +84,7 @@ class PersonService
                             return response($response, 400);
                         }
                     } else if ($uuid) {
-                        // $response = ["message" => 'OK', 'route' => 'login', 'm' => $request['mobile']];
+                         $response = ["message" => 'OK', 'route' => 'login', 'm' => $request['mobile']];
                         $response = ["message" => 'OK', 'route' => '/login', "param" => ['m' => $request['mobile']]];
                         return response($response, 200);
                     } else if ($stage['stage'] == '1') {
@@ -136,7 +126,6 @@ class PersonService
         $temp_user->stage = 2;
         return $temp_user;
     }
-
     public function convertToPersonEmailModel($personData, $uid, $status, $email)
     {
         if ($uid) {
@@ -181,14 +170,27 @@ class PersonService
         $person_mobile->status = $person_datas['status'];
         return $person_mobile;
     }
-
+public function check_person($data){
+    $mobile=$data['mobile'];
+    $email=$data['email'];
+    $checkPersonByMobile=$this->personInterface->checkPersonByMobileNo($mobile);
+    $uid=$checkPersonByMobile;
+    $checkPersonByEmail=$this->personInterface->checkPersonByEmail($email, $uid); 
+   if($checkPersonByMobile !==0  &&  $checkPersonByEmail !==0){
+    $response = ["message" => 'OK', 'route' => 'person_confirm', "param" => ['mobile' =>$mobile]];
+     return response($response, 200);
+}
+else {
+    $response = ["message" => 'Email Not Matched'];  
+    return response($response, 400);
+}
+}
     public function convertToPersonDetailsModel($data, $id)
     {
         if ($id != "") {
             $person_details = $this->personInterface->getPersonDetailsBasicUid($id);
             $person_details->uid = $data['uid'];
             $person_details->profile_pic = $data['profile_pic'];
-
             $person_details->saluation = $data['saluation'] ? $data['saluation'] : "";
             $person_details->first_name = $data['first_name'] ? $data['first_name'] : "";
             $person_details->middle_name = $data['middle_name'] ? $data['middle_name'] : "";
@@ -325,7 +327,7 @@ class PersonService
             $response = ["message" => 'OK', 'route' => '', 'param' => ['checked_email' => $check_for_email]];
             return response($response, 200);
         } else {
-            $response = ["message" => 'Email Not Found'];
+            $response = ["message" => 'Email Not Found']; 
             return response($response, 400);
         }
     }

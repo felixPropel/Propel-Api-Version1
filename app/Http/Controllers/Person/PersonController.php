@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\PersonService;
 use App\Services\UserService;
-use Log;
+use Illuminate\Support\Facades\Log;
 class PersonController extends Controller
 {
     protected $person;
@@ -55,7 +55,7 @@ class PersonController extends Controller
 
     public function person_details_stage1(Request $request)
     {
-       log::info('person_details_stage1->'.json_encode($request->all()));
+        // Log::info('personController > person_details_stage1 .' . json_encode($datas));
         $response = $this->person->person_details_stage1($request->all());
         return $response;
     }
@@ -111,16 +111,24 @@ class PersonController extends Controller
 
     public function person_details_update(Request $request)
     {
-        $response = $this->person->PersonDetailsUpdate($request->all());
+        Log::info('PersonController  > person_details_update1.' . json_encode($request->all()));
+        $response = $this->person->profileDetailsUpdate($request->all());
         return $response;
     }
+public function check_person(Request $request)
+{
+log::info('personcontroller > check_person mobile ' . json_encode($request->all()));    
+$response=$this->person->check_person($request->all());
+return $response;
 
+
+}
     public function person_details_update_extra(Request $request)
     {
+        Log::info('PersonController  > person_details_update_extra .' . json_encode($request->all()));
         $response = $this->person->PersonDetailsUpdateExtra($request->all());
         return $response;
     }
-
     public function store_mobile(Request $request)
     {
         $response = $this->person->storeMobile($request->all());

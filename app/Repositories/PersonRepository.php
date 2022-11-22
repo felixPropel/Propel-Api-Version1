@@ -25,7 +25,7 @@ use App\Models\BasicModels\BloodGroup;
 use App\Models\Address_of;
 use App\Models\UserAccount;
 use Illuminate\Support\Facades\DB;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class PersonRepository.
@@ -62,7 +62,28 @@ class PersonRepository implements PersonInterface
         $homeAddressModel->save();
         return $homeAddressModel;
     }
-
+public function checkPersonByMobileNo($mobile)
+{
+    $mobile=PersonMobile::where('mobile', $mobile)->pluck('uid')->first();
+  
+    if($mobile){
+        return $mobile;
+    }
+    else{
+        return 0;
+    }
+    
+}
+public function checkPersonByEmail($email ,$uid)
+{
+    $email=PersonEmail::where(['uid'=>$uid ,'email'=>$email])->pluck('email')->first();
+    if($email){
+        return $email;      
+    }
+    else{
+        return 0; 
+    }
+}
     public function saveOfficeAddress($officeAddressModel)
     {
         $officeAddressModel->save();
@@ -80,8 +101,6 @@ class PersonRepository implements PersonInterface
         $model = TempUsers::where('mobile', $mobile)->first();
         return $model;
     }
-
-
     public function check_for_mobile($mobile)
     {
         $check_for_mobile = PersonMobile::where('mobile', $mobile)->first();
