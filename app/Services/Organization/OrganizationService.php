@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Services\Organization;
-
 use App\Interfaces\Organization\OrganizationInterface;
 use App\Interfaces\CommonInterface;
 use App\Models\Organization\Organization;
@@ -25,7 +24,6 @@ use Illuminate\Support\Facades\Config;
  */
 class OrganizationService
 {
-
     public function __construct(OrganizationInterface $interface, CommonInterface $commonInterface)
     {
         $this->interface = $interface;
@@ -41,19 +39,16 @@ class OrganizationService
         }
         return $response;
     }
-    public function save($datas)
+    public function save($datas) 
     {
-    
-        Log::info('OrganizationService > Store new data  function Inside.' . json_encode($datas));
-       
+        Log::info('OrganizationService > Store .' . json_encode($datas));      
         $datas = (object) $datas;
         $orgdatas = (object) $datas;
         // return $datas;
         // die();
-        Log::info('OrganizationService > Store After organizationName only data.' . json_encode($orgdatas));
-        Log::info('OrganizationService > Store After Convert Object.' . json_encode($orgdatas));
+        Log::info('OrganizationService > object.' . json_encode($orgdatas));
+        Log::info('OrganizationService > Store After Convert Object tdy.' . json_encode($orgdatas));
         $setOrganizationModel = $this->convertToOrganizationModel($datas);
-
         $organizationModel = $this->interface->saveOrganizationModel($setOrganizationModel);
         if ($organizationModel) {
             $organizationId = $organizationModel->id;
@@ -68,9 +63,9 @@ class OrganizationService
             $organizationActivityModel=$this->interface->saveOrganizationActivityModel($setOrganizationActivityModel);
         }
     }
-    if(!empty($orgdatas->Activities)){
+    if(!empty($orgdatas->Subset)){
 
-        foreach($orgdatas->Subset as $sub){
+            foreach($orgdatas->Subset as $sub){
             log::info('organizationservice  '  .json_encode($sub));
             $setOrganizationSubsetModel=$this->covertToOrganizationSubsetIdModel($sub, $organizationId);
             $organizationSubsetModel=$this->interface->saveOrganizationSubsetModel($setOrganizationSubsetModel);
@@ -125,7 +120,7 @@ class OrganizationService
     }
     public function covertToOrganizationActivityModel($activity, $organizationId)
     {
-           Log::info('covertToOrganizationActivityModel '. json_encode($activity));
+        Log::info('covertToOrganizationActivityModel '. json_encode($activity));
          $model= new OrganizationActivityId();
          $model->org_id=$organizationId;
          $model->activity_id= $activity;
@@ -211,7 +206,7 @@ class OrganizationService
         $model->doc_attachment = (isset($datas->attachments) ? $datas->attachments : "");
         $model->status = '1';
         return $model;
-        Log::info(' OrganizationIdentity datas    ' . json_encode($model));
+        Log::info(' OrganizationIdentity datas' . json_encode($model));
     }
 
     public function convertToOrganizationAdminstratorModel($datas, $organizationId)
@@ -222,7 +217,7 @@ class OrganizationService
         $model->administrator_type_id = (isset($datas->administratorsType) ? $datas->administratorsType : 0);
         $model->verification_status_id = "1";
         return $model;
-        log::info('organizationService> Admin   '   . json_encode($model));
+        log::info('organizationService> Admin'   . json_encode($model));
     }
     public function organizationCommonData($datas)
     {
@@ -258,8 +253,7 @@ class OrganizationService
         // log::info('organizationService> organizationDb host   '   . json_encode(env('DB_HOST')));
         // log::info('organizationService> organizationDb username   '   . json_encode(env('COMMON_USERNAME')));
         // log::info('organizationService> organizationDb password   '   . json_encode(env('COMMON_PASS')));
-        // log::info('organizationService> organizationDb db name   '   . json_encode($db_name));
-
+        // log::info('organizationService> organizationDb db name   '   . json_encode($db_name));a
         // log::info('organizationService> organizationDbNew   '   . json_encode($new_connection));
         // modify the array
         $arr['connections'][$db_name] = $new_connection;
@@ -282,14 +276,14 @@ class OrganizationService
         }
         //Creating Dynamic DB//
         $preDatabase = Config::get('database.connections.mysql.database');
+        log::info('person service > preDatabase ' .json_encode($preDatabase));
         DB::statement("CREATE DATABASE IF NOT EXISTS $db_name");
         $new = Config::set('database.connections.mysql.database', $db_name);
-        DB::purge('mysql');
-        DB::reconnect('mysql');
+        log::info('person service > new ' .json_encode( $new));
+         DB::purge('mysql');
+         DB::reconnect('mysql');
         $database_path = database_path();
-        //  \Artisan::call('migrate', ['--path' => $database_path . '/migrations/organization/db','--force' => true]);
-      \Artisan::call('migrate');
-        Config::set('database.connections.mysql.database', $preDatabase);
-        return true;
+        \Artisan::call('migrate  --path=/database/migrations/organization/db');
+        return true;  
     }   
-}  
+} 

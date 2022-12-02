@@ -262,17 +262,16 @@ return $profile;
         $person=PersonAddress::where('uid', $uid)->get();
         return $person;
     }
-    // public function UpdatedAddress($datas){
-       
-    //    $datas->save();
-    //    log::info(' PersonRepo > saved Addresss  ' .json_encode($datas)); 
-    //    return $datas;
-    // }
+    public function UpdatedAddress($datas){
+        log::info('PersonRepo->   wating '  .json_encode( $data));
+       $datas->save();
+       return $datas;
+    }
 public function UpdateProfileDetails($data){
     log::info('PersonRepo-> before  saved '  .json_encode( $data));
     $data->save();
     return $data;
-    log::info('PersonRepo-> saved '  .json_encode( $data));
+    log::info('PersonRepo-> after saved '  .json_encode( $data));
 
 }
     public function getPersonAddressByUidAndType($uid, $type)
@@ -293,14 +292,16 @@ public function UpdateProfileDetails($data){
         return $addressModel;
     }
 public function saveOtherMobileByUid($data){
+    if(isset($data)){
     $data->save();
     return $data;
-    log::info(' personrepo > savedOtherMobile ' . json_encode($data));
+    }  
 }
 public function saveOtherEmailByUid($data){
+    if(isset($email)){
     $data->save();
     return $data;
-    log::info(' personrepo > savedOtherEmail ' . json_encode($data));
+    }
 }
     public function updateWebLink($uid, $link)
     {

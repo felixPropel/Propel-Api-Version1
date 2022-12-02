@@ -24,6 +24,8 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/get_stage', 'App\Http\Controllers\Person\PersonController@get_stage')->name('get_stage.api');
 
     Route::post('/check_for_email', 'App\Http\Controllers\Person\PersonController@check_for_email')->name('check_for_email.api');
+    Route::post('check_person', 'App\Http\Controllers\Person\PersonController@check_person')->name('check_person');
+
     Route::post('/temp_update', 'App\Http\Controllers\Person\PersonController@temp_update')->name('temp_update.api');
     Route::post('/update_person_details', 'App\Http\Controllers\Person\PersonController@update_person_details')->name('update_person_details.api');
     Route::post('/person_details_stage1', 'App\Http\Controllers\Person\PersonController@person_details_stage1')->name('person_details_stage1.api');

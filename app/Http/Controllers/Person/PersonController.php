@@ -102,26 +102,23 @@ class PersonController extends Controller
         $response = $this->person->complete_profile($request->all());
         return $response;
     }
-
     public function get_profile_details(Request $request)
     {
         $response = $this->person->getProfileDetails($request->all());
         return $response;
     }
-
     public function person_details_update(Request $request)
     {
-        Log::info('PersonController  > person_details_update1.' . json_encode($request->all()));
+        Log::info('PersonController  > now.' . json_encode($request->all()));
         $response = $this->person->profileDetailsUpdate($request->all());
-        return $response;
+        return response($response, 200);
+        
     }
 public function check_person(Request $request)
 {
 log::info('personcontroller > check_person mobile ' . json_encode($request->all()));    
 $response=$this->person->check_person($request->all());
 return $response;
-
-
 }
     public function person_details_update_extra(Request $request)
     {

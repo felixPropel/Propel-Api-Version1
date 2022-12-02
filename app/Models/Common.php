@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\TempUsers;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Common extends Model
 {
@@ -15,7 +16,7 @@ class Common extends Model
     public function check_temp_user_mobile($mobile)
     {
         $user = DB::table('temp_users')
-            ->where('mobile', '=', $mobile)
+            ->where('mobile', '=', $mobile)               
             ->where('stage', '!=', '3')
             ->first();
         if ($user === null) {
@@ -24,10 +25,14 @@ class Common extends Model
                 'stage' => 0,
                 'mobile' => 0,
             );
+            log::info('ModelCommon > array ' .json_encode($array));
             return $array;
+            
         } else {
             $stage = DB::table('temp_users')->where('mobile', $mobile)->pluck('stage')->first();
+            log::info('ModelCommon > stage ' .json_encode($stage));
             $mobile = DB::table('temp_users')->where('mobile', $mobile)->pluck('mobile')->first();
+            log::info('ModelCommon > Mobile ' .json_encode($mobile));
 
             $array = array(
                 'stage' => $stage,
@@ -80,7 +85,7 @@ class Common extends Model
             ->where('mobile', '=', $mobile)
             ->first();
         if ($uuid) {
-            return $uuid->uid;
+            return $uuid->mobile;
         } else {
             return 0;
         }
@@ -130,5 +135,10 @@ class Common extends Model
             //  ->orWhere('stage','2')
             ->update(['email' => $email, 'stage' => "2"]);
         return $update;
+    }
+    public function getUserName($uuid)
+    {
+        $name=DB::table('person_details')->where('uid',$uuid)->pluck('first_name')->first();
+        return $name;
     }
 }
