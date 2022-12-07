@@ -43,6 +43,8 @@ class PersonService
             $user_mobile = $common->check_primary_user_mobile($request['mobile']);
             if ($person_mobile != 0 && $user_mobile != 0) {      
                 $uuid = $common->get_uuid_by_mobile($request['mobile']);
+                $getName=$common->getUserName($uuid);
+                log::info(' personService  > getname ' .json_encode($getName));
                 if ($stage['stage'] === 0 && $uuid === 0) {
                     $temp_user_model = $this->convertToTempUserModel($request);
                     $temp_user = $this->personInterface->saveTempUser($temp_user_model);
@@ -54,7 +56,7 @@ class PersonService
                         return response($response, 400);
                     }
                 } else if ($uuid) {
-                    $response = ["message" => 'OK', 'route' => '/login', "param" => ['m' => $request['mobile']]];
+                    $response = ["message" => 'OK', 'mobile' =>$mobile,'username'=>$getName];
                     return response($response, 200);
                 } else if ($stage['stage'] == '1') { //mobile only
                     $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
@@ -177,7 +179,7 @@ public function check_person($data){
     $uid=$checkPersonByMobile;
     $checkPersonByEmail=$this->personInterface->checkPersonByEmail($email, $uid); 
    if($checkPersonByMobile !==0  &&  $checkPersonByEmail !==0){
-    $response = ["message" => 'OK', 'route' => 'person_confirm', "param" => ['mobile' =>$mobile]];
+    $response = ["message" => 'OK', 'route' => 'person_confirm', "param" => ['mobile' =>$mobile ,'email' =>$email,'uid'=>$uid]];
      return response($response, 200);
 }
 else {
@@ -917,8 +919,6 @@ else {
             return response($response, 400);
         }
     }
-    
-
     public function deleteOther($data){
         $mobile = $this->personInterface->getPersonMobileByUid($data['uid'], 2, "");
         if (!empty($mobile)) {
@@ -932,7 +932,6 @@ else {
             }
         }
     }
-
     public function deleteOtherEmail($data){
         $uid = $data['uid'];
         $other = $data['other'];
@@ -949,40 +948,41 @@ else {
     }
     public function profileDetailsUpdate($datas)
     {
-        Log::info('PersonService   >  profileDetailsUpdate. ' . json_encode($datas['uid']));
+      $object=(object) ($datas);
+      $image=$object->profilePhoto;
+      $extension= time().'.'.$image->extension();
+      log::info('person services > image ' .json_encode($extension)); 
         $personUid=$datas['uid'];
         $profileDetailsByUid=$this->personInterface->ProfileDetailByUid($personUid);
+       $convertProfileDetails=$this->convertprofileDetails($profileDetailsByUid,$datas);
+       $UpdateProfileDetails=$this->personInterface->UpdateProfileDetails($convertProfileDetails);
         $personAddressDetailsByUid=$this->personInterface->PersonAddressDetailsByUid($personUid);
-        log::info('GetAddressByUid ' .json_encode($personAddressDetailsByUid));
-        $convertAddressByUid=$this->UpdateAddressByUid($personAddressDetailsByUid,$datas);
-        // $UpdatedAddress=$this->personInterface->UpdatedAddress($convertAddressByUid);
-        $convertProfileDetails=$this->convertprofileDetails($profileDetailsByUid,$datas);
-        $UpdateProfileDetails=$this->personInterface->UpdateProfileDetails($convertProfileDetails);
+        $convertAddressByUid=$this->UpdateAddressByUid($personAddressDetailsByUid,$object);
+         
         if(!empty($datas['otherMobile']))
         {
          if($personUid)
          {
             foreach($datas['otherMobile'] as $mobile)
             {
-                log::info('serviceperson> othermobile  ' .json_encode($mobile));
                 $convertOtherMobile=$this->ConvertotherMobile($personUid,$mobile);
                 $saveOtherMobile=$this->personInterface->saveOtherMobileByUid($convertOtherMobile);
             }
          }
        }
+       if(!empty($datas['otherEmail']))
+    {
           if($personUid)
-      {
+       {
            foreach($datas['otherEmail'] as $email)
            {
-              log::info('personServices > email ' .json_encode($email));
               $convertOtherEmail=$this->ConvertOtherEmail($personUid ,$email);
               $saveOtherEmail=$this->personInterface->saveOtherEmailByUId($convertOtherEmail);
            }
+       }
     }
-    }
+}
 public function convertprofileDetails($profile,$datas){
-    Log::info('PersonService   > currentUid. ' . json_encode($datas));
-    Log::info('PersonService   > currentData. ' . json_encode($profile));
     if($profile){
         $profile->uid=$datas['uid'];
         $profile->Saluation=$datas['Saluation']; 
@@ -1000,36 +1000,35 @@ public function convertprofileDetails($profile,$datas){
         $profile->other_language=$datas['otherLanguage'];
         $profile->web_link=$datas['webLinks'];
         return $profile; 
-
     }
 }
-public function UpdateAddressByUid($address,$datas)
+public function UpdateAddressByUid($addressdb,$object)
 {
-    $address=count($datas['addressOf']);
-    log::info('personService > count ' .json_encode( $address));
-if($address>0){
-    for ($i = 0; $i < $address;  $i++) {    
-    $address->uid=$datas['uid'];
-    $address->address_type=$datas['addressOf'][$i];  
-    log::info('personService > address_type ' .json_encode( $address->address_type[$i]) );
-    $address[$i]->door_no=$datas['doorNo'][$i];
-    log::info('personService > door_no ' .json_encode( $address->door_no[$i]));
-    $address[$i]->bilding_name=$datas['buildingName'][$i];
-    log::info('personService > bilding ' .json_encode( $address->bilding_name[$i]));
-    $address[$i]->lank_mark=$datas['landMark'][$i];
-    $address[$i]->pincode=$datas['pinCode'][$i];
-    $address[$i]->area=$datas['area'][$i];
-    $address[$i]->street=$datas['street'][$i];
-    $address[$i]->district=$datas['district'][$i];
-    $address[$i]->city=$datas['city'][$i];
-    $address[$i]->state=$datas['state'][$i];
-    $address[$i]->country=null;
-    $address[$i]->status='1';
-    $address[$i]->save();
-    }
-}
+    $address=count($object->addressOf);
+             
+     for ($i = 0; $i < $address;  $i++)
+  {   
+         $addressdb[$i]->address_type =$object->uid;
+         $addressdb[$i]->address_type = $object->addressOf[$i]; 
+         $addressdb[$i]->door_no = $object->doorNo[$i];
+         $addressdb[$i]->bilding_name = $object->buildingName[$i];
+         $addressdb[$i]->street = $object->street[$i]; 
+         $addressdb[$i]->land_mark = $object->landMark[$i];
+         $addressdb[$i]->pinCode = $object->pinCode[$i];
+         $addressdb[$i]->state = $object->state[$i];
+         $addressdb[$i]->city = $object->city[$i];  
+         $addressdb[$i]->district = $object->district[$i]; 
+         $addressdb[$i]->area = $object->area[$i];  
+         $addressdb[$i]->area = $object->area[$i];
+         $addressdb[$i]->save();          
+     
+    
+    
+  }
 }
 public function  ConvertotherMobile($personUid,$mobile){
+    if(isset($mobile))
+    {
     $model= new PersonMobile();
     $model->uid=$personUid;
     $model->mobile=$mobile;
@@ -1037,23 +1036,24 @@ public function  ConvertotherMobile($personUid,$mobile){
     $model->status='2';
     return $model;
 }
+}
 public function  ConvertOtherEmail($personUid,$email){
+    if(isset($email)){
     $model= new PersonEmail();
     $model->uid=$personUid;
     $model->email=$email; 
     $model->status='2';
     return $model;
+    }
 }
     //Written Dhana Function Started
     //@developer Dhana
     public function findExactPersonWithEmailAndMobile($datas)
     {
-        Log::info('PersonService>findExactPersonWithEmailAndMobile Function>Inside. ');
         $datas = (object)$datas;
         $email = $datas->email;
         $mobile = $datas->mobile;
         $response = $this->personInterface->findExactPersonWithEmailAndMobile($email, $mobile);
-        Log::info('PersonService>findExactPersonWithEmailAndMobile Function>Return.' . json_encode($response));
         return response($response, 200);
     }
     //Written Dhana Function Ended
