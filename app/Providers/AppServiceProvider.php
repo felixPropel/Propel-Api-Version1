@@ -22,7 +22,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('App\Interfaces\HrmDesignationInterface','App\Repositories\HRM\HrmDesignationRepository');
         $this->app->bind('App\Interfaces\CommonInterface','App\Repositories\Common\CommonRepository');
         $this->app->bind('App\Interfaces\Organization\OrganizationInterface','App\Repositories\Organization\OrganizationRepository');
-
+       
+        $this->app->bind('App\Http\Controllers\version1\Interfaces\Person\PersonInterface','App\Http\Controllers\version1\Repositories\Person\PersonRepository');
     }
 
     /**
