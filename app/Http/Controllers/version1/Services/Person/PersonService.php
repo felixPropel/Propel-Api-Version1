@@ -4,6 +4,7 @@ namespace App\Http\Controllers\version1\Services\Person;
 
 
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
+use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Models\Person;
 use App\Models\PersonDetails;
@@ -14,15 +15,16 @@ use Illuminate\Support\Str;
 
 class PersonService
 {
-    public function __construct(PersonInterface $personInterface, CommonService $commonService)
+    public function __construct(PersonInterface $personInterface, CommonService $commonService,UserInterface $userInterface)
     {
         $this->commonService = $commonService;
         $this->personInterface = $personInterface;
+        $this->userInterface = $userInterface;
     }
     public function findMobileNumber($datas)
     {
         $datas = (object) $datas;
-        $model = $this->personInterface->findUserDataByMobileNumber($datas->mobileNumber);
+        $model = $this->userInterface->findUserDataByMobileNumber($datas->mobileNumber);
         if ($model) {
             $result = ['type' => 1, 'model' => $model, 'mobileNumber' => $datas->mobileNumber];
         } else {
@@ -35,7 +37,7 @@ class PersonService
     {
 
         $datas = (object) $datas;
-        $model = $this->personInterface->findUserDataByEmail($datas->email);
+        $model = $this->userInterface->findUserDataByEmail($datas->email);
 
         if ($model) {
             $result = ['type' => 1, 'model' => $model, 'email' => $datas->email];

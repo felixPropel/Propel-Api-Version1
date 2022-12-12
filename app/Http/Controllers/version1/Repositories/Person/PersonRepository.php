@@ -12,14 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class PersonRepository implements PersonInterface
 {
-    public function findUserDataByMobileNumber($mobileNumber)
-    {
-        return User::where('primary_mobile', $mobileNumber)->first();
-    }
-    public function findUserDataByEmail($email)
-    {
-        return User::where('primary_email', $email)->first();
-    }
+   
     public function storePerson($personModel, $personDetailModel, $personEmailModel, $personMobileModel)
     {
 
@@ -39,7 +32,7 @@ class PersonRepository implements PersonInterface
                 $personEmailModel->save();
                 return [
                     'message' => "Success",
-                    'data' => "Added Successfully."
+                    'data' => $personModel
                 ];
             });
 
@@ -53,5 +46,14 @@ class PersonRepository implements PersonInterface
                 'data' => $e
             ];
         }
+    }
+    public function getPersonPrimaryDataByUid($uid)
+    {
+        return Person::select('*')->leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
+            ->leftjoin('person_emails', 'person_emails.uid', '=', 'persons.uid')
+            ->where('person_mobiles.mobile_cachet', 1)
+            ->where('person_emails.email_cachet', 1)
+            ->where('persons.uid', $uid)
+            ->first();
     }
 }
