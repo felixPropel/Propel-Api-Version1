@@ -19,6 +19,14 @@ class PersonController extends Controller
        
         return $response;
     }
+    public function findEmail(Request $request)
+    {
+
+        $response = $this->personService->findEmail($request->all());
+       
+        return $response;
+    }
+    
     /**
      * Display a listing of the resource.
      *

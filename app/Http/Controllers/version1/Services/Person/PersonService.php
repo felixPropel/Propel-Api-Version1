@@ -23,4 +23,20 @@ class PersonService
         }
         return $this->commonService->sendResponse($result, "");
     }
+    
+    public function findEmail($datas)
+    {
+        
+        $datas = (object) $datas;
+        $model = $this->personInterface->findUserDataByEmail($datas->email);
+       
+        if ($model) {
+            $result = ['type' => 1, 'model' => $model,'email'=>$datas->email];
+        } else {
+            $result = ['type' => 0, 'model' => "",'email'=>$datas->email];
+        }
+        return $this->commonService->sendResponse($result, "");
+
+       
+    }
 }

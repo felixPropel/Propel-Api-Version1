@@ -11,5 +11,9 @@ class PersonRepository implements PersonInterface
     {      
        return User::where('primary_mobile', $mobileNumber)->first();       
     }
+    public function findUserDataByEmail($email)
+    {
+        return User::where('primary_email', $email)->first();         
+    }
 
 }
