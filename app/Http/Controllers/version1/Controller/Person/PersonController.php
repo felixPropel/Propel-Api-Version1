@@ -16,17 +16,24 @@ class PersonController extends Controller
     public function findMobileNumber(Request $request)
     {
         $response = $this->personService->findMobileNumber($request->all());
-       
+
         return $response;
     }
     public function findEmail(Request $request)
     {
 
         $response = $this->personService->findEmail($request->all());
-       
+
         return $response;
     }
-    
+
+    public function storePerson(Request $request)
+    {
+
+        $response = $this->personService->storePerson($request->all());
+        return $response;
+    }
+
     /**
      * Display a listing of the resource.
      *

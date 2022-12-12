@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class PersonEmail extends Model
 {
     use HasFactory;
-    protected $table = 'person_email';
-    public function PersonDetail()
+    protected $table = 'person_emails';
+    
+    public function ParentPerson()
     {
-        return $this->belongsTo(PersonDetails::class, 'uid', 'uid');
+        return $this->belongsTo(Person::class, 'uid', 'uid');
     }
 }

@@ -45,4 +45,9 @@ class PersonDetails extends Model
     {
         return $this->hasMany('App\Models\PersonMobile', 'uid', 'uid');
     }
+    
+    public function ParentPerson()
+    {
+        return $this->belongsTo(Person::class, 'uid', 'uid');
+    }
 }
