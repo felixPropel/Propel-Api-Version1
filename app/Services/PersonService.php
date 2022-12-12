@@ -44,8 +44,7 @@ class PersonService
             if ($person_mobile != 0 && $user_mobile != 0) {      
                 $uuid = $common->get_uuid_by_mobile($request['mobile']);
                 $getName=$common->getUserName($uuid);
-                log::info(' personService  > getname ' .json_encode($getName));
-                if ($stage['stage'] === 0 && $uuid === 0) {
+                 if ($stage['stage'] === 0 && $uuid === 0) {
                     $temp_user_model = $this->convertToTempUserModel($request);
                     $temp_user = $this->personInterface->saveTempUser($temp_user_model);
                     if ($temp_user->id > 0) { 
@@ -56,10 +55,10 @@ class PersonService
                         return response($response, 400);
                     }
                 } else if ($uuid) {
-                    $response = ["message" => 'OK', 'mobile' =>$mobile,'username'=>$getName];
+                    $response = ["route" => 'login', 'mobile' =>$mobile,'username'=>$getName];
                     return response($response, 200);
                 } else if ($stage['stage'] == '1') { //mobile only
-                    $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
+                    $response = ["message" => 'OK', 'route' => 'stage', "param" => ['mobile' => $request['mobile']]];
                     return response($response, 200);     
                 } else if ($stage['stage'] == '2') { // mobile & email
                     $response = ["message" => 'OK', 'route' => 'stage3', "param" => ['mobile' => $request['mobile']]];
@@ -70,16 +69,18 @@ class PersonService
                 }
             } else {
                 $mobile = $common->get_person_uuid_by_mobile($request['mobile']);
-                           if ($mobile) {
-                     $response = ["message" => 'OK', 'route' => 'check_email', "param" => ['mobile' => $mobile]];
-                        return response($response, 200);  
-                               } else {
-                    $uuid = $common->get_uuid_by_mobile($request['mobile']);
-                    if ($stage['stage'] === 0 && $uuid === 0) {
+                           if ($mobile) 
+                            {
+                                     $response = ["message" => 'check_email', 'route' => 'check_email', "param" => ['mobile' => $mobile]];
+                                     return response($response, 200);  
+                            } 
+                            else {
+                                    $uuid = $common->get_uuid_by_mobile($request['mobile']);
+                         if ($stage['stage'] === 0 && $uuid === 0) {
                         $temp_user_model = $this->convertToTempUserModel($request);
                         $temp_user = $this->personInterface->saveTempUser($temp_user_model);
                         if ($temp_user->id > 0) {
-                            $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
+                            $response = ["message" => 'New_person', 'route' => 'stage1', "param" => ['mobile' => $request['mobile']]];
                             return response($response, 200);
                         } else {
                             $response = ["message" => 'Something Went Wrong'];
@@ -90,7 +91,7 @@ class PersonService
                         $response = ["message" => 'OK', 'route' => '/login', "param" => ['m' => $request['mobile']]];
                         return response($response, 200);
                     } else if ($stage['stage'] == '1') {
-                        $response = ["message" => 'OK', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
+                        $response = ["message" => 'New_person', 'route' => 'stage2', "param" => ['mobile' => $request['mobile']]];
                         return response($response, 200);
                     } else if ($stage['stage'] == '2') {
                         $response = ["message" => 'OK', 'route' => 'stage3', "param" => ['mobile' => $request['mobile']]];

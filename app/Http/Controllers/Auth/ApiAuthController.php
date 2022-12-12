@@ -75,13 +75,17 @@ class ApiAuthController extends Controller
             return response(['errors' => $validator->errors()->all()], 422);
         }
         $user = User::where('primary_email', $request->username)->orWhere('primary_mobile', $request->username)->first();
+        $uid=$user->uid;
+        $user_name=PersonDetails::where('uid',$uid)->pluck('first_name')->first();
+       
+     
         if ($user) {
-            if (Hash::check($request->password, $user->password)) {
+            if (Hash::check($request->password, $user->password)) { 
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
                 $response = ['token' => $token];
                 return response($response, 200);
             } else {
-                $response = ["message" => "Password mismatch"];
+                $response = ["message" => "Password mismatch",'username' =>$user_name,'uid'=>$uid];
                 return response($response, 422);
             }
         } else {
@@ -257,7 +261,6 @@ class ApiAuthController extends Controller
             $user_id = $user->id;
             Log::info('ApiAuthController>update_password Function>else .');
         }
-
         if ($user_id) {
             $details = PersonDetails::with('email', 'mobile', 'person', 'person_address')->where("uid", $request->uid)->get();
             $result = $details->toArray();
@@ -274,27 +277,25 @@ class ApiAuthController extends Controller
 
     function forgot_password(Request $request)
     {
-        $uid = PersonMobile::where('mobile', $request->mobile)->first('uid');
-        $uuid = $uid->toArray();
-        $person_email = PersonEmail::where('uid', $uuid['uid'])->first('email');
+    //    log::info('authcontroller > uid ' .json_encode($request->all()));
+        $uid = $request->uid;
+        $person_email = PersonEmail::where('uid', $uid)->first('email');
         $email = $person_email->toArray();
         $otp = substr(str_shuffle("0123456789"), 0, 5);
         $mail_email = $email['email'];
-
-        $affectedRows = User::where("uid", $uuid['uid'])->update(["email_otp" => $otp, "email_otp_verified" => 0]);
-
+        $affectedRows = User::where("uid", $uid)->update(["email_otp" => $otp, "email_otp_verified" => 0]);
         $template_data = ['email' => $email, 'otp' => $otp];
         Mail::send(
             ['html' => 'email.email_otp'],
             $template_data,
             function ($message) use ($mail_email) {
-                $message->to("dhivakarmm@gmail.com")
+                $message->to($mail_email)
                     ->from('propelsoft@gmail.com', 'Email OTP')
                     ->subject('Password Reset');
             }
         );
         if ($affectedRows) {
-            $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uuid['uid'], 'email' => $email['email']]];
+            $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uid, 'email' => $email['email']]];
             return response($response, 200);
         } else {
             $response = ["message" => 'Mail Not Send'];
