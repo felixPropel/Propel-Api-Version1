@@ -45,6 +45,7 @@ public function getSalutation(Request $request)
 }
 public function getCommonData(Request $request)
 {
+    //TEST
     $gender=$this->commonService->getAllGender();
     $bloodGroup=$this->commonService->getAllBloodGroup();
     $response=['gender'=>$gender, 'bloodgroup'=>$bloodGroup];
