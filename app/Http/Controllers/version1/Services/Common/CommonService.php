@@ -36,7 +36,8 @@ class CommonService
     public function getSalutation(){
    
       $result=$this->commonInterface->getSalutation();
-      return $this->sendResponse($result, "");
+    
+      return $result;
     }
     public function getAllGender(){
    

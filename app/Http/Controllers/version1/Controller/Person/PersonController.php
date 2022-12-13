@@ -25,12 +25,14 @@ class PersonController extends Controller
     }
     public function findEmail(Request $request)
     {
-
         $response = $this->personService->findEmail($request->all());
-
         return $response;
     }
-
+    public function storeTempPerson(Request $request)
+    {
+        $response = $this->personService->storeTempPerson($request->all());
+        return $response;
+    }
     public function storePerson(Request $request)
     {
 

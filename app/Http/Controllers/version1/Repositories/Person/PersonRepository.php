@@ -12,7 +12,37 @@ use Illuminate\Support\Facades\DB;
 
 class PersonRepository implements PersonInterface
 {
-   
+
+    public function checkPersonByMobile($mobileNumber)
+    {
+        return Person::leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
+            ->where('person_mobiles.mobile_no', $mobileNumber)
+            ->first();
+    }
+    public function storeTempPerson($model)
+    {
+        
+        try {
+            $result = DB::transaction(function () use ($model) {
+
+                $model->save();
+                return [
+                    'message' => "Success",
+                    'data' => $model
+                ];
+            });
+
+            return $result;
+        } catch (\Exception $e) {
+
+
+            return [
+
+                'message' => "failed",
+                'data' => $e
+            ];
+        }
+    }
     public function storePerson($personModel, $personDetailModel, $personEmailModel, $personMobileModel)
     {
 
