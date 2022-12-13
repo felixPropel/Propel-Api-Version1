@@ -4,17 +4,21 @@ namespace App\Http\Controllers\version1\Controller\Person;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\version1\Services\Person\PersonService;
+use App\Http\Controllers\version1\Services\Common\commonService;
+
 use Illuminate\Http\Request;
 
 class PersonController extends Controller
 {
-    public function __construct(PersonService $service)
+    public function __construct(PersonService $service, CommonService $commonService)
     {
         $this->personService = $service;
+        $this->commonService=$commonService;
     }
 
     public function findMobileNumber(Request $request)
     {
+      
         $response = $this->personService->findMobileNumber($request->all());
 
         return $response;
@@ -33,6 +37,19 @@ class PersonController extends Controller
         $response = $this->personService->storePerson($request->all());
         return $response;
     }
+public function getSalutation(Request $request)
+{
+ 
+    $response=$this->commonService->getSalutation();
+    return $response;
+}
+public function getCommonData(Request $request)
+{
+    $gender=$this->commonService->getAllGender();
+    $bloodGroup=$this->commonService->getAllBloodGroup();
+    $response=['gender'=>$gender, 'bloodgroup'=>$bloodGroup];
+    return response($response); 
+}
 
     /**
      * Display a listing of the resource.
