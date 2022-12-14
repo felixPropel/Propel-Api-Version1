@@ -13,12 +13,12 @@ class PersonController extends Controller
     public function __construct(PersonService $service, CommonService $commonService)
     {
         $this->personService = $service;
-        $this->commonService=$commonService;
+        $this->commonService = $commonService;
     }
 
     public function findMobileNumber(Request $request)
     {
-      
+
         $response = $this->personService->findMobileNumber($request->all());
 
         return $response;
@@ -39,21 +39,30 @@ class PersonController extends Controller
         $response = $this->personService->storePerson($request->all());
         return $response;
     }
-public function getSalutation(Request $request)
-{
- 
-    $response=$this->commonService->getSalutation();
-    return $response;
-}
-public function getCommonData(Request $request)
-{
-    //TEST
-    $gender=$this->commonService->getAllGender();
-    $bloodGroup=$this->commonService->getAllBloodGroup();
-    $response=['gender'=>$gender, 'bloodgroup'=>$bloodGroup];
-    return response($response); 
-}
+    public function getSalutation(Request $request)
+    {
 
+        $response = $this->commonService->getSalutation();
+        return $response;
+    }
+    public function getCommonData(Request $request)
+    {
+        //TEST
+        $gender = $this->commonService->getAllGender();
+        $bloodGroup = $this->commonService->getAllBloodGroup();
+        $response = ['gender' => $gender, 'bloodgroup' => $bloodGroup];
+        return response($response);
+    }
+    public function resendOtpPersonConfirmation(Request $request)
+    {
+        $response = $this->personService->resendOtp($request->all());
+        return $response;
+    }
+public function personOtpValidation(Request $request)
+{
+    $response = $this->personService->personOtpValidation($request->all());
+        return $response;
+}
     /**
      * Display a listing of the resource.
      *

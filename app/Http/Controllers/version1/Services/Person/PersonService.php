@@ -73,18 +73,10 @@ class PersonService
                 $bloodGroup = $this->commonService->getAllBloodGroup();
                 $responseData = ['tempModel' => $responseModel, 'gender' => $gender, 'bloodGroup' => $bloodGroup];
             } elseif ($responseModel->stage == 3) {
-                $otp = random_int(1000, 9999);
-                $newDatas  = ['otp' => $otp, 'stage' => 4];
-                $newDatas = (object) $newDatas;
-                $model1 = $this->convertToTempPersonModel($newDatas, $tempId);
-                $storeTempPerson1 = $this->personInterface->storeTempPerson($model1);
+                $temp = ['tempId' => $tempId];
+                $storeTempPerson1 = $this->resendOtp($temp);
                 log::info('personservice > ' . json_encode($storeTempPerson1));
-                if ($storeTempPerson1['message'] == "Success") {
-                    $responseModel1 = $storeTempPerson1['data'];
-                    $responseData = ['tempModel' => $responseModel1];
-                } else {
-                    return $this->commonService->sendError($storeTempPerson1['data'], $storeTempPerson1['message']);
-                }
+                return $storeTempPerson1;
             }
 
 
@@ -109,6 +101,51 @@ class PersonService
         } else {
             return $this->commonService->sendError($personData['data'], $personData['message']);
         }
+    }
+    public function resendOtp($datas)
+    {
+
+        $datas = (object) $datas;
+        $tempId = $datas->tempId;
+
+        $otp = random_int(1000, 9999);
+        $newDatas  = ['otp' => $otp, 'stage' => 4];
+        $newDatas = (object) $newDatas;
+        $model = $this->convertToTempPersonModel($newDatas, $tempId);
+        $storeTempPerson = $this->personInterface->storeTempPerson($model);
+        if ($storeTempPerson['message'] == "Success") {
+            return $this->commonService->sendResponse($storeTempPerson['data'], $storeTempPerson['message']);
+        } else {
+            return $this->commonService->sendError($storeTempPerson['data'], $storeTempPerson['message']);
+        }
+    }
+
+    public function personOtpValidation($datas)
+    {
+        $datas = (object) $datas;
+
+        $tempPersonModel = $this->personInterface->findTempPersonById($datas->tempId);
+        if ($tempPersonModel) {
+            if ($datas->otp == $tempPersonModel->otp) {
+                $personalDatas =   json_decode($tempPersonModel->personal_data, true);
+
+                $mobileNumber = isset($tempPersonModel['mobile_no']) ? $tempPersonModel['mobile_no'] : "";
+                $email = isset($tempPersonModel['email']) ? $tempPersonModel['email'] : "";
+                $salutation = isset($personalDatas['salutation']) ? $personalDatas['salutation'] : "";
+                $firstName = isset($personalDatas['firstName']) ? $personalDatas['firstName'] : "";
+                $middleName = isset($personalDatas['middleName']) ? $personalDatas['middleName'] : "";
+                $lastName = isset($personalDatas['lastName']) ? $personalDatas['lastName'] : "";
+                $nickName = isset($personalDatas['nickName']) ? $personalDatas['nickName'] : "";
+                $gender = isset($personalDatas['gender']) ? $personalDatas['gender'] : "";
+                $bloodGroup = isset($personalDatas['bg']) ? $personalDatas['bg'] : "";
+                $dob = isset($personalDatas['dob']) ? $personalDatas['dob'] : "";
+                $personDatas = ['mobileNumber' => $mobileNumber, 'email' => $email, 'salutationId' => $salutation, 'firstName' => $firstName, 'middleName' => $middleName, 'lastName' => $lastName, 'nickName' => $nickName, 'genderId' => $gender, 'bloodGroup' => $bloodGroup, 'dob' => $dob];
+                $personModel = $this->storePerson($personDatas);
+                return $personModel;
+            } else {
+                dd("wrong person");
+            }
+        } else { }
     }
 
     public function convertToPersonModel($datas)
@@ -157,7 +194,7 @@ class PersonService
             log::info('personService > stage' . json_encode($datas->stage));
             $model->stage = $stage;
         }
-       
+
         if ($firstName) {
             $model['personal_data->firstName'] = $firstName;
         }
@@ -190,9 +227,8 @@ class PersonService
     {
         $model = new PersonDetails();
         $model->salutation_id = $datas->salutationId;
-        $model->first_name = $datas->first_name;
-        $model->gender_id = $datas->gender_id;
-        $model->nationality_id = $datas->nationality_id;
+        $model->first_name = $datas->firstName;
+        $model->gender_id = $datas->genderId;
         return $model;
     }
     public function convertToPersonMobileModel($datas)

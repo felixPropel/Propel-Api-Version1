@@ -8,4 +8,5 @@ interface PersonInterface
     public function storePerson($personModel,$personDetailModel,$personEmailModel,$personMobileModel);
     public function getPersonPrimaryDataByUid($uid);
     public function storeTempPerson($model);
+    public function findTempPersonById($id);
 }
