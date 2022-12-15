@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\version1\Services\User;
 
-
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
@@ -18,18 +17,49 @@ use Illuminate\Support\Facades\Validator;
 
 class UserService
 {
-    public function __construct(UserInterface $userInterface, PersonInterface $personInterface,CommonService $commonService)
+    public function __construct(UserInterface $userInterface, PersonInterface $personInterface, CommonService $commonService)
     {
         $this->userInterface = $userInterface;
         $this->personInterface = $personInterface;
         $this->commonService = $commonService;
+    }
+    public function loginUser($objdatas)
+    {
+        $datas = (object) $objdatas;
+
+        $validator = Validator::make($objdatas, [
+            'userName' => 'required|string|max:255',
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+
+        $user = User::where('primary_email', $datas->userName)->orWhere('primary_mobile', $datas->userName)->first();
+        $uid = $user->uid;
+        $user_name = PersonDetails::where('uid', $uid)->pluck('first_name')->first();
+
+
+        if ($user) {
+            if (Hash::check($datas->password, $user->password)) {
+                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                $response = ['token' => $token, 'uid' => $uid];
+                return $this->commonService->sendResponse($response, "");
+            } else {
+                $response = ["message" => "Password mismatch", 'username' => $user_name, 'uid' => $uid];
+                return response($response, 422);
+            }
+        } else {
+            $response = ["message" => 'User does not exist'];
+            return response($response, 422);
+        }
     }
     public function storeUser($data)
     {
         $datas = (object) $data;
 
         $personModel = $this->personInterface->getPersonPrimaryDataByUid($datas->uId);
-        
+
         $model = $this->convertToUserModel($personModel, $datas);
         $storeUser = $this->userInterface->storeUser($model);
         if ($storeUser['message'] == "Success") {

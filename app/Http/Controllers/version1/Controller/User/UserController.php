@@ -5,6 +5,7 @@ namespace App\Http\Controllers\version1\Controller\User;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\version1\Services\User\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -24,7 +25,17 @@ class UserController extends Controller
         $response = $this->userService->storeUser($request->all());
         return $response;
     }
-
+    public function login(Request $request){
+        $response = $this->userService->loginUser($request->all());
+      
+        return $response;
+    }
+    public function get_user_data(Request $request)
+    {
+        Log::info('ApiAuthController > ' . json_encode($request->all()));
+        $user = auth()->guard('api')->user();
+        return response($user, 200);
+    }
     /**
      * Show the form for creating a new resource.
      *
