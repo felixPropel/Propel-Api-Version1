@@ -20,6 +20,10 @@ class UserRepository implements UserInterface
     {
         return User::where('primary_email', $email)->first();
     }
+    public function findUserDataByUid($uId)
+    {
+        return User::where('uid', $uId)->first();
+    }
     public Function storeUser($model){
         try {
             $result = DB::transaction(function () use ($model) {

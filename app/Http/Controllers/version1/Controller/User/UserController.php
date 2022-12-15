@@ -21,13 +21,14 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function storeUser(Request $request)
-    {        
+    {
         $response = $this->userService->storeUser($request->all());
         return $response;
     }
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $response = $this->userService->loginUser($request->all());
-      
+
         return $response;
     }
     public function get_user_data(Request $request)
@@ -35,6 +36,11 @@ class UserController extends Controller
         Log::info('ApiAuthController > ' . json_encode($request->all()));
         $user = auth()->guard('api')->user();
         return response($user, 200);
+    }
+    public function changePassword(Request $request)
+    {
+        $response = $this->userService->changePassword($request->all());
+        return $response;
     }
     /**
      * Show the form for creating a new resource.

@@ -7,4 +7,5 @@ interface UserInterface
     public function findUserDataByMobileNumber($data);
     public function findUserDataByEmail($data);
     public Function storeUser($model);
+    public function findUserDataByUid($uId);
 }

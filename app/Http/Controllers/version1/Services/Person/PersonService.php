@@ -31,7 +31,8 @@ class PersonService
 
 
         if ($model) {
-            $result = ['type' => 1, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
+            $personDatas = $this->personInterface->getPersonPrimaryDataByUid($model->uid);
+            $result = ['type' => 1,'personDatas'=>$personDatas, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
         } else {
             if ($personModel) {
                 $result = ['type' => 1, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "PersonOnly"];
@@ -141,9 +142,13 @@ class PersonService
                 $dob = isset($personalDatas['dob']) ? $personalDatas['dob'] : "";
                 $personDatas = ['mobileNumber' => $mobileNumber, 'email' => $email, 'salutationId' => $salutation, 'firstName' => $firstName, 'middleName' => $middleName, 'lastName' => $lastName, 'nickName' => $nickName, 'genderId' => $gender, 'bloodGroup' => $bloodGroup, 'dob' => $dob];
                 $personModel = $this->storePerson($personDatas);
-                return $personModel;
+                $tempPersonModel->delete();
+               
+                    return $personModel;
+                
             } else {
-                dd("wrong person");
+
+                return $this->commonService->sendError("Incorrect OTP", "Wrong Otp");
             }
         } else { }
     }

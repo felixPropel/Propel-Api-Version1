@@ -87,6 +87,7 @@ class PersonRepository implements PersonInterface
     {
         return Person::select('*')->leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
             ->leftjoin('person_emails', 'person_emails.uid', '=', 'persons.uid')
+            ->leftjoin('person_details', 'person_details.uid', '=', 'persons.uid')
             ->where('person_mobiles.mobile_cachet', 1)
             ->where('person_emails.email_cachet', 1)
             ->where('persons.uid', $uid)

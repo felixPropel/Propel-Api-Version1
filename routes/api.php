@@ -77,10 +77,10 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     // Route::get('/GenerateDB', 'App\Http\Controllers\Auth\ApiAuthController@GenerateDB')->name('GenerateDB.api');
     // Route::get('/GetGSTDetails', 'App\Http\Controllers\Auth\ApiAuthController@GetGSTDetails')->name('GetGSTDetails.api');
     //Repository Calls
-   // Route::get('show', [HomeController::class, 'index'])->name('show.api');
+    // Route::get('show', [HomeController::class, 'index'])->name('show.api');
     //Repository Calls Ends//
 
-   // include_once('Person/personApi.php');
+    // include_once('Person/personApi.php');
     include_once('v1/person.php');
     include_once('v1/user.php');
 });
@@ -90,8 +90,8 @@ Route::middleware('auth:api')
     ->group(function () {
 
         Route::post('/get_user_data', 'App\Http\Controllers\version1\Controller\User\UserController@get_user_data')->name('get_user_data.api');
-        // Route::post('/logout', 'App\Http\Controllers\Auth\ApiAuthController@logout')->name('logout.api');
-
+        Route::post('/logout', 'App\Http\Controllers\Auth\ApiAuthController@logout')->name('logout.api');
+        Route::post('changePassword', 'App\Http\Controllers\version1\Controller\User\UserController@changePassword')->name('changePassword');
 
         // include_once('Organization/organizationApi.php');
         // include_once('HRM/Masters/hrmMasterApi.php');

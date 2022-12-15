@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Log;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -305,6 +305,7 @@ class ApiAuthController extends Controller
 
     public function get_user_data(Request $request)
     {
+        log::info('ApiAuthController > ' . json_encode($request->all()));
         $user = auth()->guard('api')->user();
         return response($user, 200);
     }
