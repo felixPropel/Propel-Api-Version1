@@ -28,8 +28,8 @@ class UserService
     {
         $datas = (object) $data;
 
-        $personModel = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
-
+        $personModel = $this->personInterface->getPersonPrimaryDataByUid($datas->uId);
+        
         $model = $this->convertToUserModel($personModel, $datas);
         $storeUser = $this->userInterface->storeUser($model);
         if ($storeUser['message'] == "Success") {

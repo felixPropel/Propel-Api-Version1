@@ -8,6 +8,7 @@ use App\Models\Person;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
 use App\Models\PersonMobile;
+use App\Models\TempPerson;
 use Illuminate\Support\Facades\DB;
 
 class PersonRepository implements PersonInterface
@@ -18,6 +19,11 @@ class PersonRepository implements PersonInterface
         return Person::leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
             ->where('person_mobiles.mobile_no', $mobileNumber)
             ->first();
+    }
+    public function findTempPersonById($id)
+    {
+        
+        return TempPerson::findOrFail($id);
     }
     public function storeTempPerson($model)
     {
