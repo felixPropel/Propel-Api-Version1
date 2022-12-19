@@ -7,11 +7,8 @@ use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Repositories\common\smsRepository;
 use App\Http\Controllers\version1\Services\Common\CommonService;
-<<<<<<< HEAD
-use App\Http\Controllers\version1\Services\User\UserService;
-=======
 use App\Http\Controllers\version1\Services\Common\SmsService;
->>>>>>> ce051c3b92291820626f9b6b0fbbbc6f1e5846a6
+use App\Http\Controllers\version1\Services\User\UserService;
 use App\Models\Person;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
@@ -25,21 +22,13 @@ use Carbon\Carbon;
 
 class PersonService
 {
-<<<<<<< HEAD
-    public function __construct(UserService $userService, PersonInterface $personInterface, CommonService $commonService, UserInterface $userInterface)
-=======
     public function __construct(PersonInterface $personInterface, CommonService $commonService, UserInterface $userInterface, SmsService $smsService, SmsInterface $smsInterface)
->>>>>>> ce051c3b92291820626f9b6b0fbbbc6f1e5846a6
     {
         $this->commonService = $commonService;
         $this->personInterface = $personInterface;
         $this->userInterface = $userInterface;
-<<<<<<< HEAD
-        $this->userService = $userService;
-=======
         $this->smsService = $smsService;
         $this->smsInterface = $smsInterface;
->>>>>>> ce051c3b92291820626f9b6b0fbbbc6f1e5846a6
     }
     public function findMobileNumber($datas)
     {
@@ -177,16 +166,11 @@ class PersonService
                 $tempPersonModel->delete();
 
                 return $personModel;
-<<<<<<< HEAD
-
-=======
->>>>>>> ce051c3b92291820626f9b6b0fbbbc6f1e5846a6
             } else {
 
                 return $this->commonService->sendError("Incorrect OTP", "Wrong Otp");
             }
-        } else {
-        }
+        } else { }
     }
 
     public function convertToPersonModel($datas)
@@ -287,7 +271,6 @@ class PersonService
         $model->email_cachet = 1;
         return $model;
     }
-<<<<<<< HEAD
 
     public function emailOtpValidation($datas)
     {
@@ -306,8 +289,7 @@ class PersonService
         $model = $this->userService->changePassword($datas);
         return $model;
     }
-}
-=======
+
     public function personMobileOtp($datas)
     {
 
@@ -317,7 +299,7 @@ class PersonService
         $otpMobile = $this->convertOtpMobileNumber($personDatas->uid, $otp);
         $smsTypeModel = $this->smsInterface->findSmsTypeByName('PersonToUser');
         $smsHistoryModel = $this->smsService->storeSms($personDatas->mobileNumber, $smsTypeModel->id, $otp, $personDatas->uid);
-       
+
         return $this->commonService->sendResponse($datas, '');
     }
     public function convertOtpMobileNumber($uid, $otp)
@@ -342,4 +324,3 @@ class PersonService
         }
     }
 }
->>>>>>> ce051c3b92291820626f9b6b0fbbbc6f1e5846a6

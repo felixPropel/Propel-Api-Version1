@@ -63,40 +63,24 @@ class PersonController extends Controller
     {
         $response = $this->personService->personOtpValidation($request->all());
         return $response;
-<<<<<<< HEAD
     }
-    public function emailOtpValidation(Request $request)
+    public function checkPersonEmail(Request $request)
     {
-
-        $response = $this->personService->emailOtpValidation($request->all());
-        return $response;
+        // log::info('controller > ' .json_encode($request->all()));
+        $response = $this->personService->checkPersonEmail($request->all());
+        return  $response;
     }
-    public function updatePassword(Request $request)
+    public function personMobileOtp(Request $request)
     {
-
-        $response = $this->personService->updatePassword($request->all());
-        return $response;
+        $response = $this->personService->personMobileOtp($request->all());
+        return  $response;
     }
-=======
-}
-public function checkPersonEmail(Request $request)
-{
-    // log::info('controller > ' .json_encode($request->all()));
-    $response=$this->personService->checkPersonEmail($request->all());
-    return  $response;
-}
-public function personMobileOtp(Request $request)
-{
-    $response=$this->personService->personMobileOtp($request->all());
-    return  $response; 
-}
-public function mobileOtpValidated(Request $request)
-{
-    log::info('Request > ' .json_encode($request->all()));
-    $response=$this->personService->mobileOtpValidated($request->all());
-    return  $response; 
-}
->>>>>>> ce051c3b92291820626f9b6b0fbbbc6f1e5846a6
+    public function mobileOtpValidated(Request $request)
+    {
+        log::info('Request > ' . json_encode($request->all()));
+        $response = $this->personService->mobileOtpValidated($request->all());
+        return  $response;
+    }
     /**
      * Display a listing of the resource.
      *

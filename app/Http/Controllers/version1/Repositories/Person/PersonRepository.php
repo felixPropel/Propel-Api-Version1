@@ -94,14 +94,6 @@ class PersonRepository implements PersonInterface
             ->where('persons.uid', $uid)
             ->first();
     }
-<<<<<<< HEAD
-    public function emailOtpValidation($uid)
-    {
-        return PersonEmail::where('uid',$uid)->first();
-    }
- 
-
-=======
     public function checkPersonEmailByUid($email,$uid)
     {
     return PersonEmail::where(['uid'=>$uid,'email'=>$email])->first();
@@ -110,5 +102,4 @@ class PersonRepository implements PersonInterface
     {
         return PersonMobile::where('uid',$uid)->first();
     }
->>>>>>> ce051c3b92291820626f9b6b0fbbbc6f1e5846a6
 }
