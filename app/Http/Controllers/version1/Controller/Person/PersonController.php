@@ -7,6 +7,7 @@ use App\Http\Controllers\version1\Services\Person\PersonService;
 use App\Http\Controllers\version1\Services\Common\commonService;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PersonController extends Controller
 {
@@ -62,6 +63,7 @@ class PersonController extends Controller
     {
         $response = $this->personService->personOtpValidation($request->all());
         return $response;
+<<<<<<< HEAD
     }
     public function emailOtpValidation(Request $request)
     {
@@ -75,6 +77,26 @@ class PersonController extends Controller
         $response = $this->personService->updatePassword($request->all());
         return $response;
     }
+=======
+}
+public function checkPersonEmail(Request $request)
+{
+    // log::info('controller > ' .json_encode($request->all()));
+    $response=$this->personService->checkPersonEmail($request->all());
+    return  $response;
+}
+public function personMobileOtp(Request $request)
+{
+    $response=$this->personService->personMobileOtp($request->all());
+    return  $response; 
+}
+public function mobileOtpValidated(Request $request)
+{
+    log::info('Request > ' .json_encode($request->all()));
+    $response=$this->personService->mobileOtpValidated($request->all());
+    return  $response; 
+}
+>>>>>>> ce051c3b92291820626f9b6b0fbbbc6f1e5846a6
     /**
      * Display a listing of the resource.
      *

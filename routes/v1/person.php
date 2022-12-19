@@ -20,3 +20,6 @@ Route::post('updatePassword', 'App\Http\Controllers\version1\Controller\Person\P
 Route::post('forgot_password', 'App\Http\Controllers\Auth\ApiAuthController@forgot_password')->name('forgot_password.api');
 
 //Searching Part Ended
+Route::post('checkPersonEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@checkPersonEmail')->name('checkPersonEmail');
+Route::post('personMobileOtp', 'App\Http\Controllers\version1\Controller\Person\PersonController@personMobileOtp')->name('personMobileOtp');
+Route::post('mobileOtpValidated', 'App\Http\Controllers\version1\Controller\Person\PersonController@mobileOtpValidated')->name('mobileOtpValidated');
