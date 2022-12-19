@@ -72,17 +72,19 @@ class UserService
     public function changePassword($datas)
     {
         $datas = (object) $datas;
-
+      
         $user = $this->userInterface->findUserDataByUid($datas->uid);
-
+     
         if ($user) {
             $password = Hash::make($datas->password);
             $user->password = $password;
             $model = $this->userInterface->storeUser($user);
 
             if ($model['message'] == "Success") {
+                $modeldata = $model['data'];
+                $userData = $this->personInterface->getPersonPrimaryDataByUid($modeldata->uid);
 
-                return $this->commonService->sendResponse($model['data'], $model['message']);
+                return $this->commonService->sendResponse($userData, $model['message']);
             } else {
                 return $this->commonService->sendError($model['data'], $model['message']);
             }

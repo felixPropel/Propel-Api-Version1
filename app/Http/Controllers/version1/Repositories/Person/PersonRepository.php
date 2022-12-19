@@ -93,4 +93,10 @@ class PersonRepository implements PersonInterface
             ->where('persons.uid', $uid)
             ->first();
     }
+    public function emailOtpValidation($uid)
+    {
+        return PersonEmail::where('uid',$uid)->first();
+    }
+ 
+
 }

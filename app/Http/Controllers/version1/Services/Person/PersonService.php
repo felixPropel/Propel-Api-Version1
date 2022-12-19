@@ -6,6 +6,7 @@ namespace App\Http\Controllers\version1\Services\Person;
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
+use App\Http\Controllers\version1\Services\User\UserService;
 use App\Models\Person;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
@@ -15,13 +16,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
+
 class PersonService
 {
-    public function __construct(PersonInterface $personInterface, CommonService $commonService, UserInterface $userInterface)
+    public function __construct(UserService $userService, PersonInterface $personInterface, CommonService $commonService, UserInterface $userInterface)
     {
         $this->commonService = $commonService;
         $this->personInterface = $personInterface;
         $this->userInterface = $userInterface;
+        $this->userService = $userService;
     }
     public function findMobileNumber($datas)
     {
@@ -32,7 +35,7 @@ class PersonService
 
         if ($model) {
             $personDatas = $this->personInterface->getPersonPrimaryDataByUid($model->uid);
-            $result = ['type' => 1,'personDatas'=>$personDatas, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
+            $result = ['type' => 1, 'personDatas' => $personDatas, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
         } else {
             if ($personModel) {
                 $result = ['type' => 1, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "PersonOnly"];
@@ -110,7 +113,7 @@ class PersonService
         $tempId = $datas->tempId;
 
         $otp = random_int(1000, 9999);
-        $newDatas  = ['otp' => $otp, 'stage' => 4];
+        $newDatas = ['otp' => $otp, 'stage' => 4];
         $newDatas = (object) $newDatas;
         $model = $this->convertToTempPersonModel($newDatas, $tempId);
         $storeTempPerson = $this->personInterface->storeTempPerson($model);
@@ -128,7 +131,7 @@ class PersonService
         $tempPersonModel = $this->personInterface->findTempPersonById($datas->tempId);
         if ($tempPersonModel) {
             if ($datas->otp == $tempPersonModel->otp) {
-                $personalDatas =   json_decode($tempPersonModel->personal_data, true);
+                $personalDatas = json_decode($tempPersonModel->personal_data, true);
 
                 $mobileNumber = isset($tempPersonModel['mobile_no']) ? $tempPersonModel['mobile_no'] : "";
                 $email = isset($tempPersonModel['email']) ? $tempPersonModel['email'] : "";
@@ -143,14 +146,15 @@ class PersonService
                 $personDatas = ['mobileNumber' => $mobileNumber, 'email' => $email, 'salutationId' => $salutation, 'firstName' => $firstName, 'middleName' => $middleName, 'lastName' => $lastName, 'nickName' => $nickName, 'genderId' => $gender, 'bloodGroup' => $bloodGroup, 'dob' => $dob];
                 $personModel = $this->storePerson($personDatas);
                 $tempPersonModel->delete();
-               
-                    return $personModel;
-                
+
+                return $personModel;
+
             } else {
 
                 return $this->commonService->sendError("Incorrect OTP", "Wrong Otp");
             }
-        } else { }
+        } else {
+        }
     }
 
     public function convertToPersonModel($datas)
@@ -194,7 +198,7 @@ class PersonService
         $dob = isset($datas->dob) ? $datas->dob : "";
         $bloodGroup = isset($datas->bloodGroup) ? $datas->bloodGroup : "";
         $otp = isset($datas->otp) ? $datas->otp : "";
-        $stage =   isset($datas->stage) ? $datas->stage : "";
+        $stage = isset($datas->stage) ? $datas->stage : "";
         if ($stage) {
             log::info('personService > stage' . json_encode($datas->stage));
             $model->stage = $stage;
@@ -248,6 +252,24 @@ class PersonService
         $model = new PersonEmail();
         $model->email = $datas->email;
         $model->email_cachet = 1;
+        return $model;
+    }
+
+    public function emailOtpValidation($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->personInterface->emailOtpValidation($datas->uid);
+
+        if ($model->otp_received == $datas->otp) {
+            return $this->commonService->sendResponse($model['data'], $model['message']);
+        } else {
+            return $this->commonService->sendError($model['data'], $model['message']);
+        }
+    }
+    public function updatePassword($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->userService->changePassword($datas);
         return $model;
     }
 }

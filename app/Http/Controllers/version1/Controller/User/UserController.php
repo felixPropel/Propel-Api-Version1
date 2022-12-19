@@ -33,8 +33,11 @@ class UserController extends Controller
     }
     public function get_user_data(Request $request)
     {
-        Log::info('ApiAuthController > ' . json_encode($request->all()));
+       
+        Log::info(' request data > ' . json_encode($request->all()));
         $user = auth()->guard('api')->user();
+    
+        Log::info(' request data > ' . json_encode($request->all()));
         return response($user, 200);
     }
     public function changePassword(Request $request)

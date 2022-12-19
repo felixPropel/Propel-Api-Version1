@@ -277,14 +277,16 @@ class ApiAuthController extends Controller
 
     function forgot_password(Request $request)
     {
+        
     //    log::info('authcontroller > uid ' .json_encode($request->all()));
         $uid = $request->uid;
         $person_email = PersonEmail::where('uid', $uid)->first('email');
         $email = $person_email->toArray();
         $otp = substr(str_shuffle("0123456789"), 0, 5);
         $mail_email = $email['email'];
-        $affectedRows = User::where("uid", $uid)->update(["email_otp" => $otp, "email_otp_verified" => 0]);
+        $affectedRows = PersonEmail::where("uid", $uid)->update(["otp_received" => $otp, "email_validation" => 0]);
         $template_data = ['email' => $email, 'otp' => $otp];
+        
         Mail::send(
             ['html' => 'email.email_otp'],
             $template_data,
@@ -294,10 +296,13 @@ class ApiAuthController extends Controller
                     ->subject('Password Reset');
             }
         );
+        
         if ($affectedRows) {
+           
             $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uid, 'email' => $email['email']]];
             return response($response, 200);
         } else {
+          
             $response = ["message" => 'Mail Not Send'];
             return response($response, 400);
         }

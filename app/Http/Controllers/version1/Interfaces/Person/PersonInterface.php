@@ -9,4 +9,7 @@ interface PersonInterface
     public function getPersonPrimaryDataByUid($uid);
     public function storeTempPerson($model);
     public function findTempPersonById($id);
+    public function emailOtpValidation($uid);
+
+
 }

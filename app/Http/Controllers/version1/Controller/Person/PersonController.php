@@ -58,11 +58,23 @@ class PersonController extends Controller
         $response = $this->personService->resendOtp($request->all());
         return $response;
     }
-public function personOtpValidation(Request $request)
-{
-    $response = $this->personService->personOtpValidation($request->all());
+    public function personOtpValidation(Request $request)
+    {
+        $response = $this->personService->personOtpValidation($request->all());
         return $response;
-}
+    }
+    public function emailOtpValidation(Request $request)
+    {
+
+        $response = $this->personService->emailOtpValidation($request->all());
+        return $response;
+    }
+    public function updatePassword(Request $request)
+    {
+
+        $response = $this->personService->updatePassword($request->all());
+        return $response;
+    }
     /**
      * Display a listing of the resource.
      *
