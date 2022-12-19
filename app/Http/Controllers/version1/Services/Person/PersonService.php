@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\version1\Services\Person;
 
-
+use App\Http\Controllers\version1\Interfaces\Common\SmsInterface;
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
+use App\Http\Controllers\version1\Repositories\common\smsRepository;
 use App\Http\Controllers\version1\Services\Common\CommonService;
+use App\Http\Controllers\version1\Services\Common\SmsService;
 use App\Models\Person;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
@@ -18,26 +20,27 @@ use Carbon\Carbon;
 
 class PersonService
 {
-    public function __construct(PersonInterface $personInterface, CommonService $commonService, UserInterface $userInterface)
+    public function __construct(PersonInterface $personInterface, CommonService $commonService, UserInterface $userInterface, SmsService $smsService, SmsInterface $smsInterface)
     {
         $this->commonService = $commonService;
         $this->personInterface = $personInterface;
         $this->userInterface = $userInterface;
+        $this->smsService = $smsService;
+        $this->smsInterface = $smsInterface;
     }
     public function findMobileNumber($datas)
     {
         $datas = (object) $datas;
-        $model = $this->userInterface->findUserDataByMobileNumber($datas->mobileNumber);// check user data
+        $model = $this->userInterface->findUserDataByMobileNumber($datas->mobileNumber); // check user data
         $personModel = $this->personInterface->checkPersonByMobile($datas->mobileNumber);
-       
-       
+
+
         if ($model) {
             $personDatas = $this->personInterface->getPersonPrimaryDataByUid($model->uid);
-            $result = ['type' => 1,'personDatas'=>$personDatas, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
-        } 
-        else {
+            $result = ['type' => 1, 'personDatas' => $personDatas, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
+        } else {
             if ($personModel) {
-                $result = ['type' => 2,  'personUid'=>$personModel['uid'], 'mobileNumber' => $datas->mobileNumber,  'status' => "PersonOnly"];
+                $result = ['type' => 2,  'personUid' => $personModel['uid'], 'mobileNumber' => $datas->mobileNumber,  'status' => "PersonOnly"];
             } else {
                 $result = ['type' => 0, 'model' => "", 'mobileNumber' => $datas->mobileNumber, 'status' => "NotInUser"];
             }
@@ -122,20 +125,19 @@ class PersonService
             return $this->commonService->sendError($storeTempPerson['data'], $storeTempPerson['message']);
         }
     }
-  public function checkPersonEmail($datas)
-  {
-    $datas = (object) $datas;
-    $checkEmailByUid=$this->personInterface->checkPersonEmailByUid($datas->email,$datas->personUid);
- 
-    if ($checkEmailByUid) {
-        $result=['type' => 1,'personDatas'=>$checkEmailByUid, 'mobileNumber' => $datas->mobileNumber, 'status' => "Email_In"];
-    }else{
-        $result=['type' => 0,'personDatas'=>'', 'status' => "EmailNotFound"];
-    }
-    return $this->commonService->sendResponse($result, '');
+    public function checkPersonEmail($datas)
+    {
+        $datas = (object) $datas;
+        $checkEmailByUid = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->personUid);
 
-}
-  
+        if ($checkEmailByUid) {
+            $result = ['type' => 1, 'personDatas' => $checkEmailByUid, 'mobileNumber' => $datas->mobileNumber, 'status' => "Email_In"];
+        } else {
+            $result = ['type' => 0, 'personDatas' => '', 'status' => "EmailNotFound"];
+        }
+        return $this->commonService->sendResponse($result, '');
+    }
+
 
 
     public function personOtpValidation($datas)
@@ -160,9 +162,8 @@ class PersonService
                 $personDatas = ['mobileNumber' => $mobileNumber, 'email' => $email, 'salutationId' => $salutation, 'firstName' => $firstName, 'middleName' => $middleName, 'lastName' => $lastName, 'nickName' => $nickName, 'genderId' => $gender, 'bloodGroup' => $bloodGroup, 'dob' => $dob];
                 $personModel = $this->storePerson($personDatas);
                 $tempPersonModel->delete();
-               
-                    return $personModel;
-                
+
+                return $personModel;
             } else {
 
                 return $this->commonService->sendError("Incorrect OTP", "Wrong Otp");
@@ -187,7 +188,6 @@ class PersonService
 
             $model = TempPerson::findOrFail($id);
             log::info('findOrFail > ' . json_encode($model));
-
         } else {
 
             $model = new TempPerson();
@@ -271,36 +271,35 @@ class PersonService
     }
     public function personMobileOtp($datas)
     {
-        log::info('email > ' .json_encode($datas));
+
+        log::info('email > ' . json_encode($datas));
         $personDatas = (object) $datas;
-        $otpMobile=$this->convertOtpMobileNumber($personDatas->uid);
-        return $this->commonService->sendResponse($datas, '');                    
-
+        $otp = random_int(1000, 9999);
+        $otpMobile = $this->convertOtpMobileNumber($personDatas->uid, $otp);
+        $smsTypeModel = $this->smsInterface->findSmsTypeByName('PersonToUser');
+        $smsHistoryModel = $this->smsService->storeSms($personDatas->mobileNumber, $smsTypeModel->id, $otp, $personDatas->uid);
        
-
+        return $this->commonService->sendResponse($datas, '');
     }
-    public function convertOtpMobileNumber($uid)
+    public function convertOtpMobileNumber($uid, $otp)
     {
-        if($uid){
-            $otp =random_int(1000, 9999); 
-           $model=PersonMobile::where("uid", $uid)->update(['otp_received' => $otp]);
-           return $model;
-        //    $affectedRows = User::where("uid", $uid)->update(["email_otp" => $otp, "email_otp_verified" => 0]);
+        if ($uid) {
+
+            $model = PersonMobile::where("uid", $uid)->update(['otp_received' => $otp]);
+            return $model;
+            //    $affectedRows = User::where("uid", $uid)->update(["email_otp" => $otp, "email_otp_verified" => 0]);
             // $model=PersonMobile::findOrFail($uid);
-        
-           
+
+
 
         }
-       
-         
     }
-    public function mobileOtpValidated($datas){
-        $datas=(object)$datas;
-       $model=$this->personInterface->getOtpByUid($datas->uid);
-      if($datas->otp == $model->otp_received)
-      {
-        $status=PersonMobile::where("uid", $datas->uid)->update(['mobile_cachet' =>1,'mobile_validation'=>1,'validation_updated_on' => Carbon::now()]);
-      }
+    public function mobileOtpValidated($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->personInterface->getOtpByUid($datas->uid);
+        if ($datas->otp == $model->otp_received) {
+            $status = PersonMobile::where("uid", $datas->uid)->update(['mobile_cachet' => 1, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
+        }
     }
-
 }
