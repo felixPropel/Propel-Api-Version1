@@ -10,6 +10,7 @@ use App\Models\PersonEmail;
 use App\Models\PersonMobile;
 use App\Models\TempPerson;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PersonRepository implements PersonInterface
 {
@@ -92,5 +93,13 @@ class PersonRepository implements PersonInterface
             ->where('person_emails.email_cachet', 1)
             ->where('persons.uid', $uid)
             ->first();
+    }
+    public function checkPersonEmailByUid($email,$uid)
+    {
+    return PersonEmail::where(['uid'=>$uid,'email'=>$email])->first();
+    }
+    public function getOtpByUid($uid)
+    {
+        return PersonMobile::where('uid',$uid)->first();
     }
 }
