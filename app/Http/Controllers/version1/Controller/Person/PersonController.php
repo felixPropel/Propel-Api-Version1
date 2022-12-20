@@ -5,16 +5,18 @@ namespace App\Http\Controllers\version1\Controller\Person;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\version1\Services\Person\PersonService;
 use App\Http\Controllers\version1\Services\Common\commonService;
+use App\Http\Controllers\version1\Services\User\UserService;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class PersonController extends Controller
 {
-    public function __construct(PersonService $service, CommonService $commonService)
+    public function __construct(UserService $UserService,PersonService $service, CommonService $commonService)
     {
         $this->personService = $service;
         $this->commonService = $commonService;
+        $this->userService = $UserService;
     }
 
     public function findMobileNumber(Request $request)
@@ -79,6 +81,19 @@ class PersonController extends Controller
     {
         log::info('Request > ' . json_encode($request->all()));
         $response = $this->personService->mobileOtpValidated($request->all());
+        return  $response;
+    }
+
+    public function emailOtpValidation(Request $request)
+    {
+        $response = $this->personService->emailOtpValidation($request->all());
+        return  $response;
+    }
+    public function changePassword(Request $request)
+    {
+        
+        $response = $this->userService->changePassword($request->all());
+        
         return  $response;
     }
     /**

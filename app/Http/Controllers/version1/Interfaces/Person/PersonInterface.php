@@ -11,4 +11,5 @@ interface PersonInterface
     public function findTempPersonById($id);
     public function checkPersonEmailByUid($email,$uid);
     public function getOtpByUid($uid);
+    public function emailOtpValidation($uid);
 }

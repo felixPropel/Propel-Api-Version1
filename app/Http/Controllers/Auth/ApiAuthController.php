@@ -275,9 +275,9 @@ class ApiAuthController extends Controller
     }
 
 
-    function forgot_password(Request $request)
+    function forgotPassword(Request $request)
     {
-        
+       
     //    log::info('authcontroller > uid ' .json_encode($request->all()));
         $uid = $request->uid;
         $person_email = PersonEmail::where('uid', $uid)->first('email');
@@ -298,6 +298,7 @@ class ApiAuthController extends Controller
         );
         
         if ($affectedRows) {
+            
            
             $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uid, 'email' => $email['email']]];
             return response($response, 200);
