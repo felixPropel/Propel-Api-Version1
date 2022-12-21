@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class PersonController extends Controller
 {
-    public function __construct(UserService $UserService,PersonService $service, CommonService $commonService)
+    public function __construct(PersonService $service, CommonService $commonService,UserService $UserService)
     {
         $this->personService = $service;
         $this->commonService = $commonService;
@@ -61,41 +61,61 @@ class PersonController extends Controller
         $response = $this->personService->resendOtp($request->all());
         return $response;
     }
-    public function personOtpValidation(Request $request)
-    {
-        $response = $this->personService->personOtpValidation($request->all());
+public function personOtpValidation(Request $request)
+{
+    $response = $this->personService->personOtpValidation($request->all());
         return $response;
-    }
-    public function checkPersonEmail(Request $request)
-    {
-        // log::info('controller > ' .json_encode($request->all()));
-        $response = $this->personService->checkPersonEmail($request->all());
-        return  $response;
-    }
-    public function personMobileOtp(Request $request)
-    {
-        $response = $this->personService->personMobileOtp($request->all());
-        return  $response;
-    }
-    public function mobileOtpValidated(Request $request)
-    {
-        log::info('Request > ' . json_encode($request->all()));
-        $response = $this->personService->mobileOtpValidated($request->all());
-        return  $response;
-    }
+}
+public function checkPersonEmail(Request $request)
+{
+    // log::info('controller > ' .json_encode($request->all()));
+    $response=$this->personService->checkPersonEmail($request->all());
+    return  $response;
+}
+public function personMobileOtp(Request $request)
+{
+    $response=$this->personService->personMobileOtp($request->all());
+    return  $response; 
+}
+public function mobileOtpValidated(Request $request)
+{
+    log::info('Request > ' .json_encode($request->all()));
+    $response=$this->personService->mobileOtpValidated($request->all());
+    return  $response; 
+}
+public function emailOtpValidation(Request $request)
+{
+    $response = $this->personService->emailOtpValidation($request->all());
+    return  $response;
+}
+public function changePassword(Request $request)
+{
 
-    public function emailOtpValidation(Request $request)
-    {
-        $response = $this->personService->emailOtpValidation($request->all());
-        return  $response;
-    }
-    public function changePassword(Request $request)
-    {
-        
-        $response = $this->userService->changePassword($request->all());
-        
-        return  $response;
-    }
+    $response = $this->userService->changePassword($request->all());
+
+    return  $response;
+}
+public function personDatas(Request $request)
+{
+    $response = $this->personService->personDatas($request->all());
+
+    return  $response;
+}
+public function personUpdate(Request $request)
+{
+    $response = $this->personService->personUpdate($request->all());
+    return  $response;
+}
+public function personToUser(Request $request)
+{
+    $response = $this->personService->personToUser($request->all());
+    return  $response;
+}
+public function userCreation(Request $request)
+{
+    $response=$this->userService->userCreation($request->all());
+    return  $response;
+}
     /**
      * Display a listing of the resource.
      *

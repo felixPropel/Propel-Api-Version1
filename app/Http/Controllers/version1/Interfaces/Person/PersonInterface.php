@@ -12,4 +12,9 @@ interface PersonInterface
     public function checkPersonEmailByUid($email,$uid);
     public function getOtpByUid($uid);
     public function emailOtpValidation($uid);
+    public function getPersonDatasByUid($uid);
+    public function savePersonDatas($model);
+    public function savePerson($model);
+   public function getMobileNumberByUid($uid);
+   public function getEmailByUid($uid);
 }

@@ -8,7 +8,6 @@ use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Repositories\common\smsRepository;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Http\Controllers\version1\Services\Common\SmsService;
-use App\Http\Controllers\version1\Services\User\UserService;
 use App\Models\Person;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
@@ -18,7 +17,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
-
 
 class PersonService
 {
@@ -117,7 +115,7 @@ class PersonService
         $tempId = $datas->tempId;
 
         $otp = random_int(1000, 9999);
-        $newDatas = ['otp' => $otp, 'stage' => 4];
+        $newDatas  = ['otp' => $otp, 'stage' => 4];
         $newDatas = (object) $newDatas;
         $model = $this->convertToTempPersonModel($newDatas, $tempId);
         $storeTempPerson = $this->personInterface->storeTempPerson($model);
@@ -139,9 +137,6 @@ class PersonService
         }
         return $this->commonService->sendResponse($result, '');
     }
-
-
-
     public function personOtpValidation($datas)
     {
         $datas = (object) $datas;
@@ -149,7 +144,7 @@ class PersonService
         $tempPersonModel = $this->personInterface->findTempPersonById($datas->tempId);
         if ($tempPersonModel) {
             if ($datas->otp == $tempPersonModel->otp) {
-                $personalDatas = json_decode($tempPersonModel->personal_data, true);
+                $personalDatas =   json_decode($tempPersonModel->personal_data, true);
 
                 $mobileNumber = isset($tempPersonModel['mobile_no']) ? $tempPersonModel['mobile_no'] : "";
                 $email = isset($tempPersonModel['email']) ? $tempPersonModel['email'] : "";
@@ -215,7 +210,7 @@ class PersonService
         $dob = isset($datas->dob) ? $datas->dob : "";
         $bloodGroup = isset($datas->bloodGroup) ? $datas->bloodGroup : "";
         $otp = isset($datas->otp) ? $datas->otp : "";
-        $stage = isset($datas->stage) ? $datas->stage : "";
+        $stage =   isset($datas->stage) ? $datas->stage : "";
         if ($stage) {
             log::info('personService > stage' . json_encode($datas->stage));
             $model->stage = $stage;
@@ -271,56 +266,79 @@ class PersonService
         $model->email_cachet = 1;
         return $model;
     }
-
-    public function emailOtpValidation($datas)
-    {
-        $datas = (object) $datas;
-        $model = $this->personInterface->emailOtpValidation($datas->uid);
-
-        if ($model->otp_received == $datas->otp) {
-            return $this->commonService->sendResponse($model['data'], $model['message']);
-        } else {
-            return $this->commonService->sendError($model['data'], $model['message']);
-        }
-    }
-    public function updatePassword($datas)
-    {
-        $datas = (object) $datas;
-        $model = $this->userService->changePassword($datas);
-        return $model;
-    }
-
     public function personMobileOtp($datas)
     {
-
-        log::info('email > ' . json_encode($datas));
         $personDatas = (object) $datas;
         $otp = random_int(1000, 9999);
         $otpMobile = $this->convertOtpMobileNumber($personDatas->uid, $otp);
         $smsTypeModel = $this->smsInterface->findSmsTypeByName('PersonToUser');
         $smsHistoryModel = $this->smsService->storeSms($personDatas->mobileNumber, $smsTypeModel->id, $otp, $personDatas->uid);
-
-        return $this->commonService->sendResponse($datas, '');
+        return $this->commonService->sendResponse($datas,'');
     }
-    public function convertOtpMobileNumber($uid, $otp)
+    public function convertOtpMobileNumber($uid, $otp) 
     {
         if ($uid) {
-
             $model = PersonMobile::where("uid", $uid)->update(['otp_received' => $otp]);
             return $model;
-            //    $affectedRows = User::where("uid", $uid)->update(["email_otp" => $otp, "email_otp_verified" => 0]);
-            // $model=PersonMobile::findOrFail($uid);
-
-
-
+          
         }
     }
-    public function mobileOtpValidated($datas)
+    public function mobileOtpValidated($persondatas)
     {
-        $datas = (object) $datas;
+        $datas = (object) $persondatas;
         $model = $this->personInterface->getOtpByUid($datas->uid);
         if ($datas->otp == $model->otp_received) {
             $status = PersonMobile::where("uid", $datas->uid)->update(['mobile_cachet' => 1, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
+            return $this->commonService->sendResponse($persondatas,'');
         }
+    }
+    public function personDatas($datas)
+    {
+    $model=$this->personInterface->getPersonDatasByUid($datas);
+    $salutation=$this->commonService->getSalutation();
+    $result=['personData'=>$model,'salutation'=> $salutation];
+    return $this->commonService->sendResponse($result,'');    
+    }
+    public function personUpdate($datas)
+    {
+            $datas= (object)  $datas;
+            $personData=$this->personInterface->getPersonDatasByUid($datas->uid);
+            $personUpdate=$this->updatePerson($personData,$datas);
+            $saveperson=$this->personInterface->savePersonDatas($personUpdate);
+            $gender=$this->commonService->getAllGender();
+            $bloodGroup=$this->commonService->getAllBloodGroup();
+            $result=['gender'=>$gender,'bloodGroup'=>$bloodGroup,'personData'=>$personData];
+            return $this->commonService->sendResponse($result,'');   
+
+    }
+    public function updatePerson($personData,$datas)
+    {
+if($datas->uid)
+{
+    $personData->uid=$datas->uid;
+    $personData->salutation_id=$datas->salutation;
+    $personData->first_name=$datas->firstName;
+    $personData->middle_name=$datas->middleName;
+    $personData->last_name=$datas->lastName;
+    $personData->nick_name=$datas->nickName;
+    return  $personData;
+}
+    }
+    public function personToUser($datas)
+    {
+        $datas= (object) $datas;
+        $person=$this->personInterface->getPersonDatasByUid($datas->uid);
+        $convertPerson=$this->convertPerson($person,$datas);
+        $savePerson=$this->personInterface->savePerson($convertPerson);
+        return $this->commonService->sendResponse($datas->uid,'');
+    }
+    public function convertPerson($person,$datas)
+    {
+        $person->uid=$datas->uid;
+        $person->dob=$datas->dob;
+        $person->gender_id=$datas->gender;
+        $person->blood_group_id=$datas->bloodGroup;
+          return $person;
+
     }
 }

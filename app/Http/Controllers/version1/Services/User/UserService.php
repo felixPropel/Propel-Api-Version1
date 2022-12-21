@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class UserService
 {
@@ -72,19 +73,17 @@ class UserService
     public function changePassword($datas)
     {
         $datas = (object) $datas;
-      
+
         $user = $this->userInterface->findUserDataByUid($datas->uid);
-     
+
         if ($user) {
             $password = Hash::make($datas->password);
             $user->password = $password;
             $model = $this->userInterface->storeUser($user);
 
             if ($model['message'] == "Success") {
-                $modeldata = $model['data'];
-                $userData = $this->personInterface->getPersonPrimaryDataByUid($modeldata->uid);
 
-                return $this->commonService->sendResponse($userData, $model['message']);
+                return $this->commonService->sendResponse($model['data'], $model['message']);
             } else {
                 return $this->commonService->sendError($model['data'], $model['message']);
             }
@@ -97,6 +96,27 @@ class UserService
         $model->uid = $personModel->uid;
         $model->primary_email = $personModel->email;
         $model->primary_mobile = $personModel->mobile_no;
+        $model->password = Hash::make($datas->password);
+        return $model;
+    }
+    public function userCreation($datas)
+    {
+     
+        $datas = (object) $datas ;
+        $mobile=$this->personInterface->getMobileNumberByUid($datas->uid);
+        $email=$this->personInterface->getEmailByUid($datas->uid);
+        $getPersonName=$this->personInterface->getPersonDatasByUid($datas->uid);
+        $createuser=$this->UserCreate($mobile->mobile_no,$email->email,$datas);
+        $saveUser=$this->userInterface->savedUser($createuser);
+        $result=['personName'=>$getPersonName->first_name,'mobileNumber'=>$mobile->mobile_no];
+        return $this->commonService->sendResponse($result,'');
+    }
+    public function UserCreate($mobile,$email,$datas)
+    {
+        $model = new User();
+        $model->uid = $datas->uid;
+        $model->primary_email = $email;
+        $model->primary_mobile = $mobile;
         $model->password = Hash::make($datas->password);
         return $model;
     }

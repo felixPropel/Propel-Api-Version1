@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-
 // searching Part Start
 //@Developer Dhana
 
@@ -14,12 +13,11 @@ Route::get('getCommonData', 'App\Http\Controllers\version1\Controller\Person\Per
 
 Route::post('storeTempPerson', 'App\Http\Controllers\version1\Controller\Person\PersonController@storeTempPerson')->name('storeTempPerson');
 Route::post('personOtpValidation', 'App\Http\Controllers\version1\Controller\Person\PersonController@personOtpValidation')->name('personOtpValidation');
-Route::post('emailOtpValidation', 'App\Http\Controllers\version1\Controller\Person\PersonController@emailOtpValidation')->name('emailOtpValidation');
-Route::post('changePassword', 'App\Http\Controllers\version1\Controller\Person\PersonController@changePassword')->name('changePassword');
-
-Route::post('forgotPassword', 'App\Http\Controllers\Auth\ApiAuthController@forgotPassword')->name('forgotPassword.api');
-
 //Searching Part Ended
 Route::post('checkPersonEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@checkPersonEmail')->name('checkPersonEmail');
 Route::post('personMobileOtp', 'App\Http\Controllers\version1\Controller\Person\PersonController@personMobileOtp')->name('personMobileOtp');
 Route::post('mobileOtpValidated', 'App\Http\Controllers\version1\Controller\Person\PersonController@mobileOtpValidated')->name('mobileOtpValidated');
+Route::post('personDatas', 'App\Http\Controllers\version1\Controller\Person\PersonController@personDatas')->name('personDatas');
+Route::post('personUpdate', 'App\Http\Controllers\version1\Controller\Person\PersonController@personUpdate')->name('personUpdate');
+Route::post('personToUser', 'App\Http\Controllers\version1\Controller\Person\PersonController@personToUser')->name('personToUser');
+Route::post('userCreation', 'App\Http\Controllers\version1\Controller\Person\PersonController@userCreation')->name('userCreation');

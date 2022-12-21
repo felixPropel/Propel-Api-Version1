@@ -8,4 +8,5 @@ interface UserInterface
     public function findUserDataByEmail($data);
     public Function storeUser($model);
     public function findUserDataByUid($uId);
+    public function savedUser($model);
 }

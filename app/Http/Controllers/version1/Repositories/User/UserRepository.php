@@ -46,4 +46,9 @@ class UserRepository implements UserInterface
             ];
         }
     }
+    public function savedUser($model)
+    {
+        return $model->save();
+    }
+
 }

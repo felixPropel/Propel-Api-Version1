@@ -104,7 +104,28 @@ class PersonRepository implements PersonInterface
     }
     public function emailOtpValidation($uid)
     {
-        
+
         return PersonEmail::where('uid',$uid)->first();
     }
+    public function getPersonDatasByUid($uid)
+    {
+        return PersonDetails::where('uid',$uid)->first();
+    }
+     public function savePersonDatas($model){
+
+ return $model->save();
+
+    }
+    public function savePerson($model){
+
+        return $model->save();
+       
+           }
+           public function getMobileNumberByUid($uid){
+            return  PersonMobile::where('uid',$uid)->first();
+           }
+           public function getEmailByUid($uid)
+           {
+            return PersonEmail::where('uid',$uid)->first();
+           }
 }
