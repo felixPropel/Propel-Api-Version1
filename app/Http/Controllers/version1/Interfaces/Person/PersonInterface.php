@@ -10,8 +10,9 @@ interface PersonInterface
     public function storeTempPerson($model);
     public function findTempPersonById($id);
     public function checkPersonEmailByUid($email,$uid);
-    public function getOtpByUid($uid);
-    public function emailOtpValidation($uid);
+    public function getOtpByUid($uid);//re
+    public function emailOtpValidation($uid);//re
+    public function getPersonEmailByUid($uid);//re
     public function getPersonDatasByUid($uid);
     public function savePersonDatas($model);
     public function savePerson($model);

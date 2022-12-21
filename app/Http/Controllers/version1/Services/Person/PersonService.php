@@ -249,7 +249,12 @@ class PersonService
         $model = new PersonDetails();
         $model->salutation_id = $datas->salutationId;
         $model->first_name = $datas->firstName;
+        $model->middle_name = $datas->middleName;
+        $model->last_name = $datas->lastName;
+        $model->nick_name = $datas->nickName;
+        $model->dob = $datas->dob;
         $model->gender_id = $datas->genderId;
+        $model->blood_group_id = $datas->bloodGroup;
         return $model;
     }
     public function convertToPersonMobileModel($datas)
@@ -273,14 +278,13 @@ class PersonService
         $otpMobile = $this->convertOtpMobileNumber($personDatas->uid, $otp);
         $smsTypeModel = $this->smsInterface->findSmsTypeByName('PersonToUser');
         $smsHistoryModel = $this->smsService->storeSms($personDatas->mobileNumber, $smsTypeModel->id, $otp, $personDatas->uid);
-        return $this->commonService->sendResponse($datas,'');
+        return $this->commonService->sendResponse($datas, '');
     }
-    public function convertOtpMobileNumber($uid, $otp) 
+    public function convertOtpMobileNumber($uid, $otp)
     {
         if ($uid) {
             $model = PersonMobile::where("uid", $uid)->update(['otp_received' => $otp]);
             return $model;
-          
         }
     }
     public function mobileOtpValidated($persondatas)
@@ -289,56 +293,65 @@ class PersonService
         $model = $this->personInterface->getOtpByUid($datas->uid);
         if ($datas->otp == $model->otp_received) {
             $status = PersonMobile::where("uid", $datas->uid)->update(['mobile_cachet' => 1, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
-            return $this->commonService->sendResponse($persondatas,'');
+            return $this->commonService->sendResponse($persondatas, '');
         }
     }
     public function personDatas($datas)
     {
-    $model=$this->personInterface->getPersonDatasByUid($datas);
-    $salutation=$this->commonService->getSalutation();
-    $result=['personData'=>$model,'salutation'=> $salutation];
-    return $this->commonService->sendResponse($result,'');    
+        $model = $this->personInterface->getPersonDatasByUid($datas);
+        $salutation = $this->commonService->getSalutation();
+        $result = ['personData' => $model, 'salutation' => $salutation];
+        return $this->commonService->sendResponse($result, '');
     }
     public function personUpdate($datas)
     {
-            $datas= (object)  $datas;
-            $personData=$this->personInterface->getPersonDatasByUid($datas->uid);
-            $personUpdate=$this->updatePerson($personData,$datas);
-            $saveperson=$this->personInterface->savePersonDatas($personUpdate);
-            $gender=$this->commonService->getAllGender();
-            $bloodGroup=$this->commonService->getAllBloodGroup();
-            $result=['gender'=>$gender,'bloodGroup'=>$bloodGroup,'personData'=>$personData];
-            return $this->commonService->sendResponse($result,'');   
-
+        $datas = (object)  $datas;
+        $personData = $this->personInterface->getPersonDatasByUid($datas->uid);
+        $personUpdate = $this->updatePerson($personData, $datas);
+        $saveperson = $this->personInterface->savePersonDatas($personUpdate);
+        $gender = $this->commonService->getAllGender();
+        $bloodGroup = $this->commonService->getAllBloodGroup();
+        $result = ['gender' => $gender, 'bloodGroup' => $bloodGroup, 'personData' => $personData];
+        return $this->commonService->sendResponse($result, '');
     }
-    public function updatePerson($personData,$datas)
+    public function updatePerson($personData, $datas)
     {
-if($datas->uid)
-{
-    $personData->uid=$datas->uid;
-    $personData->salutation_id=$datas->salutation;
-    $personData->first_name=$datas->firstName;
-    $personData->middle_name=$datas->middleName;
-    $personData->last_name=$datas->lastName;
-    $personData->nick_name=$datas->nickName;
-    return  $personData;
-}
+        if ($datas->uid) {
+            $personData->uid = $datas->uid;
+            $personData->salutation_id = $datas->salutation;
+            $personData->first_name = $datas->firstName;
+            $personData->middle_name = $datas->middleName;
+            $personData->last_name = $datas->lastName;
+            $personData->nick_name = $datas->nickName;
+            return  $personData;
+        }
     }
     public function personToUser($datas)
     {
-        $datas= (object) $datas;
-        $person=$this->personInterface->getPersonDatasByUid($datas->uid);
-        $convertPerson=$this->convertPerson($person,$datas);
-        $savePerson=$this->personInterface->savePerson($convertPerson);
-        return $this->commonService->sendResponse($datas->uid,'');
+        $datas = (object) $datas;
+        $person = $this->personInterface->getPersonDatasByUid($datas->uid);
+        $convertPerson = $this->convertPerson($person, $datas);
+        $savePerson = $this->personInterface->savePerson($convertPerson);
+        return $this->commonService->sendResponse($datas->uid, '');
     }
-    public function convertPerson($person,$datas)
+    public function convertPerson($person, $datas)
     {
-        $person->uid=$datas->uid;
-        $person->dob=$datas->dob;
-        $person->gender_id=$datas->gender;
-        $person->blood_group_id=$datas->bloodGroup;
-          return $person;
-
+        $person->uid = $datas->uid;
+        $person->dob = $datas->dob;
+        $person->gender_id = $datas->gender;
+        $person->blood_group_id = $datas->bloodGroup;
+        return $person;
+    }
+    public function emailOtpValidation($datas)
+    {
+        $datas = (object) $datas;
+        $uid = $datas->uid;
+        $model = $this->personInterface->getPersonEmailByUid($datas->uid);
+     
+        if($model->otp_received == $datas->otp){
+            return $this->commonService->sendResponse($uid, '');
+        }else{
+            return $this->commonService->sendError($uid, '');
+        }
     }
 }

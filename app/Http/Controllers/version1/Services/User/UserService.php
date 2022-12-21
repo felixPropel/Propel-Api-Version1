@@ -82,8 +82,10 @@ class UserService
             $model = $this->userInterface->storeUser($user);
 
             if ($model['message'] == "Success") {
+                $userModel = $model['data'];
+                $personModel = $this->personInterface->getPersonPrimaryDataByUid($userModel->uid);
 
-                return $this->commonService->sendResponse($model['data'], $model['message']);
+                return $this->commonService->sendResponse( $personModel, $model['message']);
             } else {
                 return $this->commonService->sendError($model['data'], $model['message']);
             }

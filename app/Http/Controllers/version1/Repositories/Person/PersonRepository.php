@@ -23,12 +23,12 @@ class PersonRepository implements PersonInterface
     }
     public function findTempPersonById($id)
     {
-        
+
         return TempPerson::findOrFail($id);
     }
     public function storeTempPerson($model)
     {
-        
+
         try {
             $result = DB::transaction(function () use ($model) {
 
@@ -94,38 +94,44 @@ class PersonRepository implements PersonInterface
             ->where('persons.uid', $uid)
             ->first();
     }
-    public function checkPersonEmailByUid($email,$uid)
+    public function checkPersonEmailByUid($email, $uid)
     {
-    return PersonEmail::where(['uid'=>$uid,'email'=>$email])->first();
+        return PersonEmail::where(['uid' => $uid, 'email' => $email])->first();
     }
     public function getOtpByUid($uid)
     {
-        return PersonMobile::where('uid',$uid)->first();
+        return PersonMobile::where('uid', $uid)->first();
     }
     public function emailOtpValidation($uid)
     {
 
-        return PersonEmail::where('uid',$uid)->first();
+        return PersonEmail::where('uid', $uid)->first();
+    }
+    public function getPersonEmailByUid($uid)
+    {
+
+        return PersonEmail::where('uid', $uid)->first();
     }
     public function getPersonDatasByUid($uid)
     {
-        return PersonDetails::where('uid',$uid)->first();
+        return PersonDetails::where('uid', $uid)->first();
     }
-     public function savePersonDatas($model){
-
- return $model->save();
-
-    }
-    public function savePerson($model){
+    public function savePersonDatas($model)
+    {
 
         return $model->save();
-       
-           }
-           public function getMobileNumberByUid($uid){
-            return  PersonMobile::where('uid',$uid)->first();
-           }
-           public function getEmailByUid($uid)
-           {
-            return PersonEmail::where('uid',$uid)->first();
-           }
+    }
+    public function savePerson($model)
+    {
+
+        return $model->save();
+    }
+    public function getMobileNumberByUid($uid)
+    {
+        return  PersonMobile::where('uid', $uid)->first();
+    }
+    public function getEmailByUid($uid)
+    {
+        return PersonEmail::where('uid', $uid)->first();
+    }
 }
