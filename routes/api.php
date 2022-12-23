@@ -93,7 +93,10 @@ Route::middleware('auth:api')
         Route::post('/logout', 'App\Http\Controllers\Auth\ApiAuthController@logout')->name('logout.api');
         // Route::post('changePassword', 'App\Http\Controllers\version1\Controller\User\UserController@changePassword')->name('changePassword');
 
-        // include_once('Organization/organizationApi.php');
+         include_once('v1/organization.php');
+
+
+         include_once('Organization/organizationApi.php');
         // include_once('HRM/Masters/hrmMasterApi.php');
         // include_once('HRM/Transaction/hrmTransactionApi.php');
     });
