@@ -48,4 +48,13 @@ class CommonService
         $result=$this->commonInterface->getAllBloodGroup();
         return $result;
       }
+      public function getAllState(){
+        $result=$this->commonInterface->getAllState();
+        return $result;
+      }
+      public function getDistrict($data){
+
+        $result=$this->commonInterface->getDistrict($data['stateId']);
+        return $result;
+      }
 }

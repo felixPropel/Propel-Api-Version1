@@ -7,4 +7,6 @@ interface commonInterface
     public function getSalutation();
     public function getAllGender();
     public function getAllBloodGroup();
+    public function getAllState();
+    public function getDistrict($stateId);
 }
