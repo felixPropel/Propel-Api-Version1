@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Address_of extends Model
 {
     use HasFactory;
-    protected $table = 'address_of';
+    protected $table = 'pims_com_address_types';
 }

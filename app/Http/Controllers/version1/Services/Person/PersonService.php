@@ -17,7 +17,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Models\PersonLanguage;
 
+use App\Models\WebLink;
+use App\Models\PropertyAddress;
 class PersonService
 {
     public function __construct(PersonInterface $personInterface, CommonService $commonService, UserInterface $userInterface, SmsService $smsService, SmsInterface $smsInterface)
@@ -249,7 +252,12 @@ class PersonService
         $model = new PersonDetails();
         $model->salutation_id = $datas->salutationId;
         $model->first_name = $datas->firstName;
+        $model->middle_name = $datas->middleName;
+        $model->last_name = $datas->lastName;
+        $model->nick_name = $datas->nickName;
+        $model->dob = $datas->dob;
         $model->gender_id = $datas->genderId;
+        $model->blood_group_id = $datas->bloodGroup;
         return $model;
     }
     public function convertToPersonMobileModel($datas)
@@ -273,14 +281,13 @@ class PersonService
         $otpMobile = $this->convertOtpMobileNumber($personDatas->uid, $otp);
         $smsTypeModel = $this->smsInterface->findSmsTypeByName('PersonToUser');
         $smsHistoryModel = $this->smsService->storeSms($personDatas->mobileNumber, $smsTypeModel->id, $otp, $personDatas->uid);
-        return $this->commonService->sendResponse($datas,'');
+        return $this->commonService->sendResponse($datas, '');
     }
-    public function convertOtpMobileNumber($uid, $otp) 
+    public function convertOtpMobileNumber($uid, $otp)
     {
         if ($uid) {
             $model = PersonMobile::where("uid", $uid)->update(['otp_received' => $otp]);
             return $model;
-          
         }
     }
     public function mobileOtpValidated($persondatas)
@@ -289,56 +296,239 @@ class PersonService
         $model = $this->personInterface->getOtpByUid($datas->uid);
         if ($datas->otp == $model->otp_received) {
             $status = PersonMobile::where("uid", $datas->uid)->update(['mobile_cachet' => 1, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
-            return $this->commonService->sendResponse($persondatas,'');
+            return $this->commonService->sendResponse($persondatas, '');
         }
     }
     public function personDatas($datas)
     {
-    $model=$this->personInterface->getPersonDatasByUid($datas);
-    $salutation=$this->commonService->getSalutation();
-    $result=['personData'=>$model,'salutation'=> $salutation];
-    return $this->commonService->sendResponse($result,'');    
+        $model = $this->personInterface->getPersonDatasByUid($datas);
+        $salutation = $this->commonService->getSalutation();
+        $result = ['personData' => $model, 'salutation' => $salutation];
+        return $this->commonService->sendResponse($result, '');
     }
     public function personUpdate($datas)
     {
-            $datas= (object)  $datas;
-            $personData=$this->personInterface->getPersonDatasByUid($datas->uid);
-            $personUpdate=$this->updatePerson($personData,$datas);
-            $saveperson=$this->personInterface->savePersonDatas($personUpdate);
-            $gender=$this->commonService->getAllGender();
-            $bloodGroup=$this->commonService->getAllBloodGroup();
-            $result=['gender'=>$gender,'bloodGroup'=>$bloodGroup,'personData'=>$personData];
-            return $this->commonService->sendResponse($result,'');   
-
+        $datas = (object)  $datas;
+        $personData = $this->personInterface->getPersonDatasByUid($datas->uid);
+        $personUpdate = $this->updatePerson($personData, $datas);
+        $saveperson = $this->personInterface->savePersonDatas($personUpdate);
+        $gender = $this->commonService->getAllGender();
+        $bloodGroup = $this->commonService->getAllBloodGroup();
+        $result = ['gender' => $gender, 'bloodGroup' => $bloodGroup, 'personData' => $personData];
+        return $this->commonService->sendResponse($result, '');
     }
-    public function updatePerson($personData,$datas)
+    public function updatePerson($personData, $datas)
     {
-if($datas->uid)
-{
-    $personData->uid=$datas->uid;
-    $personData->salutation_id=$datas->salutation;
-    $personData->first_name=$datas->firstName;
-    $personData->middle_name=$datas->middleName;
-    $personData->last_name=$datas->lastName;
-    $personData->nick_name=$datas->nickName;
-    return  $personData;
-}
+        if ($datas->uid) {
+            $personData->uid = $datas->uid;
+            $personData->salutation_id = $datas->salutation;
+            $personData->first_name = $datas->firstName;
+            $personData->middle_name = $datas->middleName;
+            $personData->last_name = $datas->lastName;
+            $personData->nick_name = $datas->nickName;
+            return  $personData;
+        }
     }
     public function personToUser($datas)
     {
-        $datas= (object) $datas;
-        $person=$this->personInterface->getPersonDatasByUid($datas->uid);
-        $convertPerson=$this->convertPerson($person,$datas);
-        $savePerson=$this->personInterface->savePerson($convertPerson);
-        return $this->commonService->sendResponse($datas->uid,'');
+        $datas = (object) $datas;
+        $person = $this->personInterface->getPersonDatasByUid($datas->uid);
+        $convertPerson = $this->convertPerson($person, $datas);
+        $savePerson = $this->personInterface->savePerson($convertPerson);
+        return $this->commonService->sendResponse($datas->uid, '');
     }
-    public function convertPerson($person,$datas)
+    public function convertPerson($person, $datas)
     {
+        $person->uid = $datas->uid;
+        $person->dob = $datas->dob;
+        $person->gender_id = $datas->gender;
+        $person->blood_group_id = $datas->bloodGroup;
+        return $person;
+    }
+    public function emailOtpValidation($datas)
+    {
+        $datas = (object) $datas;
+        $uid = $datas->uid;
+        $model = $this->personInterface->getPersonEmailByUid($datas->uid);
+     
+        if($model->otp_received == $datas->otp){
+            return $this->commonService->sendResponse($uid, '');
+        }else{
+            return $this->commonService->sendError($uid, '');
+        }
+    }
+    public function personProfileDetails($datas)
+    {
+        $datas = (object) $datas;
+        $gender =  $this->commonService->getAllGender();
+        $blood = $this->commonService->getAllBloodGroup();
+        $saluation = $this->commonService->getSalutation();
+        $maritalStatus=$this->commonService->getMaritalStatus();
+        $languages=$this->commonService->getLanguage();
+        $personDetails = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
+        // $personAddress = $this->personInterface->getPersonAddressByUid($datas->uid);
+        // $states = $this->commonService->getAllStates();
+        $address_of = $this->commonService->getAddrerssType();
+        $result=['uid'=>$datas->uid,'bloodGroup'=>$blood,'gender'=>$gender,'salutation'=> $saluation,'personData'=>$personDetails,'addressType'=>$address_of,'maritalStatus'=>$maritalStatus,'language'=>$languages];
+        return $this->commonService->sendResponse($result,'');
+    }
+    public function profileUpdate($datas)
+    {
+     $datas = (object) $datas;
+     $Person = $this->personInterface->getPersonDatasByUid($datas->uid);
+     $updatePerson=$this->convertProfile($Person,$datas);
+     $saveProfile=$this->personInterface->savePerson($updatePerson);
+     $anniversary=$this->personInterface->getAnniversaryDate($datas->uid);
+     $anniversaryDate=$this->anniversaryDate($anniversary,$datas);
+     $saveAnniversary=$this->personInterface->saveAnniversaryDate($anniversaryDate);
+     $motherTongue=$this->personInterface->motherTongueByUid($datas->uid);
+     $convertMotherTongue=$this->convertMotherTongue($motherTongue,$datas);
+     $updateMotherTongue=$this->personInterface->updateMotherTongue($convertMotherTongue);
+     $addAddress=$this->addAddress($datas);
+     if(!empty($datas->webLinks)){
+        $webLink=$this->addWebLink($datas);
+        $addwebLink=$this->personInterface->addWebLink($webLink);
+     }
+     if(!empty($datas->otherMobile))
+        {
+         if($datas->uid)
+         {
+            foreach($datas->otherMobile as $mobile)
+            {
+                 $convertOtherMobile=$this->ConvertotherMobile($datas->uid,$mobile);
+                $saveOtherMobile=$this->personInterface->saveOtherMobileByUid($convertOtherMobile);
+            }
+         }
+       }
+       if(!empty($datas->otherEmail))
+       {
+        if($datas->uid)
+        {
+           foreach($datas->otherEmail as $email)
+           {
+                $convertOtherEmail=$this->ConvertotherEmail($datas->uid,$email);
+               $saveOtherEmail=$this->personInterface->saveOtherEmailByUid($convertOtherEmail);
+           }
+        }
+      }
+      if(!empty($datas->otherLanguage))
+      {
+       if($datas)
+       {
+          foreach($datas->otherLanguage as $language)
+          {
+               $convertOtherLanguage=$this->ConvertotherLanguage($datas,$language);
+              $saveOtherLanguage=$this->personInterface->saveOtherLanguageByUid($convertOtherLanguage);
+          }
+       }
+     }
+
+
+   }
+    
+    
+    public function convertProfile($person,$datas)
+    {
+     if($person) { 
         $person->uid=$datas->uid;
-        $person->dob=$datas->dob;
+        $person->salutation_id=$datas->Saluation;
+        $person->first_name=$datas->firstName;
+        $person->middle_name=$datas->middleName;
+        $person->last_name=$datas->lastName;
+        $person->nick_name=$datas->nickName;
+        // $person->dob=$datas->dob;
+        $person->birth_place=$datas->birthCity;
         $person->gender_id=$datas->gender;
         $person->blood_group_id=$datas->bloodGroup;
-          return $person;
+        $person->marital_id=$datas->maritalStatus;
+        return $person;
 
+     }
+    }
+    public function  anniversaryDate($anniversary,$datas)
+    {
+    if($anniversary){
+        $anniversary->uid=$datas->uid;
+        $anniversary->anniversary_date=$datas->anniversaryDate;
+        return  $anniversary;
+    }
+    }
+    public function convertMotherTongue($motherTongue,$datas)
+    {
+if($motherTongue){
+$motherTongue->uid=$datas->uid;
+$motherTongue->mother_tongue=$datas->motherTongue;
+return $motherTongue;
+}
+    }
+    public function ConvertotherEmail($uid,$email)
+    {
+        if(isset($email))
+    {
+    $model= new PersonEmail();
+    $model->uid=$uid;
+    $model->email=$email;
+    $model->email_cachet=2;
+    $model->validation_updated_on=NULL;
+    return $model;
+}
+    }
+
+    public function ConvertotherMobile($uid,$mobile)
+    {
+        if(isset($mobile))
+    {
+    $model= new PersonMobile();
+    $model->uid=$uid;
+    $model->mobile_no=$mobile;
+    $model->mobile_cachet=2;
+    $model->validation_updated_on=NULL;
+    return $model;
+}
+    }
+
+    public function ConvertotherLanguage($datas,$language)
+    {
+        if(isset($language))
+    {
+    $model= new PersonLanguage();
+    $model->uid=$datas->uid;
+    $model->language_id=$language;
+    $model->mother_tongue=$datas->motherTongue;
+    $model->read=NULL;
+    $model->write=NULL;
+    $model->spoken=NULL;
+    $model->status=0;
+    return $model;
+}
+    }
+    public function addWebLink($datas)
+    {
+        $model=new WebLink();
+        $model->uid=$datas->uid;
+        $model->web_add=$datas->webLinks;
+        $model->web_cachet=1;
+        $model->status=1;
+        return $model;
+    }
+    public function addAddress($datas){ 
+ $address=count($datas->addressOf); 
+ for ($i = 0; $i < $address;  $i++)
+ {     
+        $Model[$i]= new PropertyAddress();
+        $Model[$i]->address_type =$datas->addressOf[$i];
+        $Model[$i]->door_no = $datas->doorNo[$i];
+        $Model[$i]->building_name = $datas->buildingName[$i];
+        $Model[$i]->pin = $datas->pinCode[$i];
+        $Model[$i]->area = $datas->area[$i];  
+        $Model[$i]->street = $datas->street[$i]; 
+        $Model[$i]->land_mark = $datas->landMark[$i];
+        $Model[$i]->district = $datas->district[$i]; 
+        $Model[$i]->city_id= $datas->city[$i];  
+        $Model[$i]->state_id= $datas->state[$i];
+        $Model[$i]->status=1;
+        $Model[$i]->save();          
+   
+ }
     }
 }

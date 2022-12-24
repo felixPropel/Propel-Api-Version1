@@ -116,6 +116,17 @@ public function userCreation(Request $request)
     $response=$this->userService->userCreation($request->all());
     return  $response;
 }
+public function personProfiles(Request $request)
+{
+    $response=$this->personService->personProfileDetails($request->all());
+    return  $response;
+}
+public function profileUpdate(Request $request)
+{
+    log::info('controller > ' .json_encode($request->all()));
+    $response=$this->personService->profileUpdate($request->all());
+    return  $response;
+}
     /**
      * Display a listing of the resource.
      *

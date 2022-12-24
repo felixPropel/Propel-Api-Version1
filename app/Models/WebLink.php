@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Models\BasicModels;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class State extends Model
+class WebLink extends Model
 {
     use HasFactory;
-    protected $table = 'pims_com_states';
+    protected $table = 'person_web_addresses';
+
 }
