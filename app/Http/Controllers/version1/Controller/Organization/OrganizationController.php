@@ -34,4 +34,9 @@ class OrganizationController extends Controller
         $response = $this->commonService->getDistrict($request->all());
         return $response;
     }
+    public function getOrganizationAccountByUid(Request $request)
+    {
+        $response = $this->service->getOrganizationAccountByUid($request->all());
+        return $response;
+    }
 }

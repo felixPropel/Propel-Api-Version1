@@ -9,11 +9,13 @@ use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Models\Organization\Organization;
 use App\Models\Organization\OrganizationDetail;
 use App\Models\Organization\OrganizationEmail;
+use App\Models\Organization\UserOrganizationRelational;
 use App\Models\Person;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
 use App\Models\PersonMobile;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -22,9 +24,17 @@ use Illuminate\Support\Facades\Log;
 
 class OrganizationService
 {
-    public function __construct(OrganizationInterface $organizationInterface)
+    public function __construct(OrganizationInterface $organizationInterface,CommonService $commonService)
     {
         $this->organizationInterface = $organizationInterface;
+        $this->commonService = $commonService;
+    }
+
+    public function getOrganizationAccountByUid($datas)
+    {
+       $datas = (object) $datas;
+       $OrganizationAccountModel = $this->organizationInterface->getOrganizationAccountByUid($datas->uid);
+       return $this->commonService->sendResponse($OrganizationAccountModel,"");
     }
     public function store($datas)
     {
@@ -33,8 +43,9 @@ class OrganizationService
         $generateOrganizationModel = $this->convertToOrganizationModel($datas);
         $generateOrganizationDetailModel = $this->convertToOrganizationDetailModel($datas);
         $generateOrganizationEmailModel = $this->convertToOrganizationEmailModel($datas);
+        $generateUserAccountModel = $this->convertToUserAccountModel($datas);
 
-        $model =  $this->organizationInterface->saveOrganization($generateOrganizationModel, $generateOrganizationDetailModel, $generateOrganizationEmailModel);
+        $model =  $this->organizationInterface->saveOrganization($generateOrganizationModel, $generateOrganizationDetailModel, $generateOrganizationEmailModel,$generateUserAccountModel);
        
         if ($model['message'] == "Success") {
 
@@ -74,5 +85,12 @@ class OrganizationService
         //$model->db_name = $datas->organizationName;
         $model->status = "1";
         return $model;
+    }
+    public function convertToUserAccountModel($datas)
+    {
+       $model = new UserOrganizationRelational();
+       $model->uid= Auth::user()->uid;
+
+       return $model;
     }
 }
