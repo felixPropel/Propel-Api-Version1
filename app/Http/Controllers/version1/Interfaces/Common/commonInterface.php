@@ -7,4 +7,8 @@ interface commonInterface
     public function getSalutation();
     public function getAllGender();
     public function getAllBloodGroup();
+    public function getAllStates();
+    public function getAddrerssType();
+    public function getMaritalStatus();
+    public function getLanguage();
 }
