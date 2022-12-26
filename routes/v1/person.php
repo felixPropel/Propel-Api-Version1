@@ -20,4 +20,4 @@ Route::post('mobileOtpValidated', 'App\Http\Controllers\version1\Controller\Pers
 Route::post('personDatas', 'App\Http\Controllers\version1\Controller\Person\PersonController@personDatas')->name('personDatas');
 Route::post('personUpdate', 'App\Http\Controllers\version1\Controller\Person\PersonController@personUpdate')->name('personUpdate');
 Route::post('personToUser', 'App\Http\Controllers\version1\Controller\Person\PersonController@personToUser')->name('personToUser');
-Route::post('userCreation', 'App\Http\Controllers\version1\Controller\Person\PersonController@userCreation')->name('userCreation');
+Route::post('userCreation1', 'App\Http\Controllers\version1\Controller\Person\PersonController@userCreation')->name('userCreation');
