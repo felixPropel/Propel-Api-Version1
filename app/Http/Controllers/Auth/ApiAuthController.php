@@ -275,7 +275,7 @@ class ApiAuthController extends Controller
     }
 
 
-    function forgotPassword(Request $request)
+    function generateEmailOtp(Request $request)
     {
        
     //    log::info('authcontroller > uid ' .json_encode($request->all()));

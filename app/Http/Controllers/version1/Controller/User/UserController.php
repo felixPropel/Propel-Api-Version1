@@ -22,27 +22,30 @@ class UserController extends Controller
      */
     public function storeUser(Request $request)
     {
+        Log::info('UserController > storeUser function Inside.' . json_encode($request->all()));
         $response = $this->userService->storeUser($request->all());
+        Log::info('UserController > storeUser function Return.' . json_encode($response));
         return $response;
     }
     public function login(Request $request)
     {
+        Log::info('UserController > login function Inside.' . json_encode($request->all()));
         $response = $this->userService->loginUser($request->all());
-
+        Log::info('UserController > login function Return.' . json_encode($response));
         return $response;
     }
     public function get_user_data(Request $request)
     {
-       
         Log::info(' request data > ' . json_encode($request->all()));
         $user = auth()->guard('api')->user();
-    
         Log::info(' request data > ' . json_encode($request->all()));
         return response($user, 200);
     }
     public function changePassword(Request $request)
-    {
+    {        
+        Log::info('UserController > changePassword function Inside.' . json_encode($request->all()));
         $response = $this->userService->changePassword($request->all());
+        Log::info('UserController > changePassword function Return.' . json_encode($response));
         return $response;
     }
     /**

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\version1\Services\Common;
 
 use App\Http\Controllers\version1\Interfaces\Common\commonInterface;
-
+use Illuminate\Support\Facades\Log;
 class CommonService
 
 {
