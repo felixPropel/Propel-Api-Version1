@@ -309,7 +309,8 @@ class PersonService
     }
     public function convertOtpMobileNumber($uid, $otp)
     {
-        Log::info('PersonService > convertOtpMobileNumber function Inside.' . json_encode($uid, $otp));
+        Log::info('PersonService > convertOtpMobileNumber function Inside.' . json_encode($uid));
+        Log::info('PersonService > convertOtpMobileNumber function Inside.' . json_encode($otp));
         if ($uid) {
             $model = PersonMobile::where("uid", $uid)->update(['otp_received' => $otp]);
             Log::info('PersonService > convertOtpMobileNumber function Return.' . json_encode($model));
@@ -352,6 +353,7 @@ class PersonService
     public function updatePerson($personData, $datas)
     {
         Log::info('PersonService > updatePerson function Inside.' . json_encode($datas));
+        Log::info('PersonService > updatePerson function Inside.' . json_encode($personData));
         if ($datas->uid) {
             $personData->uid = $datas->uid;
             $personData->salutation_id = $datas->salutation;
@@ -376,6 +378,7 @@ class PersonService
     public function convertPerson($person, $datas)
     {
         Log::info('PersonService > convertPerson function Inside.' . json_encode($datas));
+        Log::info('PersonService > convertPerson function Inside.' . json_encode($person));
         $person->uid = $datas->uid;
         $person->dob = $datas->dob;
         $person->gender_id = $datas->gender;
@@ -463,6 +466,7 @@ class PersonService
     public function convertProfile($person, $datas)
     {
         Log::info('PersonService > convertProfile function Inside.' . json_encode($datas));
+        Log::info('PersonService > convertProfile function Inside.' . json_encode($person));
         if ($person) {
             $person->uid = $datas->uid;
             $person->salutation_id = $datas->Saluation;
@@ -482,7 +486,9 @@ class PersonService
     }
     public function anniversaryDate($anniversary, $datas)
     {
-        Log::info('PersonService > anniversaryDate function Inside.' . json_encode($datas,$anniversary));
+        Log::info('PersonService > anniversaryDate function Inside.' . json_encode($datas));
+        Log::info('PersonService > anniversaryDate function Inside.' . json_encode($anniversary));
+
         if ($anniversary) {
             $anniversary->uid = $datas->uid;
             $anniversary->anniversary_date = $datas->anniversaryDate;
@@ -492,7 +498,8 @@ class PersonService
     }
     public function convertMotherTongue($motherTongue, $datas)
     {
-        Log::info('PersonService > convertMotherTongue function Inside.' . json_encode($motherTongue,$datas));
+        Log::info('PersonService > convertMotherTongue function Inside.' . json_encode($datas));
+        Log::info('PersonService > convertMotherTongue function Inside.' . json_encode($motherTongue));
         if ($motherTongue) {
             $motherTongue->uid = $datas->uid;
             $motherTongue->mother_tongue = $datas->motherTongue;
@@ -502,7 +509,8 @@ class PersonService
     }
     public function ConvertotherEmail($uid, $email)
     {
-        Log::info('PersonService > ConvertotherEmail function Inside.' . json_encode($uid,$email));
+        Log::info('PersonService > ConvertotherEmail function Inside.' . json_encode($uid));
+        Log::info('PersonService > ConvertotherEmail function Inside.' . json_encode($email));
         if (isset($email)) {
             $model = new PersonEmail();
             $model->uid = $uid;
@@ -516,7 +524,8 @@ class PersonService
 
     public function ConvertotherMobile($uid, $mobile)
     {
-        Log::info('PersonService > ConvertotherMobile function Inside.' . json_encode($uid,$mobile));
+        Log::info('PersonService > ConvertotherMobile function Inside.' . json_encode($uid));
+        Log::info('PersonService > ConvertotherMobile function Inside.' . json_encode($mobile));
         if (isset($mobile)) {
             $model = new PersonMobile();
             $model->uid = $uid;
@@ -530,7 +539,8 @@ class PersonService
 
     public function ConvertotherLanguage($datas, $language)
     {
-        Log::info('PersonService > ConvertotherLanguage function Inside.' . json_encode($datas,$language));
+        Log::info('PersonService > ConvertotherLanguage function Inside.' . json_encode($datas));
+        Log::info('PersonService > ConvertotherLanguage function Inside.' . json_encode($language));
         if (isset($language)) {
             $model = new PersonLanguage();
             $model->uid = $datas->uid;

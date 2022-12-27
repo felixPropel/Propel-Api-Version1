@@ -278,7 +278,7 @@ class ApiAuthController extends Controller
     function generateEmailOtp(Request $request)
     {
        
-    //    log::info('authcontroller > uid ' .json_encode($request->all()));
+        Log::info('ApiAuthController > generateEmailOtp function Inside.' . json_encode($request->all()));
         $uid = $request->uid;
         $person_email = PersonEmail::where('uid', $uid)->first('email');
         $email = $person_email->toArray();
@@ -286,7 +286,7 @@ class ApiAuthController extends Controller
         $mail_email = $email['email'];
         $affectedRows = PersonEmail::where("uid", $uid)->update(["otp_received" => $otp, "email_validation" => 0]);
         $template_data = ['email' => $email, 'otp' => $otp];
-        
+        Log::info('ApiAuthController > generateEmailOtp function Return.' . json_encode($template_data));
         Mail::send(
             ['html' => 'email.email_otp'],
             $template_data,
