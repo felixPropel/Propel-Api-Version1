@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\version1\Repositories\Person;
 
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
+use App\Models\Category;
 use App\Models\User;
 use App\Models\Person;
 use App\Models\PersonDetails;
@@ -13,12 +14,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\PersonLanguage;
 use App\Models\personAnniversary;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Session;
 
 class PersonRepository implements PersonInterface
 {
-
+    public function __construct(){
+        $orgDB = Session::get('orgDb');
+        Config::set('database.connections.mysql_external.database', $orgDB);       
+    }
     public function checkPersonByMobile($mobileNumber)
-    {
+    {      
         return Person::leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
             ->where('person_mobiles.mobile_no', $mobileNumber)
             ->first();
@@ -69,6 +75,8 @@ class PersonRepository implements PersonInterface
                 $personDetailModel->save();
                 $personMobileModel->save();
                 $personEmailModel->save();
+
+                
                 return [
                     'message' => "Success",
                     'data' => $personModel

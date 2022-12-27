@@ -1,23 +1,23 @@
 <?php  return array (
   'default' => 'mysql',
-  'connections' => 
-  array (
-    'sqlite' => 
-    array (
+  'connections' =>
+  array(
+    'sqlite' =>
+    array(
       'driver' => 'sqlite',
       'url' => NULL,
       'database' => 'propel_new',
       'prefix' => '',
       'foreign_key_constraints' => true,
     ),
-    'mysql' => 
-    array (
+    'mysql' =>
+    array(
       'driver' => 'mysql',
-      'url' => NULL,
+      'url' => env('DATABASE_URL'),
       'host' => '127.0.0.1',
       'port' => '3306',
-      'database' => env('DB_DATABASE'),
-      'username' => 'root',
+      'database' => env('DB_DATABASE', 'forge'),
+      'username' => env('DB_USERNAME', 'forge'),
       'password' => '',
       'unix_socket' => '',
       'charset' => 'utf8mb4',
@@ -27,15 +27,15 @@
       'strict' => true,
       'engine' => 'InnoDB',
     ),
-    'mysql2' => 
-    array (
+    'mysql_external' =>
+    array(
       'driver' => 'mysql',
       'url' => NULL,
       'host' => '127.0.0.1',
       'port' => '3306',
-      'database' => 'laramultidb2',
-      'username' => 'root',
-      'password' => '',
+      'database' =>'',
+      'username' =>  "root",
+      'password' =>"",
       'unix_socket' => '',
       'charset' => 'utf8mb4',
       'collation' => 'utf8mb4_unicode_ci',
@@ -43,8 +43,8 @@
       'strict' => true,
       'engine' => 'InnoDB',
     ),
-    'pgsql' => 
-    array (
+    'pgsql' =>
+    array(
       'driver' => 'pgsql',
       'url' => NULL,
       'host' => '127.0.0.1',
@@ -58,8 +58,8 @@
       'schema' => 'public',
       'sslmode' => 'prefer',
     ),
-    'sqlsrv' => 
-    array (
+    'sqlsrv' =>
+    array(
       'driver' => 'sqlsrv',
       'url' => NULL,
       'host' => '127.0.0.1',
@@ -71,8 +71,8 @@
       'prefix' => '',
       'prefix_indexes' => true,
     ),
-    'divamoto' => 
-    array (
+    'divamoto' =>
+    array(
       'driver' => 'mysql',
       'host' => '127.0.0.1',
       'database' => 'divamoto',
@@ -83,8 +83,8 @@
       'prefix' => '',
       'strict' => false,
     ),
-    'gsfgfdhb' => 
-    array (
+    'gsfgfdhb' =>
+    array(
       'driver' => 'mysql',
       'host' => '127.0.0.1',
       'database' => 'gsfgfdhb',
@@ -95,8 +95,8 @@
       'prefix' => '',
       'strict' => false,
     ),
-    'DivaMoto' => 
-    array (
+    'DivaMoto' =>
+    array(
       'driver' => 'mysql',
       'host' => '127.0.0.1',
       'database' => 'DivaMoto',
@@ -107,8 +107,8 @@
       'prefix' => '',
       'strict' => false,
     ),
-    'ss motors' => 
-    array (
+    'ss motors' =>
+    array(
       'driver' => 'mysql',
       'host' => NULL,
       'database' => 'ss motors',
@@ -119,8 +119,8 @@
       'prefix' => '',
       'strict' => false,
     ),
-    'genomics' => 
-    array (
+    'genomics' =>
+    array(
       'driver' => 'mysql',
       'host' => NULL,
       'database' => 'genomics',
@@ -133,24 +133,24 @@
     ),
   ),
   'migrations' => 'migrations',
-  'redis' => 
-  array (
+  'redis' =>
+  array(
     'client' => 'phpredis',
-    'options' => 
-    array (
+    'options' =>
+    array(
       'cluster' => 'redis',
       'prefix' => 'laravel_database_',
     ),
-    'default' => 
-    array (
+    'default' =>
+    array(
       'url' => NULL,
       'host' => '127.0.0.1',
       'password' => NULL,
       'port' => '6379',
       'database' => '0',
     ),
-    'cache' => 
-    array (
+    'cache' =>
+    array(
       'url' => NULL,
       'host' => '127.0.0.1',
       'password' => NULL,
