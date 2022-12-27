@@ -35,7 +35,6 @@ class OrganizationService
         Log::info('OrganizationService > getOrganizationAccountByUid function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $OrganizationAccountModel = $this->organizationInterface->getOrganizationAccountByUid($datas->uid);
-        Log::info('OrganizationService > getOrganizationAccountByUid function Return.' . json_encode($OrganizationAccountModel));
         return $this->commonService->sendResponse($OrganizationAccountModel, "");
     }
     public function store($datas)
@@ -48,8 +47,7 @@ class OrganizationService
         $generateUserAccountModel = $this->convertToUserAccountModel($datas);
         $generateOrganizationDatabaseModel = $this->convertToOrganizationDatabaseModel($datas);
         $model =  $this->organizationInterface->saveOrganization($generateOrganizationModel, $generateOrganizationDetailModel, $generateOrganizationEmailModel, $generateUserAccountModel,$generateOrganizationDatabaseModel);
-        Log::info('OrganizationService > store function Return.' . json_encode($model));
-
+    
         if ($model['message'] == "Success") {           
             return $this->commonService->sendResponse($model, $model['message']);
         } else {
@@ -60,13 +58,11 @@ class OrganizationService
   
     public function convertToOrganizationModel($datas)
     {
-        Log::info('OrganizationService > convertToOrganizationModel function Inside.' . json_encode($datas));
         $model = new Organization();
         $model->authorization = "1";
         $model->origin =  $datas->origin;
         //$model->db_name = $datas->organizationName;
         //$model->status = "1";
-        Log::info('OrganizationService > convertToOrganizationModel function Return.' . json_encode($model));
         return $model;
     }
     public function convertToOrganizationDatabaseModel($datas)
@@ -75,12 +71,10 @@ class OrganizationService
         $dbName = now()->timestamp . preg_replace('/\s+/', '', $datas->organizationName);
         $model = new OrganizationDatabase();
         $model->db_name = $dbName;
-        Log::info('OrganizationService > convertToOrganizationDatabaseModel function Return.' . json_encode($model));
         return $model;
     }
     public function convertToOrganizationDetailModel($datas)
     {
-        Log::info('OrganizationService > convertToOrganizationDetailModel function Inside.' . json_encode($datas));
         $model = new OrganizationDetail();
         $model->title_id = (isset($datas->title_id) ? $datas->title_id : "");
         $model->org_name = $datas->organizationName;
@@ -91,26 +85,30 @@ class OrganizationService
         //$model->org_ownership_id = (isset($datas->ownerShip) ? $datas->ownerShip : 0);
         $model->is_registered_org = (isset($datas->is_registered_org) ? $datas->is_registered_org : null);
         $model->date_of_reg = (isset($datas->date_of_reg) ? $datas->date_of_reg : null);
-        Log::info('OrganizationService > convertToOrganizationDetailModel function Return.' . json_encode($model));
         return $model;
     }
     public function convertToOrganizationEmailModel($datas)
     {
-        Log::info('OrganizationService > convertToOrganizationEmailModel function Inside.' . json_encode($datas));
         $model = new OrganizationEmail();
         $model->email =  $datas->organizationEmail;
         //$model->origin =  $datas->origin;
         //$model->db_name = $datas->organizationName;
         $model->status = "1";
-        Log::info('OrganizationService > convertToOrganizationEmailModel function Return.' . json_encode($model));
         return $model;
     }
     public function convertToUserAccountModel($datas)
     {
-        Log::info('OrganizationService > convertToUserAccountModel function Inside.' . json_encode($datas));
         $model = new UserOrganizationRelational();
-        $model->uid = Auth::user()->uid;
-        Log::info('OrganizationService > convertToUserAccountModel function Return.' . json_encode($model));
+         $model->uid = $datas->uid;
         return $model;
+    }
+    public function getDataBaseNameByid($orgId)
+    {
+        $datas = (object) $datas;
+        $model=$this->organizationInterface->getDataBaseNameById($datas->id);
+
+       Session::put('orgDb', $model->db_name);
+      
+        return $this->commonService->sendResponse($model, '');
     }
 }

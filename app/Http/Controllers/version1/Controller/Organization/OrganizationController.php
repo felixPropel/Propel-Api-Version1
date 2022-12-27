@@ -41,4 +41,12 @@ class OrganizationController extends Controller
         Log::info('OrganizationController > getOrganizationAccountByUid function Return.' . json_encode($response));
         return $response;
     }
+    public function getDataBaseNameByid(Request $request)
+    {
+        Log::info('OrganizationController > getDataBaseNameByid function Inside.' . json_encode($request->all()));
+        $response = $this->service->getDataBaseNameByid($request->all());
+        Log::info('OrganizationController > getDataBaseNameBy id function Return.' . json_encode($response));
+        return $response;
+    }
+
 }
