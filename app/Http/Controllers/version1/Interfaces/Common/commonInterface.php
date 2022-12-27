@@ -11,6 +11,5 @@ interface commonInterface
     public function getAddrerssType();
     public function getMaritalStatus();
     public function getLanguage();
-    public function getAllState();
     public function getDistrict($stateId);
 }

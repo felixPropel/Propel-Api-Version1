@@ -33,15 +33,12 @@ class commonRepository implements commonInterface
         $model=BloodGroup::get();
         return $model;
     }
-    public function getAllState(){  
-        $model=State::get()->toArray();
-        return $model;
-    }
     public function getDistrict($stateId){
         $model=District::where('stateId', $stateId)->get()->toArray();
         return $model;
     }
     public function getAllStates(){
+        
         return State::where('country_id', 101)->get();
     }
     public function getAddrerssType()

@@ -14,25 +14,31 @@ class OrganizationController extends Controller
     }
     public function store(Request $request)
     {
-        Log::info('OrganizationController > Store new data  function Inside.' . json_encode($request->all()));
+        Log::info('OrganizationController > store function Inside.' . json_encode($request->all()));
         $response = $this->service->store($request->all());
         // $dbResponse = $this->service->organizationDb($request->organizationName);
-        //Log::info('OrganizationController>Store function Return.' . json_encode($response));
+        Log::info('OrganizationController > store function Return.' . json_encode($response));
         return $response;
     }
-    public function getAllState()
+    public function getAllStates()
     {
-        $response = $this->commonService->getAllState();
+        Log::info('OrganizationController > getAllStates function Inside.');
+        $response = $this->commonService->getAllStates();
+        Log::info('OrganizationController > getAllStates function Return.' . json_encode($response));
         return $response;
     }
     public function getDistrict(Request $request)
     {
+        Log::info('OrganizationController > getDistrict function Inside.' . json_encode($request->all()));
         $response = $this->commonService->getDistrict($request->all());
+        Log::info('OrganizationController > getDistrict function Return.' . json_encode($response));
         return $response;
     }
     public function getOrganizationAccountByUid(Request $request)
     {
+        Log::info('OrganizationController > getOrganizationAccountByUid function Inside.' . json_encode($request->all()));
         $response = $this->service->getOrganizationAccountByUid($request->all());
+        Log::info('OrganizationController > getOrganizationAccountByUid function Return.' . json_encode($response));
         return $response;
     }
 }

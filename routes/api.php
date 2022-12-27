@@ -83,6 +83,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     // include_once('Person/personApi.php');
     include_once('v1/person.php');
     include_once('v1/user.php');
+    include_once('v1/organization.php');
 });
 
 Route::middleware('auth:api')
