@@ -68,7 +68,7 @@ class OrganizationRepository implements OrganizationInterface
             ];
         }
     }
-      public  function getDataBaseNameById($id)
+      public  function getDataBaseNameByOrgId($id)
       {
     
         return OrganizationDatabase::where('org_id',$id)->first();

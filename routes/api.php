@@ -95,6 +95,7 @@ Route::middleware('auth:api')
         // Route::post('changePassword', 'App\Http\Controllers\version1\Controller\User\UserController@changePassword')->name('changePassword');
 
         include_once('v1/organization.php');
+        include_once('v1/hrm.php');
         // include_once('HRM/Masters/hrmMasterApi.php');
         // include_once('HRM/Transaction/hrmTransactionApi.php');
     });

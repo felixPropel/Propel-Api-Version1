@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('App\Http\Controllers\version1\Interfaces\Common\SmsInterface','App\Http\Controllers\version1\Repositories\Common\SmsRepository');
         $this->app->bind('App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface','App\Http\Controllers\version1\Repositories\Organization\OrganizationRepository');
         $this->app->bind('App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface','App\Http\Controllers\version1\Repositories\Organization\OrganizationRepository');
+        $this->app->bind('App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDepartmentInterface','App\Http\Controllers\version1\Repositories\Hrm\Master\HrmDepartmentRepository');
     }
 
     /**

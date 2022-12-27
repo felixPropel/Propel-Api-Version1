@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\version1\Services\Common;
 
 use App\Http\Controllers\version1\Interfaces\Common\commonInterface;
+use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class CommonService
 {
-  public function __construct(commonInterface $commonInterface)
+  public function __construct(commonInterface $commonInterface,OrganizationInterface $organizationInterface)
   {
     $this->commonInterface = $commonInterface;
+    $this->organizationInterface = $organizationInterface;
   }
 
   public function sendResponse($result, $message)
@@ -19,6 +23,7 @@ class CommonService
       'data' => $result,
       'message' => $message,
     ];
+   
     return response()->json($response, 200);
   }
   public function sendError($error, $errorMessages = [], $code = 404)
@@ -88,6 +93,15 @@ class CommonService
     Log::info('CommonService > getLanguage function Inside.' );
     $result = $this->commonInterface->getLanguage();
     Log::info('CommonService > getLanguage function Return.' . json_encode($result));
+    return $result;
+  }
+  public function getOrganizationDatabaseByOrgId($orgId)
+  {
+    Log::info('CommonService > getOrganizationDatabaseByOrgId function Inside.' );
+    $result = $this->organizationInterface->getDataBaseNameByOrgId($orgId);    
+    Session::put('currentDatabase',$result->db_name);
+    Config::set('database.connections.mysql_external.database', $result->db_name);
+    Log::info('CommonService > getOrganizationDatabaseByOrgId function Return.' . json_encode($result));
     return $result;
   }
 }
