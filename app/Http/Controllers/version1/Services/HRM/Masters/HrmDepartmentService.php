@@ -6,7 +6,7 @@ use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDepartmentInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 
 use App\Models\HrmDepartment;
-
+use Illuminate\Support\Facades\Session;
 
 /**
  * Class HrmDepartmentService
@@ -15,7 +15,7 @@ use App\Models\HrmDepartment;
 class HrmDepartmentService
 {
     protected $interface;
-    public function __construct(HrmDepartmentInterface $interface,CommonService $commonService)
+    public function __construct(HrmDepartmentInterface $interface, CommonService $commonService)
     {
         $this->interface = $interface;
         $this->commonService = $commonService;
@@ -23,54 +23,65 @@ class HrmDepartmentService
     public function findAll($orgId)
     {
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-       
+
         $models = $this->interface->findAll();
-       
+
         return $this->commonService->sendResponse($models, '');
     }
-    public function create()
+    public function create($orgId)
     {
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $models = $this->interface->findAll();
         return $models;
     }
-   
-    public function store($data, $id = false)
+
+    public function store($data, $orgId)
     {
-        $model = $this->convertToModel($data, $id);
+
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+
+        $model = $this->convertToModel($data);
+
         $response = $this->interface->store($model);
 
-        return $response;
+        return $this->commonService->sendResponse($response, '');
     }
-    public function findById($id)
+    public function findById($orgId, $id)
     {
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+
         $response = $this->interface->findById($id);
         $responseParentDeptData = $this->interface->getParentDeptExceptThisId($id);
-        $responseArray = ['resposeModelData' => $response, 'responseParentDeptData' => $responseParentDeptData];
-        return $responseArray;
+        $responseArray = ['responseModelData' => $response, 'responseParentDeptData' => $responseParentDeptData];
+
+        return $this->commonService->sendResponse($responseArray, '');
     }
 
 
-    public function convertToModel($data, $id = false)
+    public function convertToModel($data)
     {
 
-        $data = (object)$data;
-
+        $data = (object) $data;
+        $id = $data->id;
         if ($id) {
             $model = $this->interface->findById($id);
         } else {
             $model = new HrmDepartment();
         }
-        $model->name = $data->name;
-        $model->parent_dept_id = ($data->parent_dept_id) ? $data->parent_dept_id : null;
+        $model->department_name = $data->name;
+        $model->parent_dept_id = isset($data->parent_dept_id) ? $data->parent_dept_id : null;
         $model->description = $data->description;
-        $model->status = 1;
+        $model->active_state = 1;
 
         return $model;
     }
-    public function destroyById($id)
+    public function destroyById($orgId, $id)
     {
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $model = $this->interface->findById($id);
+        $model->deleted_at = date('Y-m-d H:i:s');
+        $response = $this->interface->store($model);
 
-        $response = $this->interface->destroy($id);
-        return $response;
+        return $this->commonService->sendResponse("", 'Deleted Successfully');
     }
 }

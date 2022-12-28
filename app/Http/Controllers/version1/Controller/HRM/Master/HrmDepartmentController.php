@@ -32,13 +32,14 @@ class HrmDepartmentController extends Controller
         Log::info('HrmDepartmentController>Index Function>Return' . json_encode($response));
         return $response;
     }
-    public function index()
+
+    public function index($orgId)
     {
-        dd("well");
+
         Log::info('HrmDepartmentController>Index Function>Inside.');
-        $response = $this->service->findAll();
+        $response = $this->service->findAll($orgId);
         Log::info('HrmDepartmentController>Index Function>Return' . json_encode($response));
-        return response($response, 200);
+        return $response;
     }
 
     /**
@@ -46,10 +47,11 @@ class HrmDepartmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($orgId)
     {
+
         Log::info('HrmDepartmentController>Create Function>Inside.');
-        $response = $this->service->create();
+        $response = $this->service->create($orgId);
         Log::info('HrmDepartmentController>Create Function>Return' . json_encode($response));
         return response($response, 200);
     }
@@ -60,12 +62,13 @@ class HrmDepartmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $orgId)
     {
+
         Log::info('Store function Inside.' . json_encode($request->all()));
-        $response = $this->service->store($request->all());
+        $response = $this->service->store($request->all(), $orgId);
         Log::info('Store function Return.' . json_encode($response));
-        return response($response, 200);
+        return $response;
     }
 
     /**
@@ -86,12 +89,12 @@ class HrmDepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($orgId, $id)
     {
         Log::info('Edit function Inside.' . json_encode($id));
-        $response = $this->service->findById($id);
+        $response = $this->service->findById($orgId, $id);
         Log::info('Edit function Return.' . json_encode($response));
-        return response($response, 200);
+        return $response;
     }
 
     /**
@@ -101,7 +104,7 @@ class HrmDepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $orgId, $id)
     {
         Log::info('Update function Inside request Data.' . json_encode($request->all()));
         Log::info('Update function Inside request id.' . json_encode($id));
@@ -116,10 +119,11 @@ class HrmDepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($orgId, $id)
     {
+
         Log::info('Destroy function Inside id.' . json_encode($id));
-        $response = $this->service->destroyById($id);
+        $response = $this->service->destroyById($orgId, $id);
         Log::info('Destroy function Return .' . json_encode($response));
         return $response;
     }
