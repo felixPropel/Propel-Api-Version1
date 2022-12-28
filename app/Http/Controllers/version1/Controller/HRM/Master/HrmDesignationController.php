@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\HRM\Master;
+namespace App\Http\Controllers\version1\Controller\HRM\Master;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\HRM\Masters\HrmDesignationService;
+use App\Http\Controllers\version1\Services\HRM\Masters\HrmDesignationService;
 use Log;
 
 class HrmDesignationController extends Controller
@@ -19,9 +19,12 @@ class HrmDesignationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($orgId)
     {
-        $response = $this->service->findAll();
+       
+        Log::info('HrmDesignationController>Index Function>Inside.'.json_encode($orgId));
+        $response = $this->service->findAll($orgId);
+        Log::info('HrmDesignationController>Index Function>Return' . json_encode($response));
         return $response;
     }
 
@@ -30,10 +33,11 @@ class HrmDesignationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($orgId)
     {
-        Log::info('HrmDesignationController>Create Function>Inside.');
-        $response = $this->service->create();
+       
+        Log::info('HrmDesignationController>Create Function>Inside.'. json_encode($orgId));
+        $response = $this->service->create($orgId);
         Log::info('HrmDesignationController>Create Function>Inside.');
         return $response;
     }
@@ -44,10 +48,11 @@ class HrmDesignationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $orgId)
     {
+       
         Log::info('Store function Inside.' . json_encode($request->all()));
-        $response = $this->service->store($request->all());
+        $response = $this->service->store($request->all(),$orgId);
         // Log::info('Store function Return.' . json_encode($response));
         return $response;
     }
@@ -70,9 +75,12 @@ class HrmDesignationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($orgId, $id)
     {
-        $response = $this->service->findById($id);
+    
+        Log::info('Edit function Inside.' . json_encode($orgId,$id));
+        $response = $this->service->findById($orgId, $id);
+        Log::info('Edit function Return.' . json_encode($response));
         return $response;
     }
 
@@ -96,10 +104,13 @@ class HrmDesignationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($orgId, $id)
     {
         
-        $response = $this->service->destroyById($id);
+        Log::info('Destroy function Inside id.' . json_encode($orgId,$id));
+        $response = $this->service->destroyById($orgId, $id);
+        Log::info('Destroy function Return .' . json_encode($response));
         return $response;
+        
     }
 }

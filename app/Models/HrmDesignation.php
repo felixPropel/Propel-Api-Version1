@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class HrmDesignation extends Model
 {
-    use HasFactory;
+    public function __construct()
+    {
+        parent::__construct();
+        $this->connection ='mysql_external';
+    }
     public function hrmDesDept()
     {
-        return $this->belongsTo(HrmDepartment::class,'dept_id');
+        return $this->belongsTo(HrmDesignation::class,'');
     }
 }

@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Services\HRM\Masters;
+namespace App\Http\Controllers\version1\Services\HRM\Masters;
 
-use App\Interfaces\HrmDepartmentInterface;
-use App\Interfaces\HrmDesignationInterface;
+
 use App\Models\HrmDepartment;
 use App\Models\HrmDesignation;
+use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\version1\Services\Common\CommonService;
+use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDesignationInterface;
+use App\Http\Controllers\version1\Services\HRM\Masters\HrmDepartmentService;
 
 /**
  * Class HrmDesigationService
@@ -14,61 +17,66 @@ use App\Models\HrmDesignation;
 class HrmDesignationService
 {
     protected $interface;
-    public function __construct(HrmDesignationInterface $interface,HrmDepartmentInterface $deptInterface)
+    public function __construct(CommonService $commonService,HrmDesignationInterface $interface,HrmDepartmentService $service)
     {
-        $this->deptInterface = $deptInterface;
+        $this->commonService = $commonService;
         $this->interface = $interface;
+        $this->service = $service;
     }
-    public function findAll()
+    public function findAll($orgId)
     {
-        
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $models = $this->interface->findAll();
-        return $models;
+        return $this->commonService->sendResponse($models, '');
     }
-    public function create()
-    {
-        
-        $departmentModels = $this->deptInterface->findAll();
-        return $departmentModels;
-
+    public function create($orgId)
+    {  
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $models = $this->interface->findAll();
+        return $this->commonService->sendResponse($models, '');
     }
-    public function store($data, $id = false)
+    public function store($data, $orgId)
     {
-        $model = $this->convertToModel($data, $id);
+      
+       
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $model = $this->convertToModel($data);
         $response = $this->interface->store($model);
-
+       
         return $response;
     }
-    public function convertToModel($data, $id = false)
+    public function convertToModel($data)
     {
 
         $data = (object)$data;
-
+        $id=$data->id;
         if ($id) {
             $model = $this->interface->findById($id);
         } else {
             $model = new HrmDesignation();
         }
-        $unAssignedDesId = $this->interface->findByName('Un-Assigned');
-        $model->name = $data->designation;
-        $model->dept_id =$data->dept_id;
+        $model->designation_name = $data->designation;
         $model->no_of_posting =$data->no_of_posting;
+        $model->dept_id =$data->dept_id;
         $model->description = $data->description;
-        $model->status =1;
-
-
+        $model->active_state =1;
         return $model;
     }
-    public function findById($id)
+    public function findById($orgId,$id)
     {
-        $modelData = $this->interface->findById($id);    
-        $getDepartmentDatas = $this->deptInterface->findAll();
-        $response = ['modelData'=>$modelData,'depatmentData'=>$getDepartmentDatas];
-        return  $response; 
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $response = $this->interface->findById($id);
+        $department = $this->service->findAll($orgId);
+        $responseArray = ['responseModelData' => $response, 'department' => $department];
+
+        return $this->commonService->sendResponse($responseArray, '');
     }
-    public function destroyById($id)
+    public function destroyById($orgId,$id)
     {
-        $response = $this->interface->destroy($id);
-        return $response;
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $model = $this->interface->findById($id);
+        $model->deleted_at = date('Y-m-d H:i:s');
+        $response = $this->interface->store($model);
+        return $this->commonService->sendResponse("", 'Deleted Successfully');
     }
 }
