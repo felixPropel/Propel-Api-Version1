@@ -17,6 +17,7 @@ class CreateHrmResourceDOJSTable extends Migration
             $table->increments('id');
             $table->integer('resource_id');
             $table->date('DOJ');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
     }

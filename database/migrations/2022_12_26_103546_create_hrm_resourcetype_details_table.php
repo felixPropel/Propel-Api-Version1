@@ -17,6 +17,7 @@ class CreateHrmResourcetypeDetailsTable extends Migration
             $table->increments('id');
             $table->integer('resource_id');
             $table->integer('resource_type_id');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
     }

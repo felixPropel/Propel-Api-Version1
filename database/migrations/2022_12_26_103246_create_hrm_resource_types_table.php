@@ -18,6 +18,7 @@ class CreateHrmResourceTypesTable extends Migration
             $table->string('resource_type');
             $table->string('description');
             $table->integer('active_state');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
     }

@@ -17,6 +17,7 @@ class CreateHrmResourceWorkingsTable extends Migration
             $table->increments('id');
             $table->integer('resource_id');
             $table->integer('active_state');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
     }

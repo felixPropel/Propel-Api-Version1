@@ -20,6 +20,7 @@ class CreateHrmDesignationsTable extends Migration
             $table->integer('dept_id');
             $table->string('description');
             $table->integer('active_state');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
     }

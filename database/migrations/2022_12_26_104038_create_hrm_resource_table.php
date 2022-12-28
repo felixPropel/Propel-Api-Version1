@@ -17,6 +17,7 @@ class CreateHrmResourceTable extends Migration
             $table->increments('id');
             $table->string('uid');
             $table->string('resource_code');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
     }

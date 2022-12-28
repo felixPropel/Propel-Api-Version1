@@ -17,6 +17,7 @@ class CreateHrmResourcetypeDesignationsTable extends Migration
             $table->increments('id');
             $table->integer('resource_id');
             $table->integer('designation_id');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
     }
