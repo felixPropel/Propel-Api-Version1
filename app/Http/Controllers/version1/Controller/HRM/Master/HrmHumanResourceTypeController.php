@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\HRM\Master;
+namespace App\Http\Controllers\version1\Controller\HRM\Master;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\HRM\Masters\HrmHumanResourceTypeService;
+use App\Http\Controllers\version1\Services\HRM\Masters\HrmHumanResourceTypeService;
 use Log;
 class HrmHumanResourceTypeController extends Controller
 {
@@ -18,9 +18,11 @@ class HrmHumanResourceTypeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+    public function index($orgId)
     {
-        $response = $this->service->index();
+        
+        $response = $this->service->index($orgId);
         return $response;
     }
 
@@ -40,10 +42,10 @@ class HrmHumanResourceTypeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $orgId)
     {
         Log::info(' Human Resource Type Store function Inside.' . json_encode($request->all()));
-        $response = $this->service->store($request->all());
+        $response = $this->service->store($request->all(), $orgId);
         Log::info('Store function Return.' . json_encode($response));
         return $response;
     }
@@ -66,9 +68,11 @@ class HrmHumanResourceTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($orgId, $id)
     {
-        $response = $this->service->findById($id);
+
+        $response = $this->service->findById($orgId, $id);
+
         return $response;
     }
 
@@ -94,9 +98,10 @@ class HrmHumanResourceTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($orgId,$id)
     {
-        $response = $this->service->destroyById($id);
+     
+        $response = $this->service->destroyById($orgId,$id);
         return $response;
     }
 }

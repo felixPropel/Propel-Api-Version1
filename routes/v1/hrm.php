@@ -12,6 +12,9 @@ Route::get('getHrmDesignation/{orgId}', 'App\Http\Controllers\version1\Controlle
 Route::get('findHrmDesignationDataById/{orgId}/{id}', 'App\Http\Controllers\version1\Controller\HRM\Master\HrmDesignationController@edit')->name('findHrmDesignationDataById');
 Route::get('destroyHrmDesignationById/{orgId}/{id}', 'App\Http\Controllers\version1\Controller\HRM\Master\HrmDesignationController@destroy')->name('destroyHrmDesignationById');
 Route::get('createHrmDesignationData/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Master\HrmDesignationController@create')->name('createHrmDesignationData');
-
+Route::get('getHrmResourceTypeData/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Master\HrmHumanResourceTypeController@index')->name('getHrmResourceTypeData');
+Route::post('storeHrmResourceTypeData/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Master\HrmHumanResourceTypeController@store')->name('storeHrmResourceTypeData');
+Route::get('findHrmResourceType/{orgId}/{id}', 'App\Http\Controllers\version1\Controller\HRM\Master\HrmHumanResourceTypeController@edit')->name('findHrmResourceType');
+Route::get('deleteHrmResourceTypeData/{orgId}/{id}', 'App\Http\Controllers\version1\Controller\HRM\Master\HrmHumanResourceTypeController@destroy')->name('deleteHrmResourceTypeData');
 
 

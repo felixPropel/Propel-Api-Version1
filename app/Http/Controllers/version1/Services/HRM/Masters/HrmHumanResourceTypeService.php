@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Services\HRM\Masters;
-use App\Interfaces\HrmHumanResourceTypeInterface;
-use App\Models\HrmHumanResourceType;
-use App\Repositories\HRM\Masters\HrmResourceTypeRepository;
+namespace App\Http\Controllers\version1\Services\HRM\Masters;
 
+use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmHumanResourceTypeInterface;
+use App\Http\Controllers\version1\Services\Common\CommonService;
+
+use App\Models\HrmResourceType;
 
 /**
  * Class HrmHumanResourceTypeService
@@ -13,47 +14,53 @@ use App\Repositories\HRM\Masters\HrmResourceTypeRepository;
 class HrmHumanResourceTypeService
 {
     protected $interface;
-    public function __construct(HrmHumanResourceTypeInterface $interface)
+    public function __construct(HrmHumanResourceTypeInterface $interface, CommonService $commonService)
     {
         $this->interface = $interface;
+        $this->commonService = $commonService;
     }
-    public function index()
+    public function index($orgId)
     {
-        
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+       
         $models = $this->interface->index();
-        return $models;
+        return $this->commonService->sendResponse($models, '');
     }
-    public function store($data, $id = false)
+    public function store($data, $orgId)
     {
-        $model = $this->convertToModel($data, $id);
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $model = $this->convertToModel($data);
         $response = $this->interface->store($model);
-
-        return $response;
+        return $this->commonService->sendResponse($response, '');
     }
-    public function convertToModel($data, $id = false)
+    public function convertToModel($data)
     {
-
         $data = (object)$data;
-
+        $id = $data->id;
         if ($id) {
             $model = $this->interface->findById($id);
         } else {
-            $model = new HrmHumanResourceType();
+            $model = new HrmResourceType();
         }
-        $model->name = $data->name;
+        $model->name = $data->resourceType;
         $model->description = $data->description;
-        $model->status =  $data->status; 
+        $model->active_state = 1; 
 
         return $model;
     }
-    public function findById($id)
+    public function findById($orgId, $id)
     {
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $response = $this->interface->findById($id);
-        return $response;
+        return $this->commonService->sendResponse($response, '');
     }
-    public function destroyById($id)
+    public function destroyById($orgId, $id)
     {
-        $response = $this->interface->destroy($id);
-        return $response;
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $model = $this->interface->findById($id);
+        $model->deleted_at = date('Y-m-d H:i:s');
+        $response = $this->interface->store($model);
+
+        return $this->commonService->sendResponse("", 'Deleted Successfully');
     }
 }
