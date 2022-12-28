@@ -137,11 +137,10 @@ class PersonRepository implements PersonInterface
     }
     public function getPersonPrimaryDataByUid($uid)
     {
+       
         return Person::select('*')->leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
             ->leftjoin('person_emails', 'person_emails.uid', '=', 'persons.uid')
             ->leftjoin('person_details', 'person_details.uid', '=', 'persons.uid')
-            ->leftjoin('person_anniversarys','person_anniversarys.uid','=','persons.uid')
-            ->leftjoin('person_languages','person_languages.uid','=','persons.uid')
             ->where('person_mobiles.mobile_cachet', 1)
             ->where('person_emails.email_cachet', 1)
             ->where('persons.uid', $uid)
