@@ -42,7 +42,7 @@ class HrmHumanResourceTypeService
         } else {
             $model = new HrmResourceType();
         }
-        $model->name = $data->resourceType;
+        $model->name = $data->name;
         $model->description = $data->description;
         $model->active_state = 1; 
 
