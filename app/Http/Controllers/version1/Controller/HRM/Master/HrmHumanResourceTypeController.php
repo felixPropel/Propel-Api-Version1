@@ -21,8 +21,9 @@ class HrmHumanResourceTypeController extends Controller
 
     public function index($orgId)
     {
-        
+        Log::info('HrmHumanResourceTypeController > Store function Inside.' . json_encode($orgId));
         $response = $this->service->index($orgId);
+        Log::info('HrmHumanResourceTypeController > Store function Return.' . json_encode($response));
         return $response;
     }
 
@@ -44,9 +45,10 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function store(Request $request, $orgId)
     {
-        Log::info(' Human Resource Type Store function Inside.' . json_encode($request->all()));
+        Log::info('HrmHumanResourceTypeController > Store function Inside.' . json_encode($orgId));
+        Log::info('HrmHumanResourceTypeController > Store function Inside.' . json_encode($request->all()));
         $response = $this->service->store($request->all(), $orgId);
-        Log::info('Store function Return.' . json_encode($response));
+        Log::info('HrmHumanResourceTypeController > Store function Return.' . json_encode($response));
         return $response;
     }
 
@@ -58,7 +60,9 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function show($id)
     {
+        Log::info('HrmHumanResourceTypeController > show function Inside.' . json_encode($id));
         $response = $this->service->findById($id);
+        Log::info('HrmHumanResourceTypeController > show function Return.' . json_encode($response));
         return $response;
     }
 
@@ -70,8 +74,10 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function edit($orgId, $id)
     {
-
+        Log::info('HrmHumanResourceTypeController > edit function Inside.' . json_encode($orgId));
+        Log::info('HrmHumanResourceTypeController > edit function Inside.' . json_encode($id));
         $response = $this->service->findById($orgId, $id);
+        Log::info('HrmHumanResourceTypeController > edit function Return.' . json_encode($response));
 
         return $response;
     }
@@ -100,8 +106,10 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function destroy($orgId,$id)
     {
-     
+        Log::info('HrmHumanResourceTypeController > destroy function Inside.' . json_encode($orgId));
+        Log::info('HrmHumanResourceTypeController > destroy function Inside.' . json_encode($id));
         $response = $this->service->destroyById($orgId,$id);
+        Log::info('HrmHumanResourceTypeController > destroy function Return.' . json_encode($response));
         return $response;
     }
 }
