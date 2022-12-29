@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDesignationInterface;
 use App\Http\Controllers\version1\Services\HRM\Masters\HrmDepartmentService;
+use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDepartmentInterface;
 
 /**
  * Class HrmDesigationService
@@ -17,22 +18,26 @@ use App\Http\Controllers\version1\Services\HRM\Masters\HrmDepartmentService;
 class HrmDesignationService
 {
     protected $interface;
-    public function __construct(CommonService $commonService,HrmDesignationInterface $interface,HrmDepartmentService $service)
+    public function __construct(CommonService $commonService,HrmDesignationInterface $interface,HrmDepartmentService $service,HrmDepartmentInterface $hrmDeptInterface)
     {
         $this->commonService = $commonService;
         $this->interface = $interface;
         $this->service = $service;
+        $this->hrmDeptInterface=$hrmDeptInterface;
     }
     public function findAll($orgId)
     {
+       
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $models = $this->interface->findAll();
-        return $this->commonService->sendResponse($models, '');
+        $department=$this->hrmDeptInterface->findAll();
+        $responseArray = ['model' => $models, 'department' => $department];
+        return $this->commonService->sendResponse($responseArray, '');
     }
     public function create($orgId)
     {  
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-        $models = $this->interface->findAll();
+        $models=$this->hrmDeptInterface->findAll();
         return $this->commonService->sendResponse($models, '');
     }
     public function store($data, $orgId)
@@ -57,16 +62,16 @@ class HrmDesignationService
         }
         $model->designation_name = $data->designation;
         $model->no_of_posting =$data->no_of_posting;
-        $model->dept_id =$data->dept_id;
+        $model->dept_id =$data->department;
         $model->description = $data->description;
-        $model->active_state =1;
+        $model->active_state=isset($data->active_state)? 1 : 0;
         return $model;
     }
     public function findById($orgId,$id)
     {
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $response = $this->interface->findById($id);
-        $department = $this->service->findAll($orgId);
+        $department=$this->hrmDeptInterface->findAll();
         $responseArray = ['responseModelData' => $response, 'department' => $department];
 
         return $this->commonService->sendResponse($responseArray, '');
