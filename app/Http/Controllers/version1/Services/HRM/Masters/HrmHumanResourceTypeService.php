@@ -44,7 +44,7 @@ class HrmHumanResourceTypeService
         }
         $model->name = $data->name;
         $model->description = $data->description;
-        $model->active_state = 1; 
+        $model->active_state = isset($data->active_state) ? 1 : 0;
 
         return $model;
     }
