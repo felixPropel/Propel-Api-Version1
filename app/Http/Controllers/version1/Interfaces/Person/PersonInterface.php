@@ -26,4 +26,6 @@ interface PersonInterface
    public function saveOtherEmailByUid($model);
    public function saveOtherLanguageByUid($model);
    public function addWebLink($model);
+   public function findExactPersonWithEmailAndMobile($email, $mobile);
+   public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
 }

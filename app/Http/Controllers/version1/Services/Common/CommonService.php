@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\version1\Services\Common;
 
 use App\Http\Controllers\version1\Interfaces\Common\commonInterface;
+use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDepartmentInterface;
+use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDesignationInterface;
+use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmHumanResourceTypeInterface;
 use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -10,10 +13,13 @@ use Illuminate\Support\Facades\Session;
 
 class CommonService
 {
-  public function __construct(commonInterface $commonInterface,OrganizationInterface $organizationInterface)
+  public function __construct(commonInterface $commonInterface, OrganizationInterface $organizationInterface, HrmDepartmentInterface $hrmDeptInterface, HrmDesignationInterface $hrmDesInterface, HrmHumanResourceTypeInterface $hrmResourceTypeInterface)
   {
     $this->commonInterface = $commonInterface;
     $this->organizationInterface = $organizationInterface;
+    $this->hrmDeptInterface = $hrmDeptInterface;
+    $this->hrmDesInterface = $hrmDesInterface;
+    $this->hrmResourceTypeInterface = $hrmResourceTypeInterface;
   }
 
   public function sendResponse($result, $message)
@@ -23,7 +29,7 @@ class CommonService
       'data' => $result,
       'message' => $message,
     ];
-   
+
     return response()->json($response, 200);
   }
   public function sendError($error, $errorMessages = [], $code = 404)
@@ -47,7 +53,7 @@ class CommonService
   }
   public function getAllGender()
   {
-    Log::info('CommonService > getAllGender function Inside.' );
+    Log::info('CommonService > getAllGender function Inside.');
     $result = $this->commonInterface->getAllGender();
     Log::info('CommonService > getAllGender function Return.' . json_encode($result));
     return $result;
@@ -69,14 +75,14 @@ class CommonService
 
   public function getAllStates()
   {
-    Log::info('CommonService > getAllStates function Inside.' );
+    Log::info('CommonService > getAllStates function Inside.');
     $result = $this->commonInterface->getAllStates();
     Log::info('CommonService > getAllStates function Return.' . json_encode($result));
     return $result;
   }
   public function getAddrerssType()
   {
-    Log::info('CommonService > getAddrerssType function Inside.' );
+    Log::info('CommonService > getAddrerssType function Inside.');
     $result = $this->commonInterface->getAddrerssType();
     Log::info('CommonService > getAddrerssType function Return.' . json_encode($result));
     return $result;
@@ -90,16 +96,59 @@ class CommonService
   }
   public function getLanguage()
   {
-    Log::info('CommonService > getLanguage function Inside.' );
+    Log::info('CommonService > getLanguage function Inside.');
     $result = $this->commonInterface->getLanguage();
     Log::info('CommonService > getLanguage function Return.' . json_encode($result));
     return $result;
   }
+
+  public function getAllDocumentType()
+  {
+    Log::info('CommonService > getAllDocumentType function Inside.');
+    $result = $this->commonInterface->getAllDocumentType();
+    Log::info('CommonService > getAllDocumentType function Return.' . json_encode($result));
+    return $result;
+  }
+  public function getAllBankAccountType()
+  {
+    Log::info('CommonService > getAllBankAccountType function Inside.');
+    $result = $this->commonInterface->getAllBankAccountType();
+    Log::info('CommonService > getAllBankAccountType function Return.' . json_encode($result));
+    return $result;
+  }
+
+
+  public function getPersonMasterData()
+  {
+
+    $saluationLists = $this->getSalutation();
+    $bloodGroupLists = $this->getAllBloodGroup();
+    $genderLists = $this->getAllGender();
+    $maritalStatusLists = $this->getMaritalStatus();
+    $addressOfLists = $this->getAddrerssType();
+    $languageLists = $this->getLanguage();
+    $idDocumentTypes = $this->getAllDocumentType();
+    $bankAccountTypes = $this->getAllBankAccountType();
+    $datas = [
+      'saluationLists' => $saluationLists,
+      'bloodGroupLists' => $bloodGroupLists,
+      'genderLists' => $genderLists,
+      'maritalStatusLists' => $maritalStatusLists,
+      'addressOfLists' => $addressOfLists,
+      'languageLists' => $languageLists,
+      'idDocumentTypes' => $idDocumentTypes,
+      'bankAccountTypes' => $bankAccountTypes
+    ];
+
+
+    return $datas;
+  }
+
   public function getOrganizationDatabaseByOrgId($orgId)
   {
-    Log::info('CommonService > getOrganizationDatabaseByOrgId function Inside.' );
-    $result = $this->organizationInterface->getDataBaseNameByOrgId($orgId);    
-    Session::put('currentDatabase',$result->db_name);
+    Log::info('CommonService > getOrganizationDatabaseByOrgId function Inside.');
+    $result = $this->organizationInterface->getDataBaseNameByOrgId($orgId);
+    Session::put('currentDatabase', $result->db_name);
     Config::set('database.connections.mysql_external.database', $result->db_name);
     Log::info('CommonService > getOrganizationDatabaseByOrgId function Return.' . json_encode($result));
     return $result;

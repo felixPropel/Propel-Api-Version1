@@ -19,12 +19,13 @@ use Illuminate\Support\Facades\Session;
 
 class PersonRepository implements PersonInterface
 {
-    public function __construct(){
+    public function __construct()
+    {
         $orgDB = Session::get('orgDb');
-        Config::set('database.connections.mysql_external.database', $orgDB);       
+        Config::set('database.connections.mysql_external.database', $orgDB);
     }
     public function checkPersonByMobile($mobileNumber)
-    {      
+    {
         return Person::leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
             ->where('person_mobiles.mobile_no', $mobileNumber)
             ->first();
@@ -76,7 +77,7 @@ class PersonRepository implements PersonInterface
                 $personMobileModel->save();
                 $personEmailModel->save();
 
-                
+
                 return [
                     'message' => "Success",
                     'data' => $personModel
@@ -94,7 +95,7 @@ class PersonRepository implements PersonInterface
             ];
         }
     }
-  
+
     public function checkPersonEmailByUid($email, $uid)
     {
         return PersonEmail::where(['uid' => $uid, 'email' => $email])->first();
@@ -137,7 +138,7 @@ class PersonRepository implements PersonInterface
     }
     public function getPersonPrimaryDataByUid($uid)
     {
-       
+
         return Person::select('*')->leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
             ->leftjoin('person_emails', 'person_emails.uid', '=', 'persons.uid')
             ->leftjoin('person_details', 'person_details.uid', '=', 'persons.uid')
@@ -147,49 +148,73 @@ class PersonRepository implements PersonInterface
             ->first();
     }
 
-     public function getAnniversaryDate($uid)
-           {
-return personAnniversary::where('uid',$uid)->first();
-           }
-           public function saveAnniversaryDate($model)
-           {
+    public function getAnniversaryDate($uid)
+    {
+        return personAnniversary::where('uid', $uid)->first();
+    }
+    public function saveAnniversaryDate($model)
+    {
+        return $model->save();
+    }
+    public function motherTongueByUid($uid)
+    {
+        return PersonLanguage::where('uid', $uid)->first();
+    }
+    public function updateMotherTongue($model)
+    {
+        return $model->save();
+    }
+    public function saveOtherMobileByUid($model)
+    {
+        if (isset($model)) {
             return $model->save();
-           }
-           public function motherTongueByUid($uid)
-           {
-return PersonLanguage::where('uid',$uid)->first();
-           }
-           public function updateMotherTongue($model)
-           {
+        }
+    }
+    public function saveOtherEmailByUid($model)
+    {
+        if (isset($model)) {
             return $model->save();
-           }
-           public function saveOtherMobileByUid($model)
-           {
-            if(isset($model))
-            {
+        }
+    }
+    public function saveOtherLanguageByUid($model)
+    {
+        if (isset($model)) {
             return $model->save();
-            }
-           }
-           public function saveOtherEmailByUid($model)
-           {
-            if(isset($model))
-            {
+        }
+    }
+    public function addWebLink($model)
+    {
+        if (isset($model)) {
             return $model->save();
-            }
-            
-           }
-           public function saveOtherLanguageByUid($model)
-           {
-            if(isset($model))
-            {
-            return $model->save();
-            }
-           }
-           public function addWebLink($model)
-           {
-            if(isset($model))
-            {
-            return $model->save();
-            }
-           }
+        }
+    }
+    public function findExactPersonWithEmailAndMobile($email, $mobile)
+    {
+        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.');
+
+        $model =  Person::select('*')
+            ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
+            ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
+            ->where('person_mobiles.mobile_no', $mobile)
+            ->Where('person_emails.email', $email)
+            ->whereIn('person_mobiles.mobile_cachet', [1, 2])
+            ->whereIn('person_emails.email_cachet', [1, 2])
+            ->first();
+
+        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Return . ' . json_encode($model));
+        return $model;
+    }
+    public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile)
+    {
+        $models = Person::select('persons.id as personId', 'person_emails.email As emailId', 'person_mobiles.mobile_no as mobileId')
+            ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
+            ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
+            ->where('person_mobiles.mobile_no', $mobile)
+            ->OrWhere('person_emails.email', $email)
+            ->whereIn('person_mobiles.mobile_cachet', [1, 2])
+            ->whereIn('person_emails.email_cachet', [1, 2])
+            ->get();
+
+        return $models;
+    }
 }

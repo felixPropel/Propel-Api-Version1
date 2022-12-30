@@ -373,19 +373,19 @@ public function saveOtherEmailByUid($data){
 
     public function findExactPersonWithEmailAndMobile($email, $mobile)
     {
-        // Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.');
+        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.');
 
-        // $model =  Person::select('*')
-        //     ->leftjoin('person_mobile', 'person_mobile.uid', 'person.uid')
-        //     ->leftjoin('person_email', 'person_email.uid', 'person.uid')            
-        //     ->where('person_mobile.mobile', $mobile)
-        //     ->Where('person_email.email', $email)
-        //     ->whereIn('person_mobile.status', [1, 2])
-        //     ->whereIn('person_email.status', [1, 2])
-        //     ->first();
+        $model =  Person::select('*')
+            ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
+            ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')            
+            ->where('person_mobiles.mobile_no', $mobile)
+            ->Where('person_emails.email', $email)
+            ->whereIn('person_mobiles.mobile_cachet', [1, 2])
+            ->whereIn('person_emails.email_cachet', [1, 2])
+            ->first();
 
-        // Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Return . ' . json_encode($model));
-        // return $model;
+        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Return . ' . json_encode($model));
+        return $model;
     }
     public function findUserWithInOrganization($uId, $orgId)
     {

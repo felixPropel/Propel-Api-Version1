@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\Address_of;
+use App\Models\BasicModels\BankAccountType;
+use App\Models\BasicModels\DocumentType;
 use App\Models\BasicModels\Language;
 use App\Models\BasicModels\MaritalStatus;
 
@@ -52,5 +54,12 @@ class commonRepository implements commonInterface
     public function getLanguage(){
         return Language::get();
     }
+    public function getAllDocumentType(){
+        return DocumentType::get();
+    }
+    public function getAllBankAccountType(){
+        return BankAccountType::get();
+    }
+
 
 }

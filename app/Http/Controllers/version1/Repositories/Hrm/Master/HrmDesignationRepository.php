@@ -22,7 +22,7 @@ class HrmDesignationRepository implements HrmDesignationInterface
     }
     public function store($model)
     {
-     
+
         try {
             $result = DB::transaction(function () use ($model) {
 
@@ -49,8 +49,9 @@ class HrmDesignationRepository implements HrmDesignationInterface
         $data = HrmDesignation::where('id', $id)->first();
         return $data;
     }
-    public function getParentDeptExceptThisId($id)
+    public function findByDeptId($deptId)
     {
-        return HrmDesignation::where('id', '!=', $id)->whereNull('deleted_at')->get();
+        $data = HrmDesignation::where('dept_id', $deptId)->get();
+        return $data;
     }
 }
