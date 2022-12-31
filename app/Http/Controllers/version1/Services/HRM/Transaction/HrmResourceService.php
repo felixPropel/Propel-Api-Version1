@@ -9,9 +9,11 @@ use App\Http\Controllers\version1\Interfaces\Hrm\Transaction\HrmResourceInterfac
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
+use App\Http\Controllers\version1\Services\Person\PersonService;
 use App\Interfaces\CommonInterface;
-
-
+use App\Models\HrmResource;
+use App\Models\HrmResourceDesignation;
+use App\Models\HrmResourcetypeDetail;
 
 /**
  * Class HrmResourceService.
@@ -20,8 +22,9 @@ use App\Interfaces\CommonInterface;
 class HrmResourceService
 {
 
-    public function __construct(PersonInterface $personInterface, UserInterface $userInterface, HrmResourceInterface $hrmResourceInterface, CommonService $commonService, CommonInterface $commonInterface, HrmDepartmentInterface $hrmDeptInterface, HrmDesignationInterface $hrmDesInterface, HrmHumanResourceTypeInterface $hrmResourceTypeInterface)
+    public function __construct(PersonService $personService, PersonInterface $personInterface, UserInterface $userInterface, HrmResourceInterface $hrmResourceInterface, CommonService $commonService, CommonInterface $commonInterface, HrmDepartmentInterface $hrmDeptInterface, HrmDesignationInterface $hrmDesInterface, HrmHumanResourceTypeInterface $hrmResourceTypeInterface)
     {
+        $this->personService = $personService;
         $this->personInterface = $personInterface;
         $this->userInterface = $userInterface;
         $this->hrmResourceInterface = $hrmResourceInterface;
@@ -111,10 +114,7 @@ class HrmResourceService
 
         return $this->commonService->sendResponse($response, '');
     }
-    // public function save($datas)
-    // {
-    //     dd("well save");
-    // }
+
     public function getResourceMasterData($orgId)
     {
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
@@ -129,5 +129,54 @@ class HrmResourceService
         $masterDatas['hrmResourceTypeLists'] = $hrmResourceTypeLists;
 
         return $this->commonService->sendResponse($masterDatas, '');
+    }
+
+    public function save($datas, $orgId)
+    {
+        $orgdatas = (object) $datas;
+        // $personModelresponse = $this->personService->storePerson($datas,'resource');
+        // if($personModelresponse['message'] == "Success"){
+        //     $personModel = $personModelresponse['data'];
+        // $uId = $personModel->uid;
+        $convertToResourceModel = $this->convertToResourceModel($orgdatas, "0f6b97d2-c62d-4fbe-b33c-d34514cab70a");
+        $convertToResourceTypeDetailModel = $this->convertToResourceTypeDetailModel($orgdatas);
+        $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas);
+        dd($convertToResourceDesignationModel);
+
+        // }else{
+
+        // }    
+    }
+
+
+    public function convertToResourceModel($datas, $uid)
+    {
+        $model = new HrmResource();
+        $model->uid = $uid;
+        $model->resource_code = $datas->resourceCode;
+        return $model;
+    }
+
+    public function convertToResourceTypeDetailModel($datas)
+    {
+        //dd($datas);
+        $model = new HrmResourcetypeDetail();
+        $model->resource_type_id = $datas->resourceTypeId;
+        return $model;
+    }
+
+    public function convertToResourceDesignationModel($datas)
+    {
+        //dd($datas);
+        $model = new HrmResourceDesignation();
+        $model->designation_id = $datas->designationId;
+        return $model;
+    }
+    public function convertToResourceDesignationModel1($datas)
+    {
+        //dd($datas);
+        $model = new HrmResourceDesignation();
+        $model->designation_id = $datas->designationId;
+        return $model;
     }
 }

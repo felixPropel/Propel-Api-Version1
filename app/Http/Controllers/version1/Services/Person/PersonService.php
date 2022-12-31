@@ -102,7 +102,7 @@ class PersonService
             return $this->commonService->sendError($storeTempPerson['data'], $storeTempPerson['message']);
         }
     }
-    public function storePerson($datas)
+    public function storePerson($datas, $type = null)
     {
         Log::info('PersonService > storePerson function Inside.' . json_encode($datas));
         $datas = (object) $datas;
@@ -112,10 +112,14 @@ class PersonService
         $personMobileModel = $this->convertToPersonMobileModel($datas);
         $personData = $this->personInterface->storePerson($personModel, $personDetailModel, $personEmailModel, $personMobileModel);
         Log::info('PersonService > storePerson function Return.' . json_encode($personData));
-        if ($personData['message'] == "Success") {
-            return $this->commonService->sendResponse($personData['data'], $personData['message']);
+        if ($type) {
+            return $personData;
         } else {
-            return $this->commonService->sendError($personData['data'], $personData['message']);
+            if ($personData['message'] == "Success") {
+                return $this->commonService->sendResponse($personData['data'], $personData['message']);
+            } else {
+                return $this->commonService->sendError($personData['data'], $personData['message']);
+            }
         }
     }
     public function resendOtp($datas)
@@ -178,8 +182,7 @@ class PersonService
 
                 return $this->commonService->sendError("Incorrect OTP", "Wrong Otp");
             }
-        } else {
-        }
+        } else { }
     }
 
     public function convertToPersonModel($datas)
@@ -458,8 +461,6 @@ class PersonService
                 }
             }
         }
-
-
     }
 
 
@@ -481,7 +482,6 @@ class PersonService
             $person->marital_id = $datas->maritalStatus;
             Log::info('PersonService > convertProfile function Return.' . json_encode($person));
             return $person;
-
         }
     }
     public function anniversaryDate($anniversary, $datas)
@@ -583,7 +583,6 @@ class PersonService
             $Model[$i]->state_id = $datas->state[$i];
             $Model[$i]->status = 1;
             $Model[$i]->save();
-
         }
     }
 }

@@ -69,10 +69,11 @@ class HrmResourceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request,$orgId)
     {
+      
         Log::info('HrmResourceController>Store in wizard forms Inside.' . json_encode($request->all()));
-        $response = $this->service->save($request->all());
+        $response = $this->service->save($request->all(),$orgId);
         // Log::info('HrmResourceController>Store Return.' . json_encode($response));
         return response($response, 200);
     }

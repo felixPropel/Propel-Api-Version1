@@ -9,3 +9,4 @@ Route::post('findDesignationByDepartmentId/{orgId}', 'App\Http\Controllers\versi
 // Route::post('freshPersonOrganizationDetails', 'Hrm\Transaction\HrmResourceController@store')->name('freshPersonOrganizationDetails');
 
 Route::get('getResourceMasterData/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@getResourceMasterData')->name('getPersonMasterData');
+Route::post('resourcesStore/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\HrmResourceController@store')->name('resourcesStore');
