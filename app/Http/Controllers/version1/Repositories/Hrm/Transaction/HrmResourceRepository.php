@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\DB;
  * Class HrmDepartmentRepository.
  */
 class HrmResourceRepository implements HrmResourceInterface
-{   
+{
     public function findResourceByUid($uid)
-    {       
-       return HrmResource::where('uid',$uid)->first();
+    {
+        return HrmResource::where('uid', $uid)->first();
     }
 
     public function findAll()
@@ -58,22 +58,40 @@ class HrmResourceRepository implements HrmResourceInterface
     }
     public function saveResourceModel($model)
     {
-       $model->save();
-       return $model;
+        $model->save();
+        return $model;
     }
-     public function saveResource($ResourceTypeDetail, $ResourceDesignation, $ResourceDateOfJoin,$ResourceWorking)
-     {
-         
-        try {
-            $result = DB::transaction(function () use ($ResourceTypeDetail, $ResourceDesignation, $ResourceDateOfJoin,$ResourceWorking) {
+    public function saveResource($allModels)
+    {
 
-        $ResourceTypeDetail->save();
-        $ResourceDesignation->save();
-        $ResourceDateOfJoin->save();
-        $ResourceWorking->save(); 
+        try {
+
+            $result = DB::transaction(function () use ($allModels) {
+               
+
+                $resourceModel = $allModels['resourceModel'];
+                $resourceTypeDetailModel = $allModels['resourceTypeDetailModel'];
+                $resourceDesignModel = $allModels['resourceDesignModel'];
+                $resourceJoinModel = $allModels['resourceJoinModel'];
+                $resourceWorkingModel = $allModels['resourceWorkingModel'];
+
+                $resourceModel->save();
+
+                $resourceTypeDetailModel->ParentHrmResource()->associate($resourceModel,  'resource_id','id');
+                $resourceDesignModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
+                $resourceJoinModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
+                $resourceWorkingModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
+
+
+                $resourceTypeDetailModel->save();
+                $resourceDesignModel->save();
+                $resourceJoinModel->save();
+                $resourceWorkingModel->save();
+                
                 return [
-                    'message' => "Success"
-                   
+                    'message' => "Success",
+                    'data' => $resourceModel
+
                 ];
             });
 
@@ -87,6 +105,5 @@ class HrmResourceRepository implements HrmResourceInterface
                 'data' => $e
             ];
         }
-     }
-
+    }
 }

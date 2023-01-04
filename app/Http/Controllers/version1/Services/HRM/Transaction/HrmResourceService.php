@@ -13,9 +13,9 @@ use App\Http\Controllers\version1\Services\Person\PersonService;
 use App\Interfaces\CommonInterface;
 use App\Models\HrmResource;
 use App\Models\HrmResourceWorking;
-use App\Models\HrmResourceJoinDate;
+use App\Models\HrmResourceDoj;
 use App\Models\HrmResourceDesignation;
-use App\Models\HrmResourcetypeDetail;
+use App\Models\HrmResourceTypeDetail;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -135,67 +135,76 @@ class HrmResourceService
     }
     public function save($datas, $orgId)
     {
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+
         $orgdatas = (object) $datas;
-        $personModelresponse = $this->personService->storePerson($datas,'resource');
-        if($personModelresponse['message'] == "Success"){
+        
+        $personModelresponse = $this->personService->storePerson($datas, 'resource');
+        if ($personModelresponse['message'] == "Success") {
             $personModel = $personModelresponse['data'];
             $uId = $personModel->uid;
-        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-        $convertToResourceModel = $this->convertToResourceModel($orgdatas,$uId);
-        $resourceModel=$this->hrmResourceInterface->saveResourceModel($convertToResourceModel);
-        $resourceId=$resourceModel->id;
-        $convertToResourceTypeDetailModel = $this->convertToResourceTypeDetailModel($orgdatas,$resourceId);
-        $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas,$resourceId);
-       $convertToResourceDateOfJoin=$this->convertToResourceJoinDate($orgdatas,$resourceId);
-       $convertToResourceWorking=$this->convertToResourceWorking($orgdatas,$resourceId);
-       $saveResourceModel=$this->hrmResourceInterface->saveResource($convertToResourceTypeDetailModel, $convertToResourceDesignationModel, $convertToResourceDateOfJoin,$convertToResourceWorking);
-       log::info('saveResource ' .json_encode($saveResourceModel));
 
-        // }else{
 
-        // }    
-    }
+            $convertToResourceModel = $this->convertToResourceModel($orgdatas, $uId);
+          //  $resourceModel = $this->hrmResourceInterface->saveResourceModel($convertToResourceModel);
 
+            $convertToResourceTypeDetailModel = $this->convertToResourceTypeDetailModel($orgdatas);
+            $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas);
+            $convertToResourceDateOfJoin = $this->convertToResourceJoinDate($orgdatas);
+            $convertToResourceWorking = $this->convertToResourceWorking($orgdatas);
+
+            $allModels = [
+                'resourceModel' => $convertToResourceModel,
+                'resourceTypeDetailModel' => $convertToResourceTypeDetailModel,
+                'resourceDesignModel' => $convertToResourceDesignationModel,
+                'resourceJoinModel' => $convertToResourceDateOfJoin,
+                'resourceWorkingModel' => $convertToResourceWorking
+            ];
+           
+
+            $saveResourceModel = $this->hrmResourceInterface->saveResource($allModels);
+          
+            log::info('saveResource ' . json_encode($saveResourceModel));
+            return $this->commonService->sendResponse($saveResourceModel, '');
+            // }else{
+
+            // }    
+        }
     }
     public function convertToResourceModel($datas, $uid)
     {
-      
+
         $model = new HrmResource();
         $model->uid = $uid;
         $model->resource_code = $datas->resourceCode;
         return $model;
     }
 
-    public function convertToResourceTypeDetailModel($datas,$resourceId)
+    public function convertToResourceTypeDetailModel($datas)
     {
         //dd($datas);
-        $model = new HrmResourcetypeDetail();
-        $model->resource_id=$resourceId;
+        $model = new HrmResourceTypeDetail();
         $model->resource_type_id = $datas->resourceTypeId;
         return $model;
     }
 
-    public function convertToResourceDesignationModel($datas,$resourceId)
+    public function convertToResourceDesignationModel($datas)
     {
         //dd($datas);
         $model = new HrmResourceDesignation();
-        $model->resource_id=$resourceId;
         $model->designation_id = $datas->designationId;
         return $model;
     }
-    public function convertToResourceJoinDate($datas,$resourceId)
+    public function convertToResourceJoinDate($datas)
     {
-        $model = new HrmResourceJoinDate();
-        $model->resource_id=$resourceId;
-         $model->DOJ ='2021-10-11';
+        $model = new HrmResourceDoj();
+        $model->DOJ = '2021-10-11';
         return $model;
     }
-     public function convertToResourceWorking($datas,$resourceId)
-     {
+    public function convertToResourceWorking($datas)
+    {
         $model = new HrmResourceWorking();
-        $model->resource_id=$resourceId;
-        $model->active_state =1;
+        $model->active_state = 1;
         return $model;
-
-     }
+    }
 }

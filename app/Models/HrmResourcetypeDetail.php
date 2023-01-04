@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HrmResourcetypeDetail extends Model
+class HrmResourceTypeDetail extends Model
 {
     use HasFactory;
     public function __construct()
@@ -13,6 +13,11 @@ class HrmResourcetypeDetail extends Model
         parent::__construct();
         $this->connection ='mysql_external';
         
+    }
+    
+    public function ParentHrmResource()
+    {
+        return $this->belongsTo(HrmResource::class, 'resource_id', 'id');
     }
     
 }

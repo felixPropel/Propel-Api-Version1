@@ -13,7 +13,7 @@ class CreateHrmResourcetypeDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('hrm_resourcetype_details', function (Blueprint $table) {
+        Schema::create('hrm_resource_type_details', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('resource_id');
             $table->integer('resource_type_id');

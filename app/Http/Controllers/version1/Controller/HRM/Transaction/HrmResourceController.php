@@ -72,9 +72,10 @@ class HrmResourceController extends Controller
     public function store(Request $request,$orgId)
     {
         Log::info('HrmResourceController > resourcesStore.' . json_encode($request->all(),$orgId));
+        
         $response = $this->service->save($request->all(),$orgId);
         // Log::info('HrmResourceController>Store Return.' . json_encode($response));
-        return response($response, 200);
+        return $response;
     }
     /**
      * Display the specified resource.

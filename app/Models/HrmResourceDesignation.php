@@ -14,5 +14,10 @@ class HrmResourceDesignation extends Model
         $this->connection ='mysql_external';
         
     }
+    public function ParentHrmResource()
+    {
+        return $this->belongsTo(HrmResource::class, 'resource_id', 'id');
+    }
+    
     
 }

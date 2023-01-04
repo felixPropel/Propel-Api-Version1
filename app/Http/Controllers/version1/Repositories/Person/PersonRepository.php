@@ -59,15 +59,24 @@ class PersonRepository implements PersonInterface
             ];
         }
     }
-    public function storePerson($personModel, $personDetailModel, $personEmailModel, $personMobileModel)
+    public function storePerson($allModels)
     {
 
 
         try {
-            $result = DB::transaction(function () use ($personModel, $personDetailModel, $personEmailModel, $personMobileModel) {
+            
+          
+            
 
 
+            $result = DB::transaction(function () use ($allModels) {
 
+                $personModel = $allModels['personModel'];
+                $personDetailModel = $allModels['personDetailModel'];
+                $personEmailModel = $allModels['personEmailModel'];
+                $personMobileModel = $allModels['personMobileModel'];
+                $personAnotherEmailModel=$allModels['personAnotherEmailModel'];
+              
                 $personModel->save();
                 $personDetailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
                 $personMobileModel->ParentPerson()->associate($personModel, 'uid', 'uid');
@@ -76,6 +85,11 @@ class PersonRepository implements PersonInterface
                 $personDetailModel->save();
                 $personMobileModel->save();
                 $personEmailModel->save();
+
+                for($i=0;$i<count($personAnotherEmailModel);$i++){
+                    $personAnotherEmailModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personAnotherEmailModel[$i]->save();
+                }             
 
 
                 return [

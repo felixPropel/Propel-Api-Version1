@@ -104,14 +104,31 @@ class PersonService
     }
     public function storePerson($datas, $type = null)
     {
-        
+
         Log::info('PersonService > storePerson function Inside.' . json_encode($datas));
         $datas = (object) $datas;
+
         $personModel = $this->convertToPersonModel($datas);
         $personDetailModel = $this->convertToPersonDetailModel($datas);
         $personEmailModel = $this->convertToPersonEmailModel($datas);
         $personMobileModel = $this->convertToPersonMobileModel($datas);
-        $personData = $this->personInterface->storePerson($personModel, $personDetailModel, $personEmailModel, $personMobileModel);
+        
+        $personAnotherEmailModel = array();
+
+        if (!empty($datas->secondEmail)) {
+            $personAnotherEmailModel = $this->convertToPersonEmailModelAnother($datas);
+        }
+        // dd(count($anotherEmailModel));
+        $allModels=['personModel'=>$personModel,
+                    'personDetailModel'=>$personDetailModel,
+                    'personEmailModel'=>$personEmailModel,
+                    'personMobileModel'=>$personMobileModel,
+                    'personAnotherEmailModel'=>$personAnotherEmailModel
+                ];
+                
+              
+        $personData = $this->personInterface->storePerson($allModels);
+
         Log::info('PersonService > storePerson function Return.' . json_encode($personData));
         if ($type) {
             return $personData;
@@ -298,6 +315,23 @@ class PersonService
         Log::info('PersonService > convertToPersonEmailModel function Return.' . json_encode($model));
 
         return $model;
+    }
+    public function convertToPersonEmailModelAnother($datas)
+    {
+        $orgModel = [];
+        Log::info('PersonService > convertToPersonEmailModelAnother function Inside.' . json_encode($datas));
+        for ($i = 0; $i < count($datas->secondEmail); $i++) {
+            if ($datas->secondEmail[$i]) {
+                $model[$i] = new PersonEmail();
+                $model[$i]->email = $datas->secondEmail[$i];
+                $model[$i]->email_cachet = 2;
+                array_push($orgModel, $model[$i]);
+            }
+        }
+
+        Log::info('PersonService > convertToPersonEmailModelAnother function Return.' . json_encode($model));
+
+        return $orgModel;
     }
     public function personMobileOtp($datas)
     {
