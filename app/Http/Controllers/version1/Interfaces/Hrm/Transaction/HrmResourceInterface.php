@@ -11,4 +11,6 @@ interface HrmResourceInterface
     public function store($data);
     public function findById($id);
     public function getParentDeptExceptThisId($id);
+    public function saveResourceModel($data);
+    public function saveResource($ResourceTypeDetail, $ResourceDesignation, $ResourceDateOfJoin,$ResourceWorking);
 }

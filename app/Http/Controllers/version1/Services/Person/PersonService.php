@@ -104,6 +104,7 @@ class PersonService
     }
     public function storePerson($datas, $type = null)
     {
+        
         Log::info('PersonService > storePerson function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $personModel = $this->convertToPersonModel($datas);
@@ -272,7 +273,7 @@ class PersonService
         $model->middle_name = $datas->middleName;
         $model->last_name = $datas->lastName;
         $model->nick_name = $datas->nickName;
-        $model->dob = $datas->dob;
+        // $model->dob = $datas->dob;
         $model->gender_id = $datas->genderId;
         $model->blood_group_id = $datas->bloodGroup;
         Log::info('PersonService > convertToPersonDetailModel function Return.' . json_encode($model));
@@ -286,7 +287,6 @@ class PersonService
         $model->mobile_no = $datas->mobileNumber;
         $model->mobile_cachet = 1;
         Log::info('PersonService > convertToPersonMobileModel function Return.' . json_encode($model));
-
         return $model;
     }
     public function convertToPersonEmailModel($datas)

@@ -71,14 +71,11 @@ class HrmResourceController extends Controller
      */
     public function store(Request $request,$orgId)
     {
-      
-        Log::info('HrmResourceController>Store in wizard forms Inside.' . json_encode($request->all()));
+        Log::info('HrmResourceController > resourcesStore.' . json_encode($request->all(),$orgId));
         $response = $this->service->save($request->all(),$orgId);
         // Log::info('HrmResourceController>Store Return.' . json_encode($response));
         return response($response, 200);
     }
-
-
     /**
      * Display the specified resource.
      *

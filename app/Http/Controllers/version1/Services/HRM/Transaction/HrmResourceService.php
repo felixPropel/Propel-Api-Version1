@@ -12,8 +12,11 @@ use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Http\Controllers\version1\Services\Person\PersonService;
 use App\Interfaces\CommonInterface;
 use App\Models\HrmResource;
+use App\Models\HrmResourceWorking;
+use App\Models\HrmResourceJoinDate;
 use App\Models\HrmResourceDesignation;
 use App\Models\HrmResourcetypeDetail;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class HrmResourceService.
@@ -130,53 +133,69 @@ class HrmResourceService
 
         return $this->commonService->sendResponse($masterDatas, '');
     }
-
     public function save($datas, $orgId)
     {
         $orgdatas = (object) $datas;
-        // $personModelresponse = $this->personService->storePerson($datas,'resource');
-        // if($personModelresponse['message'] == "Success"){
-        //     $personModel = $personModelresponse['data'];
-        // $uId = $personModel->uid;
-        $convertToResourceModel = $this->convertToResourceModel($orgdatas, "0f6b97d2-c62d-4fbe-b33c-d34514cab70a");
-        $convertToResourceTypeDetailModel = $this->convertToResourceTypeDetailModel($orgdatas);
-        $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas);
-        dd($convertToResourceDesignationModel);
+        $personModelresponse = $this->personService->storePerson($datas,'resource');
+        if($personModelresponse['message'] == "Success"){
+            $personModel = $personModelresponse['data'];
+            $uId = $personModel->uid;
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $convertToResourceModel = $this->convertToResourceModel($orgdatas,$uId);
+        $resourceModel=$this->hrmResourceInterface->saveResourceModel($convertToResourceModel);
+        $resourceId=$resourceModel->id;
+        $convertToResourceTypeDetailModel = $this->convertToResourceTypeDetailModel($orgdatas,$resourceId);
+        $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas,$resourceId);
+       $convertToResourceDateOfJoin=$this->convertToResourceJoinDate($orgdatas,$resourceId);
+       $convertToResourceWorking=$this->convertToResourceWorking($orgdatas,$resourceId);
+       $saveResourceModel=$this->hrmResourceInterface->saveResource($convertToResourceTypeDetailModel, $convertToResourceDesignationModel, $convertToResourceDateOfJoin,$convertToResourceWorking);
+       log::info('saveResource ' .json_encode($saveResourceModel));
 
         // }else{
 
         // }    
     }
 
-
+    }
     public function convertToResourceModel($datas, $uid)
     {
+      
         $model = new HrmResource();
         $model->uid = $uid;
         $model->resource_code = $datas->resourceCode;
         return $model;
     }
 
-    public function convertToResourceTypeDetailModel($datas)
+    public function convertToResourceTypeDetailModel($datas,$resourceId)
     {
         //dd($datas);
         $model = new HrmResourcetypeDetail();
+        $model->resource_id=$resourceId;
         $model->resource_type_id = $datas->resourceTypeId;
         return $model;
     }
 
-    public function convertToResourceDesignationModel($datas)
+    public function convertToResourceDesignationModel($datas,$resourceId)
     {
         //dd($datas);
         $model = new HrmResourceDesignation();
+        $model->resource_id=$resourceId;
         $model->designation_id = $datas->designationId;
         return $model;
     }
-    public function convertToResourceDesignationModel1($datas)
+    public function convertToResourceJoinDate($datas,$resourceId)
     {
-        //dd($datas);
-        $model = new HrmResourceDesignation();
-        $model->designation_id = $datas->designationId;
+        $model = new HrmResourceJoinDate();
+        $model->resource_id=$resourceId;
+         $model->DOJ ='2021-10-11';
         return $model;
     }
+     public function convertToResourceWorking($datas,$resourceId)
+     {
+        $model = new HrmResourceWorking();
+        $model->resource_id=$resourceId;
+        $model->active_state =1;
+        return $model;
+
+     }
 }

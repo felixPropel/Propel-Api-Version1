@@ -56,4 +56,37 @@ class HrmResourceRepository implements HrmResourceInterface
     {
         return HrmDepartment::where('id', '!=', $id)->whereNull('deleted_at')->get();
     }
+    public function saveResourceModel($model)
+    {
+       $model->save();
+       return $model;
+    }
+     public function saveResource($ResourceTypeDetail, $ResourceDesignation, $ResourceDateOfJoin,$ResourceWorking)
+     {
+         
+        try {
+            $result = DB::transaction(function () use ($ResourceTypeDetail, $ResourceDesignation, $ResourceDateOfJoin,$ResourceWorking) {
+
+        $ResourceTypeDetail->save();
+        $ResourceDesignation->save();
+        $ResourceDateOfJoin->save();
+        $ResourceWorking->save(); 
+                return [
+                    'message' => "Success"
+                   
+                ];
+            });
+
+            return $result;
+        } catch (\Exception $e) {
+
+
+            return [
+
+                'message' => "failed",
+                'data' => $e
+            ];
+        }
+     }
+
 }
