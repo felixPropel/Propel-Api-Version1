@@ -22,7 +22,7 @@ class HrmResourceRepository implements HrmResourceInterface
     public function findAll()
     {
 
-        return HrmResource::whereNull('deleted_at')->get();
+        return HrmResource::with('Person.personDetails','designation.ParentHrmDesignation','designation.ParentHrmDesignation.department')->whereNull('deleted_at')->get();
     }
     public function store($model)
     {

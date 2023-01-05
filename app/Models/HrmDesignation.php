@@ -12,8 +12,8 @@ class HrmDesignation extends Model
         parent::__construct();
         $this->connection ='mysql_external';
     }
-    public function hrmDesDept()
+    public function department()
     {
-        return $this->belongsTo(HrmDesignation::class,'');
+        return $this->belongsTo(HrmDepartment::class,'dept_id','id');
     }
 }

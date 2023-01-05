@@ -45,7 +45,36 @@ class HrmResourceService
 
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $models = $this->hrmResourceInterface->findAll();
-        return $this->commonService->sendResponse($models, '');
+      
+        $entities = collect($models)->map(function ($model) {
+            $designation = "";
+            $department = "";
+            $name = "";
+            $status = "";
+
+            if ($model['person']) {
+                $personModel = $model['person'];
+                if($personModel['personDetails']){
+                    $personDetailModel = $personModel['personDetails'];
+                    $name = $personDetailModel['first_name']." ".$personDetailModel['middle_name']." ".$personDetailModel['last_name'];
+                }
+            }
+            if ($model['designation']) {
+                $designModel = $model['designation'];
+                if ($designModel['ParentHrmDesignation']) {
+                    $descMasterModel = $designModel['ParentHrmDesignation'];
+                    $designation = $descMasterModel['designation_name'];
+                    if ($descMasterModel['department']) {
+                        $resourceDeptModel = $descMasterModel['department'];
+                        $department = $resourceDeptModel["department_name"];
+                    }
+                }
+            }
+            $params = ['designation' => $designation, 'department' => $department,'resourceName'=>$name,'id'=>$model->id];
+            return $params;
+        });
+      
+        return $this->commonService->sendResponse($entities, '');
     }
     public function findResourceWithCredentials($datas, $orgId)
     {

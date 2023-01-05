@@ -18,6 +18,10 @@ class HrmResourceDesignation extends Model
     {
         return $this->belongsTo(HrmResource::class, 'resource_id', 'id');
     }
+    public function ParentHrmDesignation()
+    {
+        return $this->belongsTo(HrmDesignation::class, 'designation_id', 'id');
+    }
     
     
 }

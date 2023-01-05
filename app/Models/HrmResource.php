@@ -17,4 +17,9 @@ class HrmResource extends Model
     {
         return $this->hasOne(Person::class, 'uid', 'uid');
     }
+    public function designation()
+    {
+        return $this->hasOne(HrmResourceDesignation::class, 'resource_id', 'id');
+    }
+    
 }

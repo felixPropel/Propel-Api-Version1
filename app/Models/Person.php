@@ -9,7 +9,11 @@ class Person extends Model
 {
     use HasFactory;
     protected $table = 'persons';
-
+    public function __construct()
+    {
+        parent::__construct();
+        $this->connection = 'mysql';
+    }
     public function mobile()
     {
         return $this->hasMany('App\Models\PersonMobile', 'uid', 'uid');
@@ -17,6 +21,10 @@ class Person extends Model
     public function email()
     {
         return $this->hasMany('App\Models\PersonEmail', 'uid', 'uid');
+    }
+    public function personDetails()
+    {
+        return $this->hasOne(PersonDetails::class,'uid','uid');
     }
     
 }
