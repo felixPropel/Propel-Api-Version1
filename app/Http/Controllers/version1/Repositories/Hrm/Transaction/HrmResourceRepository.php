@@ -22,7 +22,7 @@ class HrmResourceRepository implements HrmResourceInterface
     public function findAll()
     {
 
-        return HrmDepartment::with('hrmParentDept')->whereNull('deleted_at')->get();
+        return HrmResource::whereNull('deleted_at')->get();
     }
     public function store($model)
     {
@@ -74,6 +74,7 @@ class HrmResourceRepository implements HrmResourceInterface
                 $resourceDesignModel = $allModels['resourceDesignModel'];
                 $resourceJoinModel = $allModels['resourceJoinModel'];
                 $resourceWorkingModel = $allModels['resourceWorkingModel'];
+                $userAccountModel = $allModels['userAccountModel'];
 
                 $resourceModel->save();
 
@@ -81,12 +82,14 @@ class HrmResourceRepository implements HrmResourceInterface
                 $resourceDesignModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
                 $resourceJoinModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
                 $resourceWorkingModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
+                $userAccountModel->ParentPerson()->associate($resourceModel, 'uid', 'uid');
 
 
                 $resourceTypeDetailModel->save();
                 $resourceDesignModel->save();
                 $resourceJoinModel->save();
                 $resourceWorkingModel->save();
+                $userAccountModel->save();
                 
                 return [
                     'message' => "Success",

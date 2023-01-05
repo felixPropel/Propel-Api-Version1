@@ -16,7 +16,13 @@ class HrmResourceController extends Controller
         $this->service = $service;
     }
 
-
+    public function index($orgId)
+    {
+        Log::info('findResourceWithCredentials-> index Inside.' . json_encode($orgId));
+        $response = $this->service->findAll($orgId);
+        return $response;
+        Log::info('HrmResourceController>Store Return.' . json_encode($response));
+    }
     public function findResourceWithCredentials(Request $request, $orgId)
     {
 
@@ -48,10 +54,7 @@ class HrmResourceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        dd("well f");
-    }
+   
 
     /**
      * Show the form for creating a new resource.
@@ -69,11 +72,11 @@ class HrmResourceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request,$orgId)
+    public function store(Request $request, $orgId)
     {
-        Log::info('HrmResourceController > resourcesStore.' . json_encode($request->all(),$orgId));
-        
-        $response = $this->service->save($request->all(),$orgId);
+        Log::info('HrmResourceController > resourcesStore.' . json_encode($request->all(), $orgId));
+
+        $response = $this->service->save($request->all(), $orgId);
         // Log::info('HrmResourceController>Store Return.' . json_encode($response));
         return $response;
     }

@@ -16,6 +16,7 @@ use App\Models\HrmResourceWorking;
 use App\Models\HrmResourceDoj;
 use App\Models\HrmResourceDesignation;
 use App\Models\HrmResourceTypeDetail;
+use App\Models\Organization\UserOrganizationRelational;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -37,6 +38,14 @@ class HrmResourceService
         $this->hrmDeptInterface = $hrmDeptInterface;
         $this->hrmDesInterface = $hrmDesInterface;
         $this->hrmResourceTypeInterface = $hrmResourceTypeInterface;
+    }
+
+    public function findAll($orgId)
+    {
+
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $models = $this->hrmResourceInterface->findAll();
+        return $this->commonService->sendResponse($models, '');
     }
     public function findResourceWithCredentials($datas, $orgId)
     {
@@ -138,7 +147,7 @@ class HrmResourceService
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
 
         $orgdatas = (object) $datas;
-        
+
         $personModelresponse = $this->personService->storePerson($datas, 'resource');
         if ($personModelresponse['message'] == "Success") {
             $personModel = $personModelresponse['data'];
@@ -146,24 +155,26 @@ class HrmResourceService
 
 
             $convertToResourceModel = $this->convertToResourceModel($orgdatas, $uId);
-          //  $resourceModel = $this->hrmResourceInterface->saveResourceModel($convertToResourceModel);
+            //  $resourceModel = $this->hrmResourceInterface->saveResourceModel($convertToResourceModel);
 
             $convertToResourceTypeDetailModel = $this->convertToResourceTypeDetailModel($orgdatas);
             $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas);
             $convertToResourceDateOfJoin = $this->convertToResourceJoinDate($orgdatas);
             $convertToResourceWorking = $this->convertToResourceWorking($orgdatas);
+            $convertToUserAccountModel = $this->convertToUserAccountModel($orgId);
 
             $allModels = [
                 'resourceModel' => $convertToResourceModel,
                 'resourceTypeDetailModel' => $convertToResourceTypeDetailModel,
                 'resourceDesignModel' => $convertToResourceDesignationModel,
                 'resourceJoinModel' => $convertToResourceDateOfJoin,
-                'resourceWorkingModel' => $convertToResourceWorking
+                'resourceWorkingModel' => $convertToResourceWorking,
+                'userAccountModel' => $convertToUserAccountModel
             ];
-           
+
 
             $saveResourceModel = $this->hrmResourceInterface->saveResource($allModels);
-          
+
             log::info('saveResource ' . json_encode($saveResourceModel));
             return $this->commonService->sendResponse($saveResourceModel, '');
             // }else{
@@ -205,6 +216,12 @@ class HrmResourceService
     {
         $model = new HrmResourceWorking();
         $model->active_state = 1;
+        return $model;
+    }
+    public function convertToUserAccountModel($orgId)
+    {
+        $model = new UserOrganizationRelational();
+        $model->organization_id = $orgId;
         return $model;
     }
 }
