@@ -16,8 +16,8 @@ class CreateHrmDepartmentsTable extends Migration
         Schema::create('hrm_departments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('department_name');
-            $table->integer('parent_dept_id');
-            $table->string('description');
+            $table->integer('parent_dept_id')->nullable();
+            $table->string('description')->nullable();
             $table->integer('active_state');
             $table->timestamp('deleted_at')->nullable();
             $table->timestamps();

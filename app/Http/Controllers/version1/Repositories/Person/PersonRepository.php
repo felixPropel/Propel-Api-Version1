@@ -61,13 +61,7 @@ class PersonRepository implements PersonInterface
     }
     public function storePerson($allModels)
     {
-
-
         try {
-            
-          
-            
-
 
             $result = DB::transaction(function () use ($allModels) {
 
@@ -76,6 +70,10 @@ class PersonRepository implements PersonInterface
                 $personEmailModel = $allModels['personEmailModel'];
                 $personMobileModel = $allModels['personMobileModel'];
                 $personAnotherEmailModel=$allModels['personAnotherEmailModel'];
+                $personAnotherMobileModel=$allModels['personAnotherMobileModel'];
+                $personWebLinkModel=$allModels['personWebLink'];
+                $personOtherLanguage=$allModels['personOtherLanguage'];
+                $personIdDocument=$allModels['personIdDocument'];
               
                 $personModel->save();
                 $personDetailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
@@ -89,8 +87,23 @@ class PersonRepository implements PersonInterface
                 for($i=0;$i<count($personAnotherEmailModel);$i++){
                     $personAnotherEmailModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAnotherEmailModel[$i]->save();
-                }             
-
+                }   
+                for($i=0;$i<count($personAnotherMobileModel);$i++){
+                    $personAnotherMobileModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personAnotherMobileModel[$i]->save();
+                }  
+                for($i=0;$i<count($personWebLinkModel);$i++){
+                    $personWebLinkModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personWebLinkModel[$i]->save();
+                }  
+                for($i=0;$i<count($personOtherLanguage);$i++){
+                    $personOtherLanguage[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personOtherLanguage[$i]->save();
+                } 
+                for($i=0;$i<count($personIdDocument);$i++){
+                    $personIdDocument[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personIdDocument[$i]->save();
+                } 
 
                 return [
                     'message' => "Success",

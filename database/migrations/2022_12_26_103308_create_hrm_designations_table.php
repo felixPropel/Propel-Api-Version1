@@ -16,9 +16,9 @@ class CreateHrmDesignationsTable extends Migration
         Schema::create('hrm_designations', function (Blueprint $table) {
             $table->increments('id');
             $table->string('designation_name');
-            $table->integer('no_of_posting');
+            $table->integer('no_of_posting')->nullable();
             $table->integer('dept_id');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->integer('active_state');
             $table->timestamp('deleted_at')->nullable();
             $table->timestamps();

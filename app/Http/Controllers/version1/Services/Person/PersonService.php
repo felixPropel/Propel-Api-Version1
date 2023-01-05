@@ -9,6 +9,8 @@ use App\Http\Controllers\version1\Repositories\common\smsRepository;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Http\Controllers\version1\Services\Common\SmsService;
 use App\Models\Person;
+use App\Models\WebLink;
+use App\Models\IdDocumentType;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
 use App\Models\PersonMobile;
@@ -18,8 +20,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\PersonLanguage;
-
-use App\Models\WebLink;
 use App\Models\PropertyAddress;
 
 class PersonService
@@ -118,16 +118,37 @@ class PersonService
         if (!empty($datas->secondEmail)) {
             $personAnotherEmailModel = $this->convertToPersonEmailModelAnother($datas);
         }
+        $personAnotherMobileModel = array();
+        if (!empty($datas->secondNumber)) {
+            $personAnotherMobileModel = $this->convertToPersonMobileModelAnother($datas);
+        }
+        $personWebLink=array();
+        if(!empty($datas->webLinks)){
+            $personWebLink=$this->convertToPersonWebLink($datas);
+        }
+        $personOtherLanguage=array();
+        if(!empty($datas->otherLanguage)){
+            $personOtherLanguage=$this->convertToPersonOtherLanguage($datas);
+        }
+        $personIdDocument=array();
+        if(!empty($datas->idDocumentType)){
+            $personIdDocument=$this->convertToPersonIdDocumnet($datas);
+        }
+
         // dd(count($anotherEmailModel));
         $allModels=['personModel'=>$personModel,
                     'personDetailModel'=>$personDetailModel,
                     'personEmailModel'=>$personEmailModel,
                     'personMobileModel'=>$personMobileModel,
-                    'personAnotherEmailModel'=>$personAnotherEmailModel
+                    'personAnotherEmailModel'=>$personAnotherEmailModel,
+                    'personAnotherMobileModel'=>$personAnotherMobileModel,
+                    'personWebLink'=>$personWebLink,
+                    'personOtherLanguage'=>$personOtherLanguage,
+                    'personIdDocument'=>$personIdDocument
                 ];
-                
-              
         $personData = $this->personInterface->storePerson($allModels);
+        log::info('allModels' .json_encode( $personData));
+
 
         Log::info('PersonService > storePerson function Return.' . json_encode($personData));
         if ($type) {
@@ -328,10 +349,81 @@ class PersonService
                 array_push($orgModel, $model[$i]);
             }
         }
+        return $orgModel;
+        Log::info('PersonService > convertToPersonEmailModelAnother function Return.' . json_encode($orgModel));
 
-        Log::info('PersonService > convertToPersonEmailModelAnother function Return.' . json_encode($model));
+    }
+    public function convertToPersonMobileModelAnother($datas)
+    {
+        $orgModel = [];
+        Log::info('PersonService > convertToPersonMobileModelAnother function Inside.' . json_encode($datas));
+        for ($i = 0; $i < count($datas->secondNumber); $i++) {
+            if ($datas->secondNumber[$i]) {
+                $model[$i] = new PersonMobile();
+                $model[$i]->mobile_no = $datas->secondNumber[$i];
+                $model[$i]->mobile_cachet = 2;
+                array_push($orgModel, $model[$i]);
+            }
+        }
+
 
         return $orgModel;
+        Log::info('PersonService > convertToPersonMobileModelAnother function Return.' . json_encode($orgModel));
+
+    }
+    public function convertToPersonWebLink($datas)
+    {
+        $orgModel = [];
+        Log::info('PersonService > convertToPersonWebLink function Inside.' . json_encode($datas));
+        for ($i = 0; $i < count($datas->webLinks); $i++) {
+            if ($datas->webLinks[$i]) {
+                $model[$i] = new WebLink();
+                $model[$i]->web_add = $datas->webLinks[$i];
+                $model[$i]->web_cachet = 1;
+                $model[$i]->status = 1;
+                array_push($orgModel, $model[$i]);
+            }
+        }
+
+
+        return $orgModel;
+        Log::info('PersonService > convertToPersonWebLink function Return.' . json_encode($orgModel));
+
+    }
+    public function convertToPersonOtherLanguage($datas)
+    {
+        $orgModel = [];
+        Log::info('PersonService > convertToPersonOtherLanguage function Inside.' . json_encode($datas));
+        for ($i = 0; $i < count($datas->otherLanguage); $i++) {
+            if ($datas->otherLanguage[$i]) {
+                $model[$i] = new PersonLanguage();
+                $model[$i]->language_id = $datas->otherLanguage[$i];
+                $model[$i]->mother_tongue =$datas->motherLanguage;
+                $model[$i]->status = 1;
+                array_push($orgModel, $model[$i]);
+            }
+        }
+        return $orgModel;
+        Log::info('PersonService > convertToPersonOtherLanguage function Return.' . json_encode($orgModel));
+    }
+    public function convertToPersonIdDocumnet($datas)
+    {
+        $orgModel = [];
+        Log::info('PersonService > convertToPersonIdDocumnet function Inside.' . json_encode($datas));
+        for ($i = 0; $i < count($datas->idDocumentType); $i++) {
+            if ($datas->idDocumentType[$i]) {
+                $model[$i] = new IdDocumentType();
+                $model[$i]->person_doc_types = $datas->idDocumentType[$i];
+                $model[$i]->Doc_no=$datas->documentNumber[$i];
+                $model[$i]->doc_validity =$datas->validTill[$i];
+                $model[$i]->attachment =$datas->attachments[$i];
+                $model[$i]->status = 1;
+                array_push($orgModel, $model[$i]);
+            }
+        }
+        return $orgModel;
+        Log::info('PersonService > convertToPersonIdDocumnet function Return.' . json_encode($orgModel));
+
     }
     public function personMobileOtp($datas)
     {

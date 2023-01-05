@@ -15,7 +15,7 @@ class CreateHrmResourcesTable extends Migration
     {
         Schema::create('hrm_resources', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('u_id');
+            $table->string('uid');
             $table->string('resource_code');
             $table->integer('org_id')->nullable();
             $table->timestamp('deleted_at')->nullable();
