@@ -74,6 +74,14 @@ class PersonRepository implements PersonInterface
                 $personWebLinkModel=$allModels['personWebLink'];
                 $personOtherLanguage=$allModels['personOtherLanguage'];
                 $personIdDocument=$allModels['personIdDocument'];
+                $personEducationModel=$allModels['personEducationModel'];
+                $personProfessionModel=$allModels['personProfessionModel'];
+                $personCommonAddressModel=$allModels['personCommonAddressModel'];
+                $personAddressId=$allModels['personAddressId'];
+              
+
+
+                
               
                 $personModel->save();
                 $personDetailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
@@ -104,13 +112,27 @@ class PersonRepository implements PersonInterface
                     $personIdDocument[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personIdDocument[$i]->save();
                 } 
-
+                for($i=0;$i<count($personEducationModel);$i++){
+                    $personEducationModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personEducationModel[$i]->save();
+                } 
+                for($i=0;$i<count($personProfessionModel);$i++){
+                    $personProfessionModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personProfessionModel[$i]->save();
+                } 
+                for($i=0;$i<count($personCommonAddressModel);$i++){               
+                    $personCommonAddressModel[$i]->save();
+                } 
+                if(!empty($personCommonAddressModel[$i])){
+                    $personAddressId->ParentComAddress()->associate($personCommonAddressModel[$i], 'property_address_id', 'id');
+                    $personAddressId->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personAddressId->save();
+                }
                 return [
                     'message' => "Success",
                     'data' => $personModel
                 ];
             });
-
             return $result;
         } catch (\Exception $e) {
 

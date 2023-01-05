@@ -10,9 +10,12 @@ use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Http\Controllers\version1\Services\Common\SmsService;
 use App\Models\Person;
 use App\Models\WebLink;
+use App\Models\PersonEducation;
+use App\Models\PersonProfession;
 use App\Models\IdDocumentType;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
+use App\Models\PersonAddress;
 use App\Models\PersonMobile;
 use App\Models\TempPerson;
 use Illuminate\Support\Facades\DB;
@@ -134,8 +137,27 @@ class PersonService
         if(!empty($datas->idDocumentType)){
             $personIdDocument=$this->convertToPersonIdDocumnet($datas);
         }
+        $personEducationModel=array();
+        if(!empty($datas->Qualification)){
+            $personEducationModel=$this->convertToPersonEducation($datas);
+        }
+        $personProfessionModel=array();
+        if(!empty($datas->ProfessionDepartment)){
+            $personProfessionModel=$this->convertToPersonProfession($datas);
+        }
+        
+        $personCommonAddressModel=array();
+       
+        if(!empty($datas->addressOf)){
+            $personCommonAddressModel=$this->convertToPersonCommonAddress($datas);
+        }
+          $personAddressId=array();
+        if(!empty($datas->addressOf)){
+            $personAddressId=$this->convertToPersonAddressId();
+        }
 
-        // dd(count($anotherEmailModel));
+
+
         $allModels=['personModel'=>$personModel,
                     'personDetailModel'=>$personDetailModel,
                     'personEmailModel'=>$personEmailModel,
@@ -144,7 +166,12 @@ class PersonService
                     'personAnotherMobileModel'=>$personAnotherMobileModel,
                     'personWebLink'=>$personWebLink,
                     'personOtherLanguage'=>$personOtherLanguage,
-                    'personIdDocument'=>$personIdDocument
+                    'personIdDocument'=>$personIdDocument,
+                    'personEducationModel'=>$personEducationModel,
+                    'personProfessionModel'=>$personProfessionModel,
+                    'personCommonAddressModel'=>$personCommonAddressModel,
+                    'personAddressId'=>$personAddressId
+
                 ];
         $personData = $this->personInterface->storePerson($allModels);
         log::info('allModels' .json_encode( $personData));
@@ -425,6 +452,76 @@ class PersonService
         Log::info('PersonService > convertToPersonIdDocumnet function Return.' . json_encode($orgModel));
 
     }
+    public function convertToPersonEducation($datas)
+    {
+        $orgModel = [];
+        Log::info('PersonService > convertToPersonEducation function Inside.' . json_encode($datas));
+        for ($i = 0; $i < count($datas->Qualification); $i++) {
+            if ($datas->Qualification[$i]) {
+                $model[$i] = new PersonEducation();
+                $model[$i]->qualification= $datas->Qualification[$i];
+                $model[$i]->education_place=$datas->university[$i];
+                $model[$i]->year_of_pass=$datas->passedYear[$i];
+                $model[$i]->Mark=$datas->mark[$i];
+                array_push($orgModel, $model[$i]);
+            }
+        }
+        return $orgModel;
+        Log::info('PersonService > convertToPersonEducation function Return.' . json_encode($orgModel));
+
+    }
+    public function convertToPersonProfession($datas)
+    {
+        $orgModel = [];
+        Log::info('PersonService > convertToPersonProfession function Inside.' . json_encode($datas));
+        for ($i = 0; $i < count($datas->ProfessionDepartment); $i++) {
+            if ($datas->ProfessionDepartment[$i]) {
+                $model[$i] = new PersonProfession();
+                $model[$i]->department= $datas->ProfessionDepartment[$i];
+                $model[$i]->designation=$datas->Designation[$i];
+                $model[$i]->organization=$datas->organization[$i];
+                // $model[$i]->doj=$datas->joinDate[$i];
+                //  $model[$i]->dor=$datas->reliveDate[$i];
+                $model[$i]->experience=$datas->experinceYear[$i];
+                array_push($orgModel, $model[$i]);
+            }
+        }
+        return $orgModel;
+        Log::info('PersonService > convertToPersonProfession function Return.' . json_encode($orgModel));
+
+    }
+    public function convertToPersonCommonAddress($datas)
+    {
+        $orgModel = [];
+        Log::info('PersonService > convertToPersonCommonAddress function Inside.' . json_encode($datas));
+        for ($i = 0; $i < count($datas->addressOf); $i++) {
+            if ($datas->addressOf[$i]) {
+                $model[$i] = new PropertyAddress();
+                $model[$i]->address_type= $datas->addressOf[$i];
+                $model[$i]->door_no=$datas->doorNo[$i];
+                 $model[$i]->building_name=$datas->buildingName[$i];
+                 $model[$i]->pin=$datas->pinCode[$i];
+                $model[$i]->area=$datas->area[$i];
+                $model[$i]->street=$datas->street[$i];
+                $model[$i]->land_mark=$datas->landMark[$i];
+                $model[$i]->district=$datas->district[$i];
+                $model[$i]->city_id=$datas->city[$i];
+                $model[$i]->state_id=$datas->state[$i]; 
+                $model[$i]->status=1;     
+                array_push($orgModel, $model[$i]);
+            }
+        }
+        return $orgModel;
+        Log::info('PersonService > convertToPersonCommonAddress function Return.' . json_encode($orgModel));
+
+    }
+    public function convertToPersonAddressId(){
+        $model =new PersonAddress();
+        $model->address_cachet = 1;
+        return $model;
+        Log::info('PersonService > convertToPersonAddressId function Inside.' . json_encode($model));
+    }
+
     public function personMobileOtp($datas)
     {
         Log::info('PersonService > personMobileOtp function Inside.' . json_encode($datas));

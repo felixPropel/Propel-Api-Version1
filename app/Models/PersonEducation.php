@@ -5,18 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PersonAddress extends Model
+class PersonEducation extends Model
 {
     use HasFactory;
-    protected $table = 'person_addresses';
-
-    public function ParentComAddress()
-    {
-        return $this->belongsTo(PropertyAddress::class, 'property_address_id','id');
-    }
+    protected $table = 'person_educations';
+    
     public function ParentPerson()
     {
         return $this->belongsTo(Person::class, 'uid', 'uid');
     }
-
 }
