@@ -49,18 +49,14 @@ class HrmResourceController extends Controller
         return $response;
         Log::info('HrmResourceController>Store Return.' . json_encode($response));
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-   
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function resourceRelive(Request $request,$orgId)
+    {
+    Log::info('findResourceWithCredentials-> resourceRelive Inside OrgId .' . json_encode($orgId));
+    $response = $this->service->resourceRelive($request->all(),$orgId);
+    return $response;
+    Log::info('HrmResourceController>Store Return.' . json_encode($response));
+    }
+    
     public function create()
     {
         //

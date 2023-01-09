@@ -15,10 +15,11 @@ use App\Models\HrmResource;
 use App\Models\HrmResourceWorking;
 use App\Models\HrmResourceDoj;
 use App\Models\HrmResourceDesignation;
+use App\Models\HrmResourceReliveDetail;
 use App\Models\HrmResourceTypeDetail;
 use App\Models\Organization\UserOrganizationRelational;
 use Illuminate\Support\Facades\Log;
-
+use Carbon\Carbon;
 /**
  * Class HrmResourceService.
  * @package App\Services
@@ -45,7 +46,7 @@ class HrmResourceService
 
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $models = $this->hrmResourceInterface->findAll();
-      
+
         $entities = collect($models)->map(function ($model) {
             $designation = "";
             $department = "";
@@ -54,9 +55,9 @@ class HrmResourceService
 
             if ($model['person']) {
                 $personModel = $model['person'];
-                if($personModel['personDetails']){
+                if ($personModel['personDetails']) {
                     $personDetailModel = $personModel['personDetails'];
-                    $name = $personDetailModel['first_name']." ".$personDetailModel['middle_name']." ".$personDetailModel['last_name'];
+                    $name = $personDetailModel['first_name'] . " " . $personDetailModel['middle_name'] . " " . $personDetailModel['last_name'];
                 }
             }
             if ($model['designation']) {
@@ -70,10 +71,10 @@ class HrmResourceService
                     }
                 }
             }
-            $params = ['designation' => $designation, 'department' => $department,'resourceName'=>$name,'id'=>$model->id];
+            $params = ['designation' => $designation, 'department' => $department, 'resourceName' => $name, 'id' => $model->id];
             return $params;
         });
-      
+
         return $this->commonService->sendResponse($entities, '');
     }
     public function findResourceWithCredentials($datas, $orgId)
@@ -109,18 +110,16 @@ class HrmResourceService
         /*Some Important Types credential Type End */
         if ($checkPerson) {
             $uId = $checkPerson->uid;
-            $checkUserWithUid =  $this->personInterface->checkUserByUID($uId); 
-           if ($checkUserWithUid)
-            { 
+            $checkUserWithUid =  $this->personInterface->checkUserByUID($uId);
+            if ($checkUserWithUid) {
                 $userWithInOrganization = $this->hrmResourceInterface->findResourceByUid($uId);
                 if ($userWithInOrganization) {
-                    $results = [ 'type' => 6, 'status' => "SameOrganizationUser", 'data' => ""];
+                    $results = ['type' => 6, 'status' => "SameOrganizationUser", 'data' => ""];
                 } else {
-                    $getUserName=$this->personInterface->getPersonDatasByUid($uId);
-                    $results = ['type'=> 7 ,'data' =>$getUserName];
+                    $getUserName = $this->personInterface->getPersonDatasByUid($uId);
+                    $results = ['type' => 7, 'data' => $getUserName];
                 }
                 return $this->commonService->sendResponse($results, '');
-
             } else {
                 $checkResource = $this->hrmResourceInterface->findResourceByUid($uId);
                 if ($checkResource) {
@@ -129,11 +128,8 @@ class HrmResourceService
                     $resData = ['type' => 5, 'PersonUid' => $uId];
                 }
                 return $this->commonService->sendResponse($resData, '');
-
             }
-        }
-
-        else {
+        } else {
 
             $getAllPersonByMobileAndEmail =  $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
 
@@ -170,6 +166,27 @@ class HrmResourceService
         $masterDatas['hrmResourceTypeLists'] = $hrmResourceTypeLists;
 
         return $this->commonService->sendResponse($masterDatas, '');
+    }
+    public function resourceRelive($datas, $orgId)
+    {
+
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $datas = (object) $datas;
+        $cModel = $this->convertToResourceReliveModel($datas);
+        $model = "";
+        dd($cModel);
+    }
+
+    public function convertToResourceReliveModel($datas)
+    {
+
+
+        $model = new HrmResourceReliveDetail();
+        $model->reource_id = $datas->resourceId;
+        $model->relive_type_id = $datas->reliveType;
+        $model->relive_date = $datas->reliveDate;
+        $model->reason = $datas->reason;
+        return $model;
     }
     public function save($datas, $orgId)
     {
@@ -253,72 +270,66 @@ class HrmResourceService
         $model->organization_id = $orgId;
         return $model;
     }
-    public function resourceMobileOtp($datas,$orgId)
+    public function resourceMobileOtp($datas, $orgId)
     {
-      
-        $datas=(object) $datas;
+
+        $datas = (object) $datas;
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $otp = random_int(1000, 9999);
         $model = PersonMobile::where("uid", $datas->uid)->update(['otp_received' => $otp]);
-        if($model){
-            $result=['type'=>1,'status'=>"OtpSuccessfully",'datas'=>$datas];
+        if ($model) {
+            $result = ['type' => 1, 'status' => "OtpSuccessfully", 'datas' => $datas];
+        } else {
+            $result = ['type' => 2, 'status' => "OtpFailed", 'datas' => ""];
         }
-        else{
-            $result=['type'=>2,'status'=>"OtpFailed",'datas'=>""];
-        }
-return  $this->commonService->sendResponse($result, '');
-       
-
+        return  $this->commonService->sendResponse($result, '');
     }
-    public function resourceOtpValidate($datas,$orgId)
+    public function resourceOtpValidate($datas, $orgId)
     {
-        $datas=(object)$datas;
-  
-$dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-$model=$this->personInterface->getMobileNumberByUid($datas->uid);
-if($model->otp_received==$datas->otp)
-{
-        $saluationLists = $this->commonInterface->getSalutation();
-        $bloodGroupLists=$this->commonInterface->getAllBloodGroup();
-        $genderLists=$this->commonInterface->getAllGender();
-        $maritalStatusLists=$this->commonInterface->getMaritalStatus();
-        $addressOfLists=$this->commonInterface->getAddrerssType();
-        $hrmDepartmentLists=$this->hrmDeptInterface->findAll();
-        $hrmDesignationLists=$this->hrmDesInterface->findAll();
-        $hrmResourceTypeLists=$this->hrmResourceTypeInterface->index();
-        $languageLists=$this->commonInterface->getLanguage();
-        $getLanguageByuid=$this->personInterface->motherTongueByUid($datas->uid);
-        $idDocumentTypes=$this->commonInterface->getAllDocumentType();
-        $bankAccountTypes=$this->commonInterface->getAllBankAccountType();
-        $getPersonPrimaryData=$this->personInterface->getPersonPrimaryDataByUid($datas->uid);
-        $anniversaryDate=$this->personInterface->getAnniversaryDate($datas->uid);
-        $personAddress=$this->personInterface->personAddressByuid($datas->uid);
-    
-        $allDatas=[
-            'type'=> 1,
-            'status'=>"OTP SuccessFully",
-            'salutation'=>$saluationLists,
-            'bloodGroup'=>$bloodGroupLists,
-            'gender'=>$genderLists,
-            'addressOf'=>$addressOfLists,
-            'hrmDepartment'=>$hrmDepartmentLists,
-            'hrmDesignation'=>$hrmDesignationLists,
-            'idDocumentTypes'=>$idDocumentTypes,
-            'getPersonPrimaryData'=>$getPersonPrimaryData,
-            'maritalStatus'=>$maritalStatusLists,
-            'hrmResourceType'=>$hrmResourceTypeLists,
-            'language'=>$languageLists,
-            'bankAccount'=>$bankAccountTypes,
-            'otherLanguages'=>$getLanguageByuid,
-            'anniversaryDate'=>$anniversaryDate,
-            'personAddress'=>$personAddress
-        ];
-}
-else{
-    $allDatas=['Status'=>'OTP InValid','datas'=>''];
-}
+        $datas = (object) $datas;
 
-return  $this->commonService->sendResponse($allDatas, '');
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $model = $this->personInterface->getMobileNumberByUid($datas->uid);
+        if ($model->otp_received == $datas->otp) {
+            $saluationLists = $this->commonInterface->getSalutation();
+            $bloodGroupLists = $this->commonInterface->getAllBloodGroup();
+            $genderLists = $this->commonInterface->getAllGender();
+            $maritalStatusLists = $this->commonInterface->getMaritalStatus();
+            $addressOfLists = $this->commonInterface->getAddrerssType();
+            $hrmDepartmentLists = $this->hrmDeptInterface->findAll();
+            $hrmDesignationLists = $this->hrmDesInterface->findAll();
+            $hrmResourceTypeLists = $this->hrmResourceTypeInterface->index();
+            $languageLists = $this->commonInterface->getLanguage();
+            $getLanguageByuid = $this->personInterface->motherTongueByUid($datas->uid);
+            $idDocumentTypes = $this->commonInterface->getAllDocumentType();
+            $bankAccountTypes = $this->commonInterface->getAllBankAccountType();
+            $getPersonPrimaryData = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
+            $anniversaryDate = $this->personInterface->getAnniversaryDate($datas->uid);
+            $personAddress = $this->personInterface->personAddressByuid($datas->uid);
 
+            $allDatas = [
+                'type' => 1,
+                'status' => "OTP SuccessFully",
+                'salutation' => $saluationLists,
+                'bloodGroup' => $bloodGroupLists,
+                'gender' => $genderLists,
+                'addressOf' => $addressOfLists,
+                'hrmDepartment' => $hrmDepartmentLists,
+                'hrmDesignation' => $hrmDesignationLists,
+                'idDocumentTypes' => $idDocumentTypes,
+                'getPersonPrimaryData' => $getPersonPrimaryData,
+                'maritalStatus' => $maritalStatusLists,
+                'hrmResourceType' => $hrmResourceTypeLists,
+                'language' => $languageLists,
+                'bankAccount' => $bankAccountTypes,
+                'otherLanguages' => $getLanguageByuid,
+                'anniversaryDate' => $anniversaryDate,
+                'personAddress' => $personAddress
+            ];
+        } else {
+            $allDatas = ['Status' => 'OTP InValid', 'datas' => ''];
+        }
+
+        return  $this->commonService->sendResponse($allDatas, '');
     }
 }

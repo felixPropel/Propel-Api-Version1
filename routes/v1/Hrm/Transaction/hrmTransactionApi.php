@@ -13,3 +13,4 @@ Route::post('resourcesStore/{orgId}', 'App\Http\Controllers\version1\Controller\
 Route::get('findAllResources/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@index')->name('findAllResources');
 Route::post('generateMobileOtp/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceMobileOtp')->name('generateMobileOtp');
 Route::post('resourceOtpValidate/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceOtpValidate')->name('resourceOtpValidate');
+Route::post('resourceRelive/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceRelive')->name('resourceRelive');
