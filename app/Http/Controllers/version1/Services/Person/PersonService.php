@@ -109,13 +109,17 @@ class PersonService
     {
 
         Log::info('PersonService > storePerson function Inside.' . json_encode($datas));
+        //    dd($datas);
+        $datas['personUid'] = isset($datas['personUid']) ? $datas['personUid'] : null;
+
+
         $datas = (object) $datas;
 
         $personModel = $this->convertToPersonModel($datas);
         $personDetailModel = $this->convertToPersonDetailModel($datas);
         $personEmailModel = $this->convertToPersonEmailModel($datas);
         $personMobileModel = $this->convertToPersonMobileModel($datas);
-        
+
         $personAnotherEmailModel = array();
 
         if (!empty($datas->secondEmail)) {
@@ -125,56 +129,57 @@ class PersonService
         if (!empty($datas->secondNumber)) {
             $personAnotherMobileModel = $this->convertToPersonMobileModelAnother($datas);
         }
-        $personWebLink=array();
-        if(!empty($datas->webLinks)){
-            $personWebLink=$this->convertToPersonWebLink($datas);
+        $personWebLink = array();
+        if (!empty($datas->webLinks)) {
+            $personWebLink = $this->convertToPersonWebLink($datas);
         }
-        $personOtherLanguage=array();
-        if(!empty($datas->otherLanguage)){
-            $personOtherLanguage=$this->convertToPersonOtherLanguage($datas);
+        $personOtherLanguage = array();
+        if (!empty($datas->otherLanguage)) {
+            $personOtherLanguage = $this->convertToPersonOtherLanguage($datas);
         }
-        $personIdDocument=array();
-        if(!empty($datas->idDocumentType)){
-            $personIdDocument=$this->convertToPersonIdDocumnet($datas);
+        $personIdDocument = array();
+        if (!empty($datas->idDocumentType)) {
+            $personIdDocument = $this->convertToPersonIdDocumnet($datas);
         }
-        $personEducationModel=array();
-        if(!empty($datas->Qualification)){
-            $personEducationModel=$this->convertToPersonEducation($datas);
+        $personEducationModel = array();
+        if (!empty($datas->Qualification)) {
+            $personEducationModel = $this->convertToPersonEducation($datas);
         }
-        $personProfessionModel=array();
-        if(!empty($datas->ProfessionDepartment)){
-            $personProfessionModel=$this->convertToPersonProfession($datas);
+        $personProfessionModel = array();
+        if (!empty($datas->ProfessionDepartment)) {
+            $personProfessionModel = $this->convertToPersonProfession($datas);
         }
-        
-        $personCommonAddressModel=array();
-       
-        if(!empty($datas->addressOf)){
-            $personCommonAddressModel=$this->convertToPersonCommonAddress($datas);
+
+        $personCommonAddressModel = array();
+
+        if (!empty($datas->addressOf)) {
+            $personCommonAddressModel = $this->convertToPersonCommonAddress($datas);
         }
-          $personAddressId=array();
-        if(!empty($datas->addressOf)){
-            $personAddressId=$this->convertToPersonAddressId();
+        $personAddressId = array();
+        if (!empty($datas->addressOf)) {
+            $personAddressId = $this->convertToPersonAddressId();
         }
 
 
 
-        $allModels=['personModel'=>$personModel,
-                    'personDetailModel'=>$personDetailModel,
-                    'personEmailModel'=>$personEmailModel,
-                    'personMobileModel'=>$personMobileModel,
-                    'personAnotherEmailModel'=>$personAnotherEmailModel,
-                    'personAnotherMobileModel'=>$personAnotherMobileModel,
-                    'personWebLink'=>$personWebLink,
-                    'personOtherLanguage'=>$personOtherLanguage,
-                    'personIdDocument'=>$personIdDocument,
-                    'personEducationModel'=>$personEducationModel,
-                    'personProfessionModel'=>$personProfessionModel,
-                    'personCommonAddressModel'=>$personCommonAddressModel,
-                    'personAddressId'=>$personAddressId
+        $allModels = [
+            'personModel' => $personModel,
+            'personDetailModel' => $personDetailModel,
+            'personEmailModel' => $personEmailModel,
+            'personMobileModel' => $personMobileModel,
+            'personAnotherEmailModel' => $personAnotherEmailModel,
+            'personAnotherMobileModel' => $personAnotherMobileModel,
+            'personWebLink' => $personWebLink,
+            'personOtherLanguage' => $personOtherLanguage,
+            'personIdDocument' => $personIdDocument,
+            'personEducationModel' => $personEducationModel,
+            'personProfessionModel' => $personProfessionModel,
+            'personCommonAddressModel' => $personCommonAddressModel,
+            'personAddressId' => $personAddressId
 
-                ];
+        ];
         $personData = $this->personInterface->storePerson($allModels);
-        log::info('allModels' .json_encode( $personData));
+        log::info('allModels' . json_encode($personData));
 
 
         Log::info('PersonService > storePerson function Return.' . json_encode($personData));
@@ -252,20 +257,15 @@ class PersonService
     public function convertToPersonModel($datas)
     {
         Log::info('PersonService > uidByPerson.' . json_encode($datas->personUid));
-        if($datas->personUid){
-     $model=$this->personInterface->getPersonByUid($datas->personUid);
-     $model->uid=$datas->personUid;
-     $model->stage =1;
-     $model->origin =1;
-     $model->existence =1;
+        if ($datas->personUid) {
+            $model = $this->personInterface->getPersonByUid($datas->personUid);
+        } else {
+            $model = new Person();
+            $model->uid = Str::uuid();
         }
-        else{
-        $model = new Person();
-        $model->uid =Str::uuid();
-        $model->stage =1;
-        $model->origin =1;
-        $model->existence =1;
-        }
+        $model->stage = 1;
+        $model->origin = 1;
+        $model->existence = 1;
         Log::info('PersonService > personUid .' . json_encode($model));
         return $model;
     }
@@ -339,31 +339,22 @@ class PersonService
     public function convertToPersonDetailModel($datas)
     {
         Log::info('PersonService > convertToPersonDetailModel function Inside.' . json_encode($datas));
-        if($datas->personUid){
-            $model=$this->personInterface->getPersonDatasByUid($datas->personUid);
-            $model->salutation_id = $datas->salutationId;
-            $model->first_name = $datas->firstName;
-            $model->middle_name = $datas->middleName;
-            $model->last_name = $datas->lastName;
-            $model->nick_name = $datas->nickName;
-            // $model->dob = $datas->dob;
-            $model->birth_place=$datas->birthCity;
-            $model->gender_id = $datas->genderId;
-            $model->blood_group_id = $datas->bloodGroup;
-        }
-        else{
+        if ($datas->personUid) {
+            $model = $this->personInterface->getPersonDatasByUid($datas->personUid);
+        } else {
             $model = new PersonDetails();
-            $model->salutation_id = $datas->salutationId;
-            $model->first_name = $datas->firstName;
-            $model->middle_name = $datas->middleName;
-            $model->last_name = $datas->lastName;
-            $model->nick_name = $datas->nickName;
-            // $model->dob = $datas->dob;
-            $model->birth_place=$datas->birthCity;
-            $model->gender_id = $datas->genderId;
-            $model->blood_group_id = $datas->bloodGroup;
         }
-       
+        $model->salutation_id = $datas->salutationId;
+        $model->first_name = $datas->firstName;
+        $model->middle_name = isset($datas->middleName) ? $datas->middleName : '';
+        $model->last_name =  isset($datas->lastName) ? $datas->lastName : '';
+        $model->nick_name = isset($datas->nickName) ? $datas->nickName : '';
+        // $model->dob = $datas->dob;
+        $model->birth_place =  isset($datas->birthCity) ? $datas->birthCity : '';
+        $model->gender_id = isset($datas->genderId) ? $datas->genderId : '';
+        $model->blood_group_id = isset($datas->bloodGroup) ? $datas->bloodGroup : '';
+
+
         Log::info('PersonService > convertToPersonDetailModel function Return.' . json_encode($model));
 
         return $model;
@@ -371,35 +362,32 @@ class PersonService
     public function convertToPersonMobileModel($datas)
     {
         Log::info('PersonService > convertToPersonMobileModel function Inside.' . json_encode($datas));
-        if($datas->personUid){
-            $model=$this->personInterface->getMobileNumberByUid($datas->personUid);
-            $model->mobile_no =$datas->mobileNumber;
+        if ($datas->personUid) {
+            $model = $this->personInterface->getMobileNumberByUid($datas->personUid);
+            $model->mobile_no = $datas->mobileNumber;
             $model->mobile_cachet = 1;
-        }
-        else{
+        } else {
             $model = new PersonMobile();
             $model->mobile_no = $datas->mobileNumber;
             $model->mobile_cachet = 1;
-
         }
-       
+
         Log::info('PersonService > convertToPersonMobileModel function Return.' . json_encode($model));
         return $model;
     }
     public function convertToPersonEmailModel($datas)
     {
         Log::info('PersonService > convertToPersonEmailModel function Inside.' . json_encode($datas));
-        if($datas->personUid){
-            $model=$this->personInterface->getPersonEmailByUid($datas->personUid);
+        if ($datas->personUid) {
+            $model = $this->personInterface->getPersonEmailByUid($datas->personUid);
             $model->email =  $datas->email;
             $model->email_cachet = 1;
-        }
-        else{
+        } else {
             $model = new PersonEmail();
             $model->email = $datas->email;
             $model->email_cachet = 1;
         }
-      
+
         Log::info('PersonService > convertToPersonEmailModel function Return.' . json_encode($model));
 
         return $model;
@@ -418,7 +406,6 @@ class PersonService
         }
         return $orgModel;
         Log::info('PersonService > convertToPersonEmailModelAnother function Return.' . json_encode($orgModel));
-
     }
     public function convertToPersonMobileModelAnother($datas)
     {
@@ -436,7 +423,6 @@ class PersonService
 
         return $orgModel;
         Log::info('PersonService > convertToPersonMobileModelAnother function Return.' . json_encode($orgModel));
-
     }
     public function convertToPersonWebLink($datas)
     {
@@ -455,7 +441,6 @@ class PersonService
 
         return $orgModel;
         Log::info('PersonService > convertToPersonWebLink function Return.' . json_encode($orgModel));
-
     }
     public function convertToPersonOtherLanguage($datas)
     {
@@ -465,7 +450,7 @@ class PersonService
             if ($datas->otherLanguage[$i]) {
                 $model[$i] = new PersonLanguage();
                 $model[$i]->language_id = $datas->otherLanguage[$i];
-                $model[$i]->mother_tongue =$datas->motherLanguage;
+                $model[$i]->mother_tongue = $datas->motherLanguage;
                 $model[$i]->status = 1;
                 array_push($orgModel, $model[$i]);
             }
@@ -481,16 +466,15 @@ class PersonService
             if ($datas->idDocumentType[$i]) {
                 $model[$i] = new IdDocumentType();
                 $model[$i]->person_doc_types = $datas->idDocumentType[$i];
-                $model[$i]->Doc_no=$datas->documentNumber[$i];
-                $model[$i]->doc_validity =$datas->validTill[$i];
-                $model[$i]->attachment =$datas->attachments[$i];
+                $model[$i]->Doc_no = $datas->documentNumber[$i];
+                $model[$i]->doc_validity = $datas->validTill[$i];
+                $model[$i]->attachment = $datas->attachments[$i];
                 $model[$i]->status = 1;
                 array_push($orgModel, $model[$i]);
             }
         }
         return $orgModel;
         Log::info('PersonService > convertToPersonIdDocumnet function Return.' . json_encode($orgModel));
-
     }
     public function convertToPersonEducation($datas)
     {
@@ -499,16 +483,15 @@ class PersonService
         for ($i = 0; $i < count($datas->Qualification); $i++) {
             if ($datas->Qualification[$i]) {
                 $model[$i] = new PersonEducation();
-                $model[$i]->qualification= $datas->Qualification[$i];
-                $model[$i]->education_place=$datas->university[$i];
-                $model[$i]->year_of_pass=$datas->passedYear[$i];
-                $model[$i]->Mark=$datas->mark[$i];
+                $model[$i]->qualification = $datas->Qualification[$i];
+                $model[$i]->education_place = $datas->university[$i];
+                $model[$i]->year_of_pass = $datas->passedYear[$i];
+                $model[$i]->Mark = $datas->mark[$i];
                 array_push($orgModel, $model[$i]);
             }
         }
         return $orgModel;
         Log::info('PersonService > convertToPersonEducation function Return.' . json_encode($orgModel));
-
     }
     public function convertToPersonProfession($datas)
     {
@@ -517,18 +500,17 @@ class PersonService
         for ($i = 0; $i < count($datas->ProfessionDepartment); $i++) {
             if ($datas->ProfessionDepartment[$i]) {
                 $model[$i] = new PersonProfession();
-                $model[$i]->department= $datas->ProfessionDepartment[$i];
-                $model[$i]->designation=$datas->Designation[$i];
-                $model[$i]->organization=$datas->organization[$i];
+                $model[$i]->department = $datas->ProfessionDepartment[$i];
+                $model[$i]->designation = $datas->Designation[$i];
+                $model[$i]->organization = $datas->organization[$i];
                 // $model[$i]->doj=$datas->joinDate[$i];
                 //  $model[$i]->dor=$datas->reliveDate[$i];
-                $model[$i]->experience=$datas->experinceYear[$i];
+                $model[$i]->experience = $datas->experinceYear[$i];
                 array_push($orgModel, $model[$i]);
             }
         }
         return $orgModel;
         Log::info('PersonService > convertToPersonProfession function Return.' . json_encode($orgModel));
-
     }
     public function convertToPersonCommonAddress($datas)
     {
@@ -537,26 +519,26 @@ class PersonService
         for ($i = 0; $i < count($datas->addressOf); $i++) {
             if ($datas->addressOf[$i]) {
                 $model[$i] = new PropertyAddress();
-                $model[$i]->address_type= $datas->addressOf[$i];
-                $model[$i]->door_no=$datas->doorNo[$i];
-                 $model[$i]->building_name=$datas->buildingName[$i];
-                 $model[$i]->pin=$datas->pinCode[$i];
-                $model[$i]->area=$datas->area[$i];
-                $model[$i]->street=$datas->street[$i];
-                $model[$i]->land_mark=$datas->landMark[$i];
-                $model[$i]->district=$datas->district[$i];
-                $model[$i]->city_id=$datas->city[$i];
-                $model[$i]->state_id=$datas->state[$i]; 
-                $model[$i]->status=1;     
+                $model[$i]->address_type = $datas->addressOf[$i];
+                $model[$i]->door_no = $datas->doorNo[$i];
+                $model[$i]->building_name = $datas->buildingName[$i];
+                $model[$i]->pin = $datas->pinCode[$i];
+                $model[$i]->area = $datas->area[$i];
+                $model[$i]->street = $datas->street[$i];
+                $model[$i]->land_mark = $datas->landMark[$i];
+                $model[$i]->district = $datas->district[$i];
+                $model[$i]->city_id = $datas->city[$i];
+                $model[$i]->state_id = $datas->state[$i];
+                $model[$i]->status = 1;
                 array_push($orgModel, $model[$i]);
             }
         }
         return $orgModel;
         Log::info('PersonService > convertToPersonCommonAddress function Return.' . json_encode($orgModel));
-
     }
-    public function convertToPersonAddressId(){
-        $model =new PersonAddress();
+    public function convertToPersonAddressId()
+    {
+        $model = new PersonAddress();
         $model->address_cachet = 1;
         return $model;
         Log::info('PersonService > convertToPersonAddressId function Inside.' . json_encode($model));
