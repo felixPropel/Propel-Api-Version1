@@ -65,7 +65,22 @@ class HrmResourceController extends Controller
     {
         //
     }
+public function resourceMobileOtp(Request $request, $orgId)
+{
+    Log::info('HrmResourceController > resourceMobileOtp.' . json_encode($request->all()));
+    $response = $this->service->resourceMobileOtp($request->all(),$orgId);
+    return $response;
+    Log::info('HrmResourceController> resourceMobileOtp .' . json_encode($response));
 
+}
+public function resourceOtpValidate(Request $request, $orgId)
+{
+    Log::info('HrmResourceController > resourceOtpValidate.' . json_encode($request->all()));
+    $response = $this->service->resourceOtpValidate($request->all(),$orgId);
+    return $response;
+    Log::info('HrmResourceController> resourceOtpValidate .' . json_encode($response));
+
+}
     /**
      * Store a newly created resource in storage.
      *

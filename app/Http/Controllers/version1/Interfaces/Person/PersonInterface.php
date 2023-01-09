@@ -28,4 +28,7 @@ interface PersonInterface
    public function addWebLink($model);
    public function findExactPersonWithEmailAndMobile($email, $mobile);
    public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
+   public function checkUserByUID($uid);
+   public function personAddressByuid($uid);
+   public function getPersonByUid($uid);
 }

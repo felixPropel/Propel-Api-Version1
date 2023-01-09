@@ -193,7 +193,6 @@ class PersonService
         Log::info('PersonService > resendOtp function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $tempId = $datas->tempId;
-
         $otp = random_int(1000, 9999);
         $newDatas = ['otp' => $otp, 'stage' => 4];
         $newDatas = (object) $newDatas;
@@ -250,16 +249,24 @@ class PersonService
             }
         } else { }
     }
-
     public function convertToPersonModel($datas)
     {
-        Log::info('PersonService > convertToPersonModel function Inside.' . json_encode($datas));
+        Log::info('PersonService > uidByPerson.' . json_encode($datas->personUid));
+        if($datas->personUid){
+     $model=$this->personInterface->getPersonByUid($datas->personUid);
+     $model->uid=$datas->personUid;
+     $model->stage =1;
+     $model->origin =1;
+     $model->existence =1;
+        }
+        else{
         $model = new Person();
-        $model->uid = Str::uuid();
-        $model->stage = 1;
-        $model->origin = 1;
-        $model->existence = 1;
-        Log::info('PersonService > convertToPersonModel function Return.' . json_encode($model));
+        $model->uid =Str::uuid();
+        $model->stage =1;
+        $model->origin =1;
+        $model->existence =1;
+        }
+        Log::info('PersonService > personUid .' . json_encode($model));
         return $model;
     }
     public function convertToTempPersonModel($datas, $id = null)
@@ -332,15 +339,31 @@ class PersonService
     public function convertToPersonDetailModel($datas)
     {
         Log::info('PersonService > convertToPersonDetailModel function Inside.' . json_encode($datas));
-        $model = new PersonDetails();
-        $model->salutation_id = $datas->salutationId;
-        $model->first_name = $datas->firstName;
-        $model->middle_name = $datas->middleName;
-        $model->last_name = $datas->lastName;
-        $model->nick_name = $datas->nickName;
-        // $model->dob = $datas->dob;
-        $model->gender_id = $datas->genderId;
-        $model->blood_group_id = $datas->bloodGroup;
+        if($datas->personUid){
+            $model=$this->personInterface->getPersonDatasByUid($datas->personUid);
+            $model->salutation_id = $datas->salutationId;
+            $model->first_name = $datas->firstName;
+            $model->middle_name = $datas->middleName;
+            $model->last_name = $datas->lastName;
+            $model->nick_name = $datas->nickName;
+            // $model->dob = $datas->dob;
+            $model->birth_place=$datas->birthCity;
+            $model->gender_id = $datas->genderId;
+            $model->blood_group_id = $datas->bloodGroup;
+        }
+        else{
+            $model = new PersonDetails();
+            $model->salutation_id = $datas->salutationId;
+            $model->first_name = $datas->firstName;
+            $model->middle_name = $datas->middleName;
+            $model->last_name = $datas->lastName;
+            $model->nick_name = $datas->nickName;
+            // $model->dob = $datas->dob;
+            $model->birth_place=$datas->birthCity;
+            $model->gender_id = $datas->genderId;
+            $model->blood_group_id = $datas->bloodGroup;
+        }
+       
         Log::info('PersonService > convertToPersonDetailModel function Return.' . json_encode($model));
 
         return $model;
@@ -348,18 +371,35 @@ class PersonService
     public function convertToPersonMobileModel($datas)
     {
         Log::info('PersonService > convertToPersonMobileModel function Inside.' . json_encode($datas));
-        $model = new PersonMobile();
-        $model->mobile_no = $datas->mobileNumber;
-        $model->mobile_cachet = 1;
+        if($datas->personUid){
+            $model=$this->personInterface->getMobileNumberByUid($datas->personUid);
+            $model->mobile_no =$datas->mobileNumber;
+            $model->mobile_cachet = 1;
+        }
+        else{
+            $model = new PersonMobile();
+            $model->mobile_no = $datas->mobileNumber;
+            $model->mobile_cachet = 1;
+
+        }
+       
         Log::info('PersonService > convertToPersonMobileModel function Return.' . json_encode($model));
         return $model;
     }
     public function convertToPersonEmailModel($datas)
     {
         Log::info('PersonService > convertToPersonEmailModel function Inside.' . json_encode($datas));
-        $model = new PersonEmail();
-        $model->email = $datas->email;
-        $model->email_cachet = 1;
+        if($datas->personUid){
+            $model=$this->personInterface->getPersonEmailByUid($datas->personUid);
+            $model->email =  $datas->email;
+            $model->email_cachet = 1;
+        }
+        else{
+            $model = new PersonEmail();
+            $model->email = $datas->email;
+            $model->email_cachet = 1;
+        }
+      
         Log::info('PersonService > convertToPersonEmailModel function Return.' . json_encode($model));
 
         return $model;

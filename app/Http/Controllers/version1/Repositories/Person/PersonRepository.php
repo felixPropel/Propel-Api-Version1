@@ -10,6 +10,8 @@ use App\Models\PersonDetails;
 use App\Models\PersonEmail;
 use App\Models\PersonMobile;
 use App\Models\TempPerson;
+use App\Models\PersonAddress;
+use App\Models\PropertyAddress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\PersonLanguage;
@@ -124,8 +126,7 @@ class PersonRepository implements PersonInterface
                     $personCommonAddressModel[$i]->save();
                 } 
                 if(!empty($personCommonAddressModel[$i])){
-                    $personAddressId->ParentComAddress()->associate($personCommonAddressModel[$i], 'property_address_id', 'id');
-                    $personAddressId->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personAddressId->ParentPerson()->associate($personModel,'uid', 'uid');
                     $personAddressId->save();
                 }
                 return [
@@ -167,6 +168,11 @@ class PersonRepository implements PersonInterface
     {
         return PersonDetails::where('uid', $uid)->first();
     }
+    public function getPersonByUid($uid)
+    {
+        return Person::where('uid', $uid)->first();
+
+    }
     public function savePersonDatas($model)
     {
 
@@ -196,10 +202,11 @@ class PersonRepository implements PersonInterface
             ->where('persons.uid', $uid)
             ->first();
     }
-
     public function getAnniversaryDate($uid)
     {
-        return personAnniversary::where('uid', $uid)->first();
+    
+        return   personAnniversary::where('uid', $uid)->first();
+    
     }
     public function saveAnniversaryDate($model)
     {
@@ -207,7 +214,10 @@ class PersonRepository implements PersonInterface
     }
     public function motherTongueByUid($uid)
     {
-        return PersonLanguage::where('uid', $uid)->first();
+    
+            return PersonLanguage::where('uid', $uid)->get();
+          
+     
     }
     public function updateMotherTongue($model)
     {
@@ -266,4 +276,16 @@ class PersonRepository implements PersonInterface
 
         return $models;
     }
+    public function checkUserByUID($uid)
+    {
+        return User::where('uid',$uid)->first();
+    }
+    public function personAddressByuid($uid)
+{
+$models=PropertyAddress::select('*')
+        ->leftjoin('person_addresses','person_addresses.property_address_id','com_property_addresses.id')
+        ->where('person_addresses.uid',$uid)
+        ->get(); 
+        return $models;
+}
 }

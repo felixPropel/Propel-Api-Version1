@@ -10,7 +10,9 @@ use App\Models\BasicModels\State;
 use App\Models\BasicModels\District;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
+use App\Models\HrmDepartment;
+use App\Models\HrmDesignation;
+use App\Models\HrmHumanResourceType;
 use App\Models\Address_of;
 use App\Models\BasicModels\BankAccountType;
 use App\Models\BasicModels\DocumentType;
@@ -60,6 +62,6 @@ class commonRepository implements commonInterface
     public function getAllBankAccountType(){
         return BankAccountType::get();
     }
-
+  
 
 }
