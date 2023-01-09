@@ -2,6 +2,7 @@
 
 namespace  App\Http\Controllers\version1\Services\HRM\Transaction;
 
+use App\Http\Controllers\version1\Interfaces\Common\commonInterface;
 use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDepartmentInterface;
 use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDesignationInterface;
 use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmHumanResourceTypeInterface;
@@ -10,7 +11,7 @@ use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Http\Controllers\version1\Services\Person\PersonService;
-use App\Interfaces\CommonInterface;
+
 use App\Models\HrmResource;
 use App\Models\HrmResourceWorking;
 use App\Models\HrmResourceDoj;
@@ -27,7 +28,7 @@ use Carbon\Carbon;
 class HrmResourceService
 {
 
-    public function __construct(PersonService $personService, PersonInterface $personInterface, UserInterface $userInterface, HrmResourceInterface $hrmResourceInterface, CommonService $commonService, CommonInterface $commonInterface, HrmDepartmentInterface $hrmDeptInterface, HrmDesignationInterface $hrmDesInterface, HrmHumanResourceTypeInterface $hrmResourceTypeInterface)
+    public function __construct(PersonService $personService, PersonInterface $personInterface, UserInterface $userInterface, HrmResourceInterface $hrmResourceInterface, CommonService $commonService, commonInterface $commonInterface, HrmDepartmentInterface $hrmDeptInterface, HrmDesignationInterface $hrmDesInterface, HrmHumanResourceTypeInterface $hrmResourceTypeInterface)
     {
         $this->personService = $personService;
         $this->personInterface = $personInterface;
@@ -274,6 +275,7 @@ class HrmResourceService
     {
 
         $datas = (object) $datas;
+       
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $otp = random_int(1000, 9999);
         $model = PersonMobile::where("uid", $datas->uid)->update(['otp_received' => $otp]);
@@ -287,11 +289,13 @@ class HrmResourceService
     public function resourceOtpValidate($datas, $orgId)
     {
         $datas = (object) $datas;
-
+       
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $model = $this->personInterface->getMobileNumberByUid($datas->uid);
+        
         if ($model->otp_received == $datas->otp) {
             $saluationLists = $this->commonInterface->getSalutation();
+          
             $bloodGroupLists = $this->commonInterface->getAllBloodGroup();
             $genderLists = $this->commonInterface->getAllGender();
             $maritalStatusLists = $this->commonInterface->getMaritalStatus();
