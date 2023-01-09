@@ -78,15 +78,11 @@ class HrmResourceService
     }
     public function findResourceWithCredentials($datas, $orgId)
     {
-
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $datas = (object) $datas;
         $mobile = $datas->mobileNo;
         $email = $datas->email;
-
         $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email, $mobile);
-
-
         // $saluationLists = $this->commonInterface->getAllSalutions();
         // $bloodGroupLists=$this->commonInterface->getAllBloodGroups();
         // $genderLists=$this->commonInterface->getAllGenders();
@@ -106,34 +102,38 @@ class HrmResourceService
         /* 3.Person Email Only */
         /* 4.Resource True */
         /* 5.Resource false */
+        /* 6.SameOrganizationUser/employee*/
+        /* 7. NotInSameOrganizationUser */
+
 
         /*Some Important Types credential Type End */
         if ($checkPerson) {
-
             $uId = $checkPerson->uid;
+            $checkUserWithUid =  $this->personInterface->checkUserByUID($uId); 
+           if ($checkUserWithUid)
+            { 
+                $userWithInOrganization = $this->hrmResourceInterface->findResourceByUid($uId);
+                if ($userWithInOrganization) {
+                    $results = [ 'type' => 6, 'status' => "SameOrganizationUser", 'data' => ""];
+                } else {
+                    $getUserName=$this->personInterface->getPersonDatasByUid($uId);
+                    $results = ['type'=> 7 ,'data' =>$getUserName];
+                }
+                return $this->commonService->sendResponse($results, '');
 
-            $checkResource = $this->hrmResourceInterface->findResourceByUid($uId);
-            if ($checkResource) {
-                $resData = ['type' => 4, 'ResUid' => $uId];
             } else {
-                $resData = ['type' => 5, 'PersonUid' => $uId];
+                $checkResource = $this->hrmResourceInterface->findResourceByUid($uId);
+                if ($checkResource) {
+                    $resData = ['type' => 4, 'ResUid' => $uId];
+                } else {
+                    $resData = ['type' => 5, 'PersonUid' => $uId];
+                }
+                return $this->commonService->sendResponse($resData, '');
+
             }
+        }
 
-
-            // $checkUserWithUid =  $this->personInterface->checkUserByUID($uId);
-
-            // if ($checkUserWithUid) {
-            //     $orgId = "1";
-            //     $userWithInOrganization = $this->personInterface->findUserWithInOrganization($uId, $orgId);
-            //     if ($userWithInOrganization) {
-            //         $results = ['status' => "SameOrganizationUser", 'data' => ""];
-            //     } else {
-            //         $results = ['status' => "NotInSameOrganizationUser", 'data' => ""];
-            //     }
-            // } else {
-            //     $results = ['status' => "SinglePersonOnly", 'data' =>  $checkPerson];
-            // }
-        } else {
+        else {
 
             $getAllPersonByMobileAndEmail =  $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
 
