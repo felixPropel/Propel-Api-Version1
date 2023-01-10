@@ -351,6 +351,7 @@ class PersonService
         $model->nick_name = isset($datas->nickName) ? $datas->nickName : '';
         // $model->dob = $datas->dob;
         $model->birth_place =  isset($datas->birthCity) ? $datas->birthCity : '';
+        $model->marital_id =  isset($datas->maritalStatus) ? $datas->maritalStatus: '';
         $model->gender_id = isset($datas->genderId) ? $datas->genderId : '';
         $model->blood_group_id = isset($datas->bloodGroup) ? $datas->bloodGroup : '';
 

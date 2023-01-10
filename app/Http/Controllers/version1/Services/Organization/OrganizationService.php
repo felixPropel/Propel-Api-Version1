@@ -7,12 +7,16 @@ use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Models\Organization\Organization;
+use App\Models\Organization\OrganizationDocument;
+use App\Models\Organization\OrganizationWebAddress;
+
 use App\Models\Organization\OrganizationDatabase;
 use App\Models\Organization\OrganizationDetail;
 use App\Models\Organization\OrganizationEmail;
 use App\Models\Organization\UserOrganizationRelational;
 use App\Models\Person;
 use App\Models\PersonDetails;
+use App\Models\PropertyAddress;
 use App\Models\PersonEmail;
 use App\Models\PersonMobile;
 use App\Models\User;
@@ -46,7 +50,10 @@ class OrganizationService
         $generateOrganizationEmailModel = $this->convertToOrganizationEmailModel($datas);
         $generateUserAccountModel = $this->convertToUserAccountModel($datas);
         $generateOrganizationDatabaseModel = $this->convertToOrganizationDatabaseModel($datas);
-        $model =  $this->organizationInterface->saveOrganization($generateOrganizationModel, $generateOrganizationDetailModel, $generateOrganizationEmailModel, $generateUserAccountModel,$generateOrganizationDatabaseModel);
+        $generateOrganizationDocumentModel=$this->convertToOrganizationDocumentModel($datas);
+        $generateOrganizationWebAddressModel=$this->convertToOrganizationWebAddressModel($datas);
+        $generateOrganizationAddressModel=$this->convertToOrganizationAddressModel($datas);
+        $model =  $this->organizationInterface->saveOrganization($generateOrganizationModel, $generateOrganizationDetailModel, $generateOrganizationEmailModel, $generateUserAccountModel,$generateOrganizationDatabaseModel,$generateOrganizationDocumentModel,$generateOrganizationWebAddressModel,$generateOrganizationAddressModel);
     
         if ($model['message'] == "Success") {           
             return $this->commonService->sendResponse($model, $model['message']);
@@ -110,5 +117,40 @@ class OrganizationService
        Session::put('orgDb', $model->db_name);
       
         return $this->commonService->sendResponse($model, '');
+    }
+    public function convertToOrganizationDocumentModel($datas)
+    {
+        $model=new  OrganizationDocument();
+        $model->org_gst_no=(isset($datas->organizationGst) ? $datas->organizationGst : null);
+        $model->org_pan_no=(isset($datas->organizationPan) ? $datas->organizationPan : null);
+        // $model->doc_validity=Null;
+        // $model->attachment=Null;
+        $model->status=1;
+        return $model;
+    }
+    public function convertToOrganizationWebAddressModel($datas)
+    {
+        $model= new OrganizationWebAddress();
+        $model->web_address=(isset($datas->organizationWebsite) ? $datas->organizationWebsite : null);
+        $model->status=1;
+        return $model;
+
+    }
+    public function convertToOrganizationAddressModel($datas)
+    {
+        $model=new PropertyAddress();
+        $model->door_no=(isset($datas->doorNo) ? $datas->doorNo : null);
+        $model->building_name=(isset($datas->buildingName) ? $datas->buildingName : null);
+        $model->pin=(isset($datas->pincode) ? $datas->pincode : null);
+        $model->state_id=(isset($datas->state) ? $datas->state : null);
+        $model->street=(isset($datas->street) ? $datas->street : null);
+        $model->land_mark=(isset($datas->landmark) ? $datas->landmark : null);
+        $model->district=(isset($datas->district) ? $datas->district : null);
+        $model->city_id=(isset($datas->city) ? $datas->city : null);
+        $model->area=(isset($datas->area) ? $datas->area : null);
+        return $model;
+
+
+        
     }
 }

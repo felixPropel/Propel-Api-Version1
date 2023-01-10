@@ -27,21 +27,26 @@ class OrganizationRepository implements OrganizationInterface
             ->where('uid', $uid)
             ->get();
     }
-    public function saveOrganization($orgModel, $orgDetailModel, $orgEmailModel, $userAccountModel, $orgDBModel)
+    public function saveOrganization($orgModel, $orgDetailModel, $orgEmailModel, $userAccountModel, $orgDBModel,$orgDocModel,$orgWebLinkModel,$orgAddressModel)
     {
         try {
-            $result = DB::transaction(function () use ($orgModel, $orgDetailModel, $orgEmailModel, $userAccountModel, $orgDBModel) {
+            $result = DB::transaction(function () use ($orgModel, $orgDetailModel, $orgEmailModel, $userAccountModel, $orgDBModel,$orgDocModel,$orgWebLinkModel,$orgAddressModel) {
                 
                 $orgModel->save();
                 $orgDetailModel->ParentOrganization()->associate($orgModel, 'org_id', 'id');
                 $orgEmailModel->ParentOrganization()->associate($orgModel, 'org_id', 'id');
                 $userAccountModel->ParentOrganization()->associate($orgModel, 'organization_id', 'id');
                 $orgDBModel->ParentOrganization()->associate($orgModel, 'org_id', 'id');
+                $orgDocModel->ParentOrganization()->associate($orgModel, 'org_id', 'id');
+                $orgWebLinkModel->ParentOrganization()->associate($orgModel, 'org_id', 'id');
 
                 $orgDetailModel->save();
                 $orgEmailModel->save();
                 $userAccountModel->save();
                 $orgDBModel->save();
+                $orgDocModel->save();
+                $orgWebLinkModel->save();
+                $orgAddressModel->save();
 
 
                 $preDatabase = Config::get('database.connections.mysql.database');
