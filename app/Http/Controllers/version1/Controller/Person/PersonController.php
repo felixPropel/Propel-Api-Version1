@@ -154,7 +154,7 @@ public function personProfiles(Request $request)
 public function profileUpdate(Request $request)
 {
     Log::info('PersonController > profileUpdate function Inside.' . json_encode($request->all()));
-    $response=$this->personService->profileUpdate($request->all());
+    $response=$this->personService->storePerson($request->all());
     Log::info('PersonController > profileUpdate function Return.' .json_encode($response));
     return  $response;
 }
