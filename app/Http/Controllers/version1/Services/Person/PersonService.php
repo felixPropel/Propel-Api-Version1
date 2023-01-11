@@ -635,6 +635,23 @@ class PersonService
         Log::info('PersonService > convertPerson function Return.' . json_encode($person));
         return $person;
     }
+    public function generateEmailOtp($uid)
+    {
+        Log::info('PersonService > generateEmailOtp function Inside.' . json_encode($uid));
+        $data = $this->personInterface->getPersonEmailByUid($uid);
+        $otp = substr(str_shuffle("123456789"), 0, 5);
+        $model = PersonEmail::where("uid", $uid)->update(["otp_received" => $otp, "email_validation_status" => 0]);
+        Log::info('PersonService > generateEmailOtp function Return.' . json_encode($model));
+        if ($model) {
+            $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uid, 'email' => $data->email]];
+            return response($response, 200);
+        } else {
+            $response = ["message" => 'Mail Not Send'];
+            return response($response, 400);
+        }
+
+    }
+
     public function emailOtpValidation($datas)
     {
         Log::info('PersonService > emailOtpValidation function Inside.' . json_encode($datas));

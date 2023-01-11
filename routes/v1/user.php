@@ -5,5 +5,5 @@ use Illuminate\Support\Facades\Route;
 Route::post('userLogin', 'App\Http\Controllers\version1\Controller\User\UserController@login')->name('userLogin');
 Route::post('storeUser', 'App\Http\Controllers\version1\Controller\User\UserController@storeUser')->name('storeUser');
 //Searching Part Ended
-Route::post('generateEmailOtp', 'App\Http\Controllers\Auth\ApiAuthController@generateEmailOtp')->name('generateEmailOtp');
+
 Route::post('changePassword', 'App\Http\Controllers\version1\Controller\User\UserController@changePassword')->name('changePassword');

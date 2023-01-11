@@ -102,6 +102,14 @@ public function mobileOtpValidated(Request $request)
     Log::info('PersonController > mobileOtpValidated function Return.' . json_encode($response));
     return  $response; 
 }
+public function generateEmailOtp(Request $request)
+{
+    Log::info('PersonController > mobileOtpValidated function Inside.' . json_encode($request->all()));
+    $response=$this->personService->generateEmailOtp($request->all());
+    Log::info('PersonController > mobileOtpValidated function Return.' . json_encode($response));
+    return  $response; 
+}
+
 public function emailOtpValidation(Request $request)
 {
     Log::info('PersonController > emailOtpValidation function Inside.' . json_encode($request->all()));
@@ -147,7 +155,7 @@ public function userCreation(Request $request)
 public function personProfiles(Request $request)
 {
     Log::info('PersonController > personProfiles function Inside.' . json_encode($request->all()));
-    $response=$this->personService->personProfileDetails($request->all());
+    $response=$this->personService->storePerson($request->all());
     Log::info('PersonController > personProfiles function Return.' . json_encode($response));
     return  $response;
 }
