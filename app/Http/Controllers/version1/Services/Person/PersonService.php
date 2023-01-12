@@ -669,8 +669,11 @@ class PersonService
         $personDetails = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
         $personAddressByUid=$this->personInterface->personAddressByuid($datas->uid);
         $personMasterData=$this->commonService->getPersonMasterData();
+        $secondMobileAndEmail=$this->personInterface->personSecondMobileAndEmailByUid($datas->uid);
         $personMasterData['PersonDatas']= $personDetails;
         $personMasterData['PersonAddress']= $personAddressByUid;
+        $personMasterData['secondMobileAndEmail']= $secondMobileAndEmail;
+
         Log::info('PersonService > personProfileDetails function Return.' . json_encode($personMasterData));
         return $this->commonService->sendResponse($personMasterData, '');
     }

@@ -288,4 +288,12 @@ $models=PropertyAddress::select('*')
         ->get(); 
         return $models;
 }
+public  function personSecondMobileAndEmailByUid($uid)
+{
+     $mobile=PersonMobile::where(['uid'=>$uid ,['mobile_cachet','!=','1']])->get();
+     $email=PersonEmail::where(['uid'=>$uid , ['email_cachet','!=','1']])->get();
+     $model['mobile']=$mobile;
+     $model['email']=$email;
+    return $model;
+}
 }
