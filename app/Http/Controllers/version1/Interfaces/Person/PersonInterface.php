@@ -32,4 +32,6 @@ interface PersonInterface
    public function personAddressByuid($uid);
    public function getPersonByUid($uid);
    public  function personSecondMobileAndEmailByUid($uid);
+   public function eitherPersonByMobile($mobile);
+   public function eitherPersonByEmail($email);
 }

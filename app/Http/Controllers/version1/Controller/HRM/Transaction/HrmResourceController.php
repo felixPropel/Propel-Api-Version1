@@ -69,12 +69,29 @@ public function resourceMobileOtp(Request $request, $orgId)
     Log::info('HrmResourceController> resourceMobileOtp .' . json_encode($response));
 
 }
+  
+public function resourceEmailOtp(Request $request, $orgId)
+{
+    Log::info('HrmResourceController > resourceEmailOtp.' . json_encode($request->all()));
+    $response = $this->service->resourceEmailOtp($request->all(),$orgId);
+    return $response;
+    Log::info('HrmResourceController> resourceEmailOtp .' . json_encode($response));
+
+}
 public function resourceOtpValidate(Request $request, $orgId)
 {
     Log::info('HrmResourceController > resourceOtpValidate.' . json_encode($request->all()));
     $response = $this->service->resourceOtpValidate($request->all(),$orgId);
     return $response;
     Log::info('HrmResourceController> resourceOtpValidate .' . json_encode($response));
+
+}
+public function resourceEmailOtpValidate(Request $request, $orgId)
+{
+    Log::info('HrmResourceController > resourceEmailOtpValidate.' . json_encode($request->all()));
+    $response = $this->service->resourceEmailOtpValidate($request->all(),$orgId);
+    return $response;
+    Log::info('HrmResourceController> resourceEmailOtpValidate .' . json_encode($response));
 
 }
     /**

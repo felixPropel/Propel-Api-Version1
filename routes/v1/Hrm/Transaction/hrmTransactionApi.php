@@ -7,10 +7,11 @@ Route::post('findDesignationByDepartmentId/{orgId}', 'App\Http\Controllers\versi
 // Route::post('findResourceWithCredentials', 'Hrm\Transaction\HrmResourceController@findResourceWithCredentials')->name('findResourceWithCredentials');
 // Route::post('findDesignationByDepartmentId', 'Hrm\Transaction\HrmResourceController@findDesignationByDepartmentId')->name('findDesignationByDepartmentId');
 // Route::post('freshPersonOrganizationDetails', 'Hrm\Transaction\HrmResourceController@store')->name('freshPersonOrganizationDetails');
-
 Route::get('getResourceMasterData/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@getResourceMasterData')->name('getPersonMasterData');
 Route::post('resourcesStore/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\HrmResourceController@store')->name('resourcesStore');
 Route::get('findAllResources/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@index')->name('findAllResources');
 Route::post('generateMobileOtp/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceMobileOtp')->name('generateMobileOtp');
 Route::post('resourceOtpValidate/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceOtpValidate')->name('resourceOtpValidate');
 Route::post('resourceRelive/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceRelive')->name('resourceRelive');
+Route::post('resourceEmailOtp/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceEmailOtp')->name('resourceEmailOtp');
+Route::post('resourceEmailOtpValidate/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceEmailOtpValidate')->name('resourceEmailOtpValidate');
