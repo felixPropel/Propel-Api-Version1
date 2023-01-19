@@ -14,9 +14,8 @@ use App\Http\Controllers\version1\Services\Person\PersonService;
 use App\Models\PersonMobile;
 use App\Models\PersonEmail;
 use App\Models\HrmResource;
-use App\Models\HrmResourceWorking;
-use App\Models\HrmResourceDoj;
-use App\Models\HrmResourceDesignation;
+use App\Models\HrmResourceSr;
+use App\Models\HrmResourceTypeDesignation;
 use App\Models\HrmResourceReliveDetail;
 use App\Models\HrmResourceTypeDetail;
 use App\Models\Organization\UserOrganizationRelational;
@@ -131,7 +130,7 @@ class HrmResourceService
                 $result=['type'=>9, 'emailOnly'=>$checkPersonByEmail];
             }
             else{
-                $result=['type'=>10];  
+                $result=['type'=>10 , 'status' => 'freshResource'];  
             }
 
           }
@@ -210,7 +209,6 @@ class HrmResourceService
 
             $convertToResourceTypeDetailModel = $this->convertToResourceTypeDetailModel($orgdatas);
             $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas);
-            $convertToResourceDateOfJoin = $this->convertToResourceJoinDate($orgdatas);
             $convertToResourceWorking = $this->convertToResourceWorking($orgdatas);
             $convertToUserAccountModel = $this->convertToUserAccountModel($orgId);
 
@@ -218,12 +216,9 @@ class HrmResourceService
                 'resourceModel' => $convertToResourceModel,
                 'resourceTypeDetailModel' => $convertToResourceTypeDetailModel,
                 'resourceDesignModel' => $convertToResourceDesignationModel,
-                'resourceJoinModel' => $convertToResourceDateOfJoin,
                 'resourceWorkingModel' => $convertToResourceWorking,
                 'userAccountModel' => $convertToUserAccountModel
             ];
-
-
             $saveResourceModel = $this->hrmResourceInterface->saveResource($allModels);
 
             log::info('saveResource ' . json_encode($saveResourceModel));
@@ -253,20 +248,17 @@ class HrmResourceService
     public function convertToResourceDesignationModel($datas)
     {
         //dd($datas);
-        $model = new HrmResourceDesignation();
+        $model = new HrmResourceTypeDesignation();
         $model->designation_id = $datas->designationId;
         return $model;
     }
-    public function convertToResourceJoinDate($datas)
-    {
-        $model = new HrmResourceDoj();
-        $model->DOJ = '2021-10-11';
-        return $model;
-    }
+ 
     public function convertToResourceWorking($datas)
     {
-        $model = new HrmResourceWorking();
+        $model = new HrmResourceSr();
         $model->active_state = 1;
+        $model->date_of_joining= date('Y-m-d');
+        log::info('hrmResourceService   HrmResourceSr ' .json_encode($model->date_of_joining));
         return $model;
     }
     public function convertToUserAccountModel($orgId)

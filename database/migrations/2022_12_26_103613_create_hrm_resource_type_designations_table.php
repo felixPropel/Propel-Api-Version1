@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHrmResourcetypeDesignationsTable extends Migration
+class CreateHrmResourceTypeDesignationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateHrmResourcetypeDesignationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('hrm_resource_designations', function (Blueprint $table) {
+        Schema::create('hrm_resource_type_designations', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('resource_id');
             $table->integer('designation_id');
@@ -29,6 +29,6 @@ class CreateHrmResourcetypeDesignationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hrm_resourcetype_designations');
+        Schema::dropIfExists('hrm_resource_type_designations');
     }
 }

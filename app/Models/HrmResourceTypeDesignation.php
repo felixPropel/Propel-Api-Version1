@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HrmResourceDesignation extends Model
+class HrmResourceTypeDesignation extends Model
 {
     use HasFactory;
     public function __construct()

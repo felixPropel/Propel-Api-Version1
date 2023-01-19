@@ -72,7 +72,6 @@ class HrmResourceRepository implements HrmResourceInterface
                 $resourceModel = $allModels['resourceModel'];
                 $resourceTypeDetailModel = $allModels['resourceTypeDetailModel'];
                 $resourceDesignModel = $allModels['resourceDesignModel'];
-                $resourceJoinModel = $allModels['resourceJoinModel'];
                 $resourceWorkingModel = $allModels['resourceWorkingModel'];
                 $userAccountModel = $allModels['userAccountModel'];
 
@@ -80,14 +79,12 @@ class HrmResourceRepository implements HrmResourceInterface
 
                 $resourceTypeDetailModel->ParentHrmResource()->associate($resourceModel,  'resource_id','id');
                 $resourceDesignModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
-                $resourceJoinModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
                 $resourceWorkingModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
                 $userAccountModel->ParentPerson()->associate($resourceModel, 'uid', 'uid');
 
 
                 $resourceTypeDetailModel->save();
                 $resourceDesignModel->save();
-                $resourceJoinModel->save();
                 $resourceWorkingModel->save();
                 $userAccountModel->save();
                 
