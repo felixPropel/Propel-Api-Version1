@@ -30,7 +30,7 @@ class UserService
         $datas = (object) $objdatas;
         $validator = Validator::make($objdatas, [
             'userName' => 'required|string|max:255',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string',
         ]);
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], 422);

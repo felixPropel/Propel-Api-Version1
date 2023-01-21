@@ -246,8 +246,7 @@ class PersonService
 
                 return $personModel;
             } else {
-
-                return $this->commonService->sendError("Incorrect OTP", "Wrong Otp");
+                return $this->commonService->sendError(['tempId' => $tempPersonModel->id, 'mobileNumber' => $tempPersonModel->mobile_no]);
             }
         } else { }
     }
