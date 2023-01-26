@@ -19,7 +19,7 @@ class HrmResource extends Model
     }
     public function designation()
     {
-        return $this->hasOne(HrmResourceDesignation::class, 'resource_id', 'id');
+        return $this->hasOne(HrmResourceTypeDesignation::class, 'resource_id', 'id');
     }
     
 }

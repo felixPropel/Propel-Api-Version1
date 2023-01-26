@@ -26,24 +26,6 @@ class PersonRepository implements PersonInterface
         $orgDB = Session::get('orgDb');
         Config::set('database.connections.mysql_external.database', $orgDB);
     }
-    public function eitherPersonByMobile($mobileNumber)
-    {
-        return Person::select('persons.uid','person_mobiles.mobile_no','person_details.first_name','person_emails.email')
-            ->leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
-            ->leftjoin('person_details', 'person_details.uid', '=', 'persons.uid')
-            ->leftjoin('person_emails', 'person_emails.uid', '=', 'persons.uid')
-            ->where('person_mobiles.mobile_no', $mobileNumber)
-            ->first();
-    }
-    public function eitherPersonByEmail($email)
-    {
-        return Person::select('persons.uid','person_mobiles.mobile_no','person_details.first_name','person_emails.email')
-            ->leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid')
-            ->leftjoin('person_details', 'person_details.uid', '=', 'persons.uid')
-            ->leftjoin('person_emails', 'person_emails.uid', '=', 'persons.uid')
-            ->where('person_emails.email', $email)
-            ->first();
-    }
     public function findTempPersonById($id)
     {
 
@@ -277,8 +259,7 @@ class PersonRepository implements PersonInterface
     }
     public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile)
     {
-
-        $models = Person::select('persons.id as personId','person_details.first_name as personName','person_emails.email As emailId', 'person_mobiles.mobile_no as mobileId')
+        $models = Person::select('persons.id as personId','persons.uid as personUid','person_details.first_name as personName','person_emails.email As emailId', 'person_mobiles.mobile_no as mobileId')
             ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
             ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
             ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
@@ -309,14 +290,16 @@ public  function personSecondMobileAndEmailByUid($uid)
      $model['email']=$email;
     return $model;
 }
-public function checkPersonByMobile($mobile)
+public function checkPersonByMobile($mobile) 
 {
-    $models = Person::select('persons.id as personId','person_details.first_name as personName', 'person_mobiles.mobile_no as mobileId')
-    ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
-    ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
-    ->where('person_mobiles.mobile_no', $mobile)
-     ->whereIn('person_mobiles.mobile_cachet', [1, 2])
-    ->get();
+    return  PersonMobile::where('mobile_no', $mobile)->first();
+//    return Person::select('persons.uid as personUid','person_details.first_name as personName', 'person_mobiles.mobile_no as mobileId')
+//     ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
+//     ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
+//     ->where('person_mobiles.mobile_no', $mobile)
+//      ->whereIn('person_mobiles.mobile_cachet', [1, 2])
+//     ->get();
+ 
 }
 
 }
