@@ -153,6 +153,15 @@ class PersonRepository implements PersonInterface
 
         return PersonEmail::where('uid', $uid)->first();
     }
+    public function findEmailByPersonEmail ($email)
+    {
+        $model=  PersonEmail::where('email',$email)->whereIn('email_cachet', [1, 2])->get();
+        if (count($model) == 0) {
+            return NUll;
+        } else {
+            return $model;
+        }
+    }
     public function getPersonEmailByUid($uid)
     {
 
@@ -268,7 +277,11 @@ class PersonRepository implements PersonInterface
             ->whereIn('person_mobiles.mobile_cachet', [1, 2])
             ->whereIn('person_emails.email_cachet', [1, 2])
             ->get();
-        return $models;
+            if (count($models) == true) {
+                return $models;
+            } else {
+                return NULL;
+            }
     }
     public function checkUserByUID($uid)
     {
@@ -292,14 +305,8 @@ public  function personSecondMobileAndEmailByUid($uid)
 }
 public function checkPersonByMobile($mobile) 
 {
-    return  PersonMobile::where('mobile_no', $mobile)->first();
-//    return Person::select('persons.uid as personUid','person_details.first_name as personName', 'person_mobiles.mobile_no as mobileId')
-//     ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
-//     ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
-//     ->where('person_mobiles.mobile_no', $mobile)
-//      ->whereIn('person_mobiles.mobile_cachet', [1, 2])
-//     ->get();
- 
+    return  PersonMobile::where(['mobile_no'=>$mobile,'mobile_cachet'=>1])->first();
+
 }
 
 }

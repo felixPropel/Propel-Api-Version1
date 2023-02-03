@@ -42,32 +42,32 @@ class PersonService
         $model = $this->userInterface->findUserDataByMobileNumber($datas->mobileNumber); // check user data
         $personModel = $this->personInterface->checkPersonByMobile($datas->mobileNumber);
         Log::info('PersonService > findMobileNumber function Return.' . json_encode($personModel));
-
-
         if ($model) {
             $personDatas = $this->personInterface->getPersonPrimaryDataByUid($model->uid);
             $result = ['type' => 1, 'personDatas' => $personDatas, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
         } else {
-            if ($personModel) {
-                $result = ['type' => 2, 'personUid' => $personModel['uid'], 'mobileNumber' => $datas->mobileNumber, 'status' => "PersonOnly"];
-            } else {
-                $result = ['type' => 0, 'model' => "", 'mobileNumber' => $datas->mobileNumber, 'status' => "NotInUser"];
-            }
+             $result = ['type' => 0, 'model' => "", 'mobileNumber' => $datas->mobileNumber, 'status' => "checkingPerson"];
         }
         return $this->commonService->sendResponse($result, "");
     }
 
-    public function findEmail($datas)
+    public function findCredential($datas)
     {
-        Log::info('PersonService > findEmail function Inside.' . json_encode($datas));
+        Log::info('PersonService > findCredential function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $model = $this->userInterface->findUserDataByEmail($datas->email);
-        Log::info('PersonService > findEmail function Return.' . json_encode($model));
-
-        if ($model) {
-            $result = ['type' => 1, 'model' => $model, 'email' => $datas->email];
-        } else {
-            $result = ['type' => 0, 'model' => "", 'email' => $datas->email];
+        $checkPersonMobile=$this->personInterface->checkPersonByMobile($datas->mobileNumber);
+        if(!empty($checkPersonMobile)){
+            $checkPersonEmail=$this->personInterface->checkPersonEmailByUid($datas->email,$checkPersonMobile->uid);
+        }
+        $personAllDetails=$this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email,$datas->mobileNumber);
+        if( $checkPersonMobile  &&  $checkPersonEmail){
+            $result=['type'=>1,'personData'=>$datas,'uid'=>$checkPersonMobile->uid,'status'=>'ExactPerson'];
+        }
+        else if(!empty($personAllDetails)){
+            $result=['type'=>2,'personData'=>$personAllDetails,'status'=>'MappedPerson'];
+        }
+        else{
+            $result=['type'=>3,'status'=>'freshUser'];
         }
         return $this->commonService->sendResponse($result, "");
     }
@@ -76,7 +76,6 @@ class PersonService
         Log::info('PersonService > storeTempPerson function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $tempId = isset($datas->tempId) ? $datas->tempId : 0;
-
         $model = $this->convertToTempPersonModel($datas, $tempId);
         $storeTempPerson = $this->personInterface->storeTempPerson($model);
         Log::info('PersonService > storeTempPerson function Return.' . json_encode($storeTempPerson));
@@ -212,11 +211,15 @@ class PersonService
         Log::info('PersonService > checkPersonEmail function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $checkEmailByUid = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->personUid);
+        $findEmailByPereson=$this->personInterface->findEmailByPersonEmail($datas->email);
         Log::info('PersonService > checkPersonEmail function Return.' . json_encode($checkEmailByUid));
         if ($checkEmailByUid) {
             $result = ['type' => 1, 'personDatas' => $checkEmailByUid, 'mobileNumber' => $datas->mobileNumber, 'status' => "Email_In"];
-        } else {
-            $result = ['type' => 0, 'personDatas' => '', 'status' => "EmailNotFound"];
+        } elseif($findEmailByPereson){
+            $result = ['type' => 2, 'personDatas' =>$findEmailByPereson, 'status' => "mutipleperson"];
+        }
+        else {
+            $result = ['type' => 0, 'personDatas' => '', 'status' => "Email Not Our System"];
         }
         return $this->commonService->sendResponse($result, '');
     }
@@ -550,7 +553,7 @@ class PersonService
         $smsTypeModel = $this->smsInterface->findSmsTypeByName('PersonToUser');
         $smsHistoryModel = $this->smsService->storeSms($personDatas->mobileNumber, $smsTypeModel->id, $otp, $personDatas->uid);
         Log::info('PersonService > personMobileOtp function Return.' . json_encode($datas));
-        return $this->commonService->sendResponse($datas, '');
+        return $this->commonService->sendResponse($datas, 'OtpSuccesfully');
     }
     public function convertOtpMobileNumber($uid, $otp)
     {
@@ -564,14 +567,19 @@ class PersonService
     }
     public function mobileOtpValidated($persondatas)
     {
+   
         Log::info('PersonService > mobileOtpValidated function Inside.' . json_encode($persondatas));
         $datas = (object) $persondatas;
         $model = $this->personInterface->getOtpByUid($datas->uid);
-        Log::info('PersonService > mobileOtpValidated function Return.' . json_encode($model));
+        Log::info('PersonService > mobileOtpValidated getOtpByUid function Return.' . json_encode($model));
         if ($datas->otp == $model->otp_received) {
             $status = PersonMobile::where("uid", $datas->uid)->update(['mobile_cachet' => 1, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
-            return $this->commonService->sendResponse($persondatas, '');
+            $result=['personData'=>$persondatas,'status'=>'OtpValidateSuccess','type'=>1 ];
+        }else{
+            $result=['personData'=>"",'status'=>'OtpValidatefailed','type'=>0 ];
         }
+        return $this->commonService->sendResponse($result,'');
+
     }
     public function personDatas($datas)
     {
@@ -639,7 +647,7 @@ class PersonService
         $model = PersonEmail::where("uid", $uid)->update(["otp_received" => $otp, "email_validation_status" => 0]);
         Log::info('PersonService > generateEmailOtp function Return.' . json_encode($model));
         if ($model) {
-            $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uid, 'email' => $data->email]];
+            $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uid['uid'], 'email' => $data->email]];
             return response($response, 200);
         } else {
             $response = ["message" => 'Mail Not Send'];
@@ -675,5 +683,13 @@ class PersonService
 
         Log::info('PersonService > personProfileDetails function Return.' . json_encode($personMasterData));
         return $this->commonService->sendResponse($personMasterData, '');
+    }
+    public function getDetailedAllPerson($datas)
+    {
+        Log::info('PersonService > getDetailedAllPerson function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $personAllDetails=$this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email,$datas->mobileNumber);
+        return $this->commonService->sendResponse($personAllDetails, '');
+
     }
     }

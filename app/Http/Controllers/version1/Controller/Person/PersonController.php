@@ -26,11 +26,11 @@ class PersonController extends Controller
         Log::info('PersonController > findMobileNumber function Return.' . json_encode($response));
         return $response;
     }
-    public function findEmail(Request $request)
+    public function findCredential(Request $request)
     {
-        Log::info('PersonController > findEmail function Inside.' . json_encode($request->all()));
-        $response = $this->personService->findEmail($request->all());
-        Log::info('PersonController > findEmail function Return.' . json_encode($response));
+        Log::info('PersonController > findCredential function Inside.' . json_encode($request->all()));
+        $response = $this->personService->findCredential($request->all());
+        Log::info('PersonController > findCredential function Return.' . json_encode($response));
         return $response;
     }
     public function storeTempPerson(Request $request)
@@ -80,6 +80,13 @@ public function personOtpValidation(Request $request)
     $response = $this->personService->personOtpValidation($request->all());
     Log::info('PersonController > personOtpValidation function Return.' . json_encode($response));
     return $response;
+}
+public function getDetailedAllPerson(Request $request)
+{
+    Log::info('PersonController > getDetailedAllPerson function Inside.' . json_encode($request->all()));
+    $response=$this->personService->getDetailedAllPerson($request->all());
+    Log::info('PersonController > getDetailedAllPerson function Return.' . json_encode($response));
+    return  $response;
 }
 public function checkPersonEmail(Request $request)
 {

@@ -3,7 +3,7 @@ use Illuminate\Support\Facades\Route;
 // searching Part Start
 //@Developer Dhana
 Route::post('findMobileNumber', 'App\Http\Controllers\version1\Controller\Person\PersonController@findMobileNumber')->name('findMobileNumber');
-Route::post('findEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@findEmail')->name('findEmail');
+Route::post('findCredential', 'App\Http\Controllers\version1\Controller\Person\PersonController@findCredential')->name('findCredential');
 Route::post('storePerson', 'App\Http\Controllers\version1\Controller\Person\PersonController@storePerson')->name('storePerson');
 Route::get('getSalutation', 'App\Http\Controllers\version1\Controller\Person\PersonController@getSalutation')->name('getSalutation');
 Route::get('getCommonData', 'App\Http\Controllers\version1\Controller\Person\PersonController@getCommonData')->name('getCommonData');
@@ -21,3 +21,4 @@ Route::post('userCreation', 'App\Http\Controllers\version1\Controller\Person\Per
 Route::post('emailOtpValidation', 'App\Http\Controllers\version1\Controller\Person\PersonController@emailOtpValidation')->name('emailOtpValidation');
 Route::post('personProfiles', 'App\Http\Controllers\version1\Controller\Person\PersonController@personProfiles')->name('personProfiles');
 Route::post('profileUpdate', 'App\Http\Controllers\version1\Controller\Person\PersonController@profileUpdate')->name('profileUpdate');
+Route::post('getDetailedAllPerson', 'App\Http\Controllers\version1\Controller\Person\PersonController@getDetailedAllPerson')->name('getDetailedAllPerson');

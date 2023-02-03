@@ -93,8 +93,7 @@ class HrmResourceService
         /* 5.Resource false */
         /* 6.SameOrganizationUser/employee*/
         /* 7. NotInSameOrganizationUser */
-           /*8. MobileOnly */
-            /*9. EmailOnly */
+
 
 
         /*Some Important Types credential Type End */
@@ -120,27 +119,11 @@ class HrmResourceService
                 return $this->commonService->sendResponse($resData, '');
             }
         } else { 
-            $checkPersonByMobile=$this->personInterface->eitherPersonByMobile($mobile);
-            if($checkPersonByMobile){   
-                $result=['type'=>8, 'mobileOnly'=>$checkPersonByMobile];
-            }
-          else{
-            $checkPersonByEmail=$this->personInterface->eitherPersonByEmail($email);
-            if($checkPersonByEmail){
-                $result=['type'=>9, 'emailOnly'=>$checkPersonByEmail];
-            }
-            else{
-                $result=['type'=>10 , 'status' => 'freshResource'];  
-            }
-
-          }
-          return $this->commonService->sendResponse($result, '');
             $getAllPersonByMobileAndEmail =  $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
-          
-            if (count($getAllPersonByMobileAndEmail)){
+            if ($getAllPersonByMobileAndEmail){
                 $resData = ['type' => 1, 'AllPersons' => $getAllPersonByMobileAndEmail];
             } else {
-                $resData = ['type' => 2];
+                $resData = ['type' => 2 ,'status' => 'freshResource'];
             }
         }
         return $this->commonService->sendResponse($resData, '');
@@ -269,7 +252,9 @@ class HrmResourceService
     }
     public function resourceMobileOtp($datas, $orgId)
     {
+        log::info('hrmResourceService   otp ' .json_encode($datas));
         $datas = (object) $datas;
+        log::info('hrmResourceService object  otp ' .json_encode($datas));
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $otp = random_int(1000, 9999);
         $model = PersonMobile::where("uid", $datas->uid)->update(['otp_received' => $otp]);
