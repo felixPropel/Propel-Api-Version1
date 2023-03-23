@@ -50,4 +50,12 @@ class PersonDetails extends Model
     {
         return $this->belongsTo(Person::class, 'uid', 'uid');
     }
+    public function gender()
+    {
+        return $this->hasOne('App\Models\BasicModels\Gender', 'id','gender_id');
+    }
+    public function bloodGroup()
+    {
+        return $this->hasOne('App\Models\BasicModels\BloodGroup', 'id','blood_group_id');
+    }
 }

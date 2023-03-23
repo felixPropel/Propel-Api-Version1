@@ -3,20 +3,18 @@
 namespace App\Http\Controllers\version1\Repositories\Person;
 
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
-use App\Models\Category;
-use App\Models\User;
 use App\Models\Person;
+use App\Models\personAnniversary;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
+use App\Models\PersonLanguage;
 use App\Models\PersonMobile;
-use App\Models\TempPerson;
-use App\Models\PersonAddress;
 use App\Models\PropertyAddress;
+use App\Models\TempPerson;
+use App\Models\User;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\PersonLanguage;
-use App\Models\personAnniversary;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 
 class PersonRepository implements PersonInterface
@@ -40,18 +38,17 @@ class PersonRepository implements PersonInterface
                 $model->save();
                 return [
                     'message' => "Success",
-                    'data' => $model
+                    'data' => $model,
                 ];
             });
 
             return $result;
         } catch (\Exception $e) {
 
-
             return [
 
                 'message' => "failed",
-                'data' => $e
+                'data' => $e,
             ];
         }
     }
@@ -65,20 +62,16 @@ class PersonRepository implements PersonInterface
                 $personDetailModel = $allModels['personDetailModel'];
                 $personEmailModel = $allModels['personEmailModel'];
                 $personMobileModel = $allModels['personMobileModel'];
-                $personAnotherEmailModel=$allModels['personAnotherEmailModel'];
-                $personAnotherMobileModel=$allModels['personAnotherMobileModel'];
-                $personWebLinkModel=$allModels['personWebLink'];
-                $personOtherLanguage=$allModels['personOtherLanguage'];
-                $personIdDocument=$allModels['personIdDocument'];
-                $personEducationModel=$allModels['personEducationModel'];
-                $personProfessionModel=$allModels['personProfessionModel'];
-                $personCommonAddressModel=$allModels['personCommonAddressModel'];
-                $personAddressId=$allModels['personAddressId'];
-              
+                $personAnotherEmailModel = $allModels['personAnotherEmailModel'];
+                $personAnotherMobileModel = $allModels['personAnotherMobileModel'];
+                $personWebLinkModel = $allModels['personWebLink'];
+                $personOtherLanguage = $allModels['personOtherLanguage'];
+                $personIdDocument = $allModels['personIdDocument'];
+                $personEducationModel = $allModels['personEducationModel'];
+                $personProfessionModel = $allModels['personProfessionModel'];
+                $personCommonAddressModel = $allModels['personCommonAddressModel'];
+                $personAddressId = $allModels['personAddressId'];
 
-
-                
-              
                 $personModel->save();
                 $personDetailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
                 $personMobileModel->ParentPerson()->associate($personModel, 'uid', 'uid');
@@ -88,54 +81,53 @@ class PersonRepository implements PersonInterface
                 $personMobileModel->save();
                 $personEmailModel->save();
 
-                for($i=0;$i<count($personAnotherEmailModel);$i++){
+                for ($i = 0; $i < count($personAnotherEmailModel); $i++) {
                     $personAnotherEmailModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAnotherEmailModel[$i]->save();
-                }   
-                for($i=0;$i<count($personAnotherMobileModel);$i++){
+                }
+                for ($i = 0; $i < count($personAnotherMobileModel); $i++) {
                     $personAnotherMobileModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAnotherMobileModel[$i]->save();
-                }  
-                for($i=0;$i<count($personWebLinkModel);$i++){
+                }
+                for ($i = 0; $i < count($personWebLinkModel); $i++) {
                     $personWebLinkModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personWebLinkModel[$i]->save();
-                }  
-                for($i=0;$i<count($personOtherLanguage);$i++){
+                }
+                for ($i = 0; $i < count($personOtherLanguage); $i++) {
                     $personOtherLanguage[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personOtherLanguage[$i]->save();
-                } 
-                for($i=0;$i<count($personIdDocument);$i++){
+                }
+                for ($i = 0; $i < count($personIdDocument); $i++) {
                     $personIdDocument[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personIdDocument[$i]->save();
-                } 
-                for($i=0;$i<count($personEducationModel);$i++){
+                }
+                for ($i = 0; $i < count($personEducationModel); $i++) {
                     $personEducationModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personEducationModel[$i]->save();
-                } 
-                for($i=0;$i<count($personProfessionModel);$i++){
+                }
+                for ($i = 0; $i < count($personProfessionModel); $i++) {
                     $personProfessionModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personProfessionModel[$i]->save();
-                } 
-                for($i=0;$i<count($personCommonAddressModel);$i++){               
+                }
+                for ($i = 0; $i < count($personCommonAddressModel); $i++) {
                     $personCommonAddressModel[$i]->save();
-                } 
-                if(!empty($personCommonAddressModel[$i])){
-                    $personAddressId->ParentPerson()->associate($personModel,'uid', 'uid');
+                }
+                if (!empty($personCommonAddressModel[$i])) {
+                    $personAddressId->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAddressId->save();
                 }
                 return [
                     'message' => "Success",
-                    'data' => $personModel
+                    'data' => $personModel,
                 ];
             });
             return $result;
         } catch (\Exception $e) {
 
-
             return [
 
                 'message' => "failed",
-                'data' => $e
+                'data' => $e,
             ];
         }
     }
@@ -153,11 +145,11 @@ class PersonRepository implements PersonInterface
 
         return PersonEmail::where('uid', $uid)->first();
     }
-    public function findEmailByPersonEmail ($email)
+    public function findEmailByPersonEmail($email)
     {
-        $model=  PersonEmail::where('email',$email)->whereIn('email_cachet', [1, 2])->get();
+        $model = PersonEmail::where('email', $email)->whereIn('email_cachet', [1, 2])->get();
         if (count($model) == 0) {
-            return NUll;
+            return null;
         } else {
             return $model;
         }
@@ -188,7 +180,7 @@ class PersonRepository implements PersonInterface
     }
     public function getMobileNumberByUid($uid)
     {
-        return  PersonMobile::where('uid', $uid)->first();
+        return PersonMobile::where('uid', $uid)->first();
     }
     public function getEmailByUid($uid)
     {
@@ -207,9 +199,9 @@ class PersonRepository implements PersonInterface
     }
     public function getAnniversaryDate($uid)
     {
-    
-        return   personAnniversary::where('uid', $uid)->first();
-    
+
+        return personAnniversary::where('uid', $uid)->first();
+
     }
     public function saveAnniversaryDate($model)
     {
@@ -217,10 +209,9 @@ class PersonRepository implements PersonInterface
     }
     public function motherTongueByUid($uid)
     {
-    
-            return PersonLanguage::where('uid', $uid)->get();
-          
-     
+
+        return PersonLanguage::where('uid', $uid)->get();
+
     }
     public function updateMotherTongue($model)
     {
@@ -254,7 +245,7 @@ class PersonRepository implements PersonInterface
     {
         Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.');
 
-        $model =  Person::select('*')
+        $model = Person::select('*')
             ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
             ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
             ->where('person_mobiles.mobile_no', $mobile)
@@ -268,7 +259,7 @@ class PersonRepository implements PersonInterface
     }
     public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile)
     {
-        $models = Person::select('persons.id as personId','persons.uid as personUid','person_details.first_name as personName','person_emails.email As emailId', 'person_mobiles.mobile_no as mobileId')
+        $models = Person::select('persons.id as personId', 'persons.uid as personUid', 'person_details.first_name as personName', 'person_emails.email As emailId', 'person_mobiles.mobile_no as mobileId')
             ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
             ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
             ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
@@ -277,36 +268,38 @@ class PersonRepository implements PersonInterface
             ->whereIn('person_mobiles.mobile_cachet', [1, 2])
             ->whereIn('person_emails.email_cachet', [1, 2])
             ->get();
-            if (count($models) == true) {
-                return $models;
-            } else {
-                return NULL;
-            }
+        if (count($models) == true) {
+            return $models;
+        } else {
+            return null;
+        }
     }
     public function checkUserByUID($uid)
     {
-        return User::where('uid',$uid)->first();
+        return User::where('uid', $uid)->first();
     }
     public function personAddressByuid($uid)
-{
-$models=PropertyAddress::select('*')
-        ->leftjoin('person_addresses','person_addresses.property_address_id','com_property_addresses.id')
-        ->where('person_addresses.uid',$uid)
-        ->get(); 
+    {
+        $models = PropertyAddress::select('*')
+            ->leftjoin('person_addresses', 'person_addresses.property_address_id', 'com_property_addresses.id')
+            ->where('person_addresses.uid', $uid)
+            ->get();
         return $models;
-}
-public  function personSecondMobileAndEmailByUid($uid)
-{
-     $mobile=PersonMobile::where(['uid'=>$uid ,['mobile_cachet','!=','1']])->get();
-     $email=PersonEmail::where(['uid'=>$uid , ['email_cachet','!=','1']])->get();
-     $model['mobile']=$mobile;
-     $model['email']=$email;
-    return $model;
-}
-public function checkPersonByMobile($mobile) 
-{
-    return  PersonMobile::where(['mobile_no'=>$mobile,'mobile_cachet'=>1])->first();
-
-}
-
+    }
+    public function personSecondMobileAndEmailByUid($uid)
+    {
+        $mobile = PersonMobile::where(['uid' => $uid, ['mobile_cachet', '!=', '1']])->get();
+        $email = PersonEmail::where(['uid' => $uid, ['email_cachet', '!=', '1']])->get();
+        $model['mobile'] = $mobile;
+        $model['email'] = $email;
+        return $model;
+    }
+    public function checkPersonByMobile($mobile)
+    {
+        return PersonMobile::where(['mobile_no' => $mobile, 'mobile_cachet' => 1])->first();
+    }
+    public function getAllDatasInUser($uid)
+    {
+        return Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personDetails.gender', 'personDetails.bloodGroup', 'personAddress', 'personAddress.ParentComAddress','personEducation','personProfession')->where('uid', $uid)->get();
+    }
 }

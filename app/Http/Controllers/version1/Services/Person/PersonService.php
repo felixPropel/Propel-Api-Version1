@@ -5,25 +5,23 @@ namespace App\Http\Controllers\version1\Services\Person;
 use App\Http\Controllers\version1\Interfaces\Common\SmsInterface;
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
-use App\Http\Controllers\version1\Repositories\common\smsRepository;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Http\Controllers\version1\Services\Common\SmsService;
-use App\Models\Person;
-use App\Models\WebLink;
-use App\Models\PersonEducation;
-use App\Models\PersonProfession;
 use App\Models\IdDocumentType;
-use App\Models\PersonDetails;
-use App\Models\PersonEmail;
+use App\Models\Person;
 use App\Models\PersonAddress;
-use App\Models\PersonMobile;
-use App\Models\TempPerson;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use App\Models\PersonDetails;
+use App\Models\PersonEducation;
+use App\Models\PersonEmail;
 use App\Models\PersonLanguage;
+use App\Models\PersonMobile;
+use App\Models\PersonProfession;
 use App\Models\PropertyAddress;
+use App\Models\TempPerson;
+use App\Models\WebLink;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PersonService
 {
@@ -46,7 +44,7 @@ class PersonService
             $personDatas = $this->personInterface->getPersonPrimaryDataByUid($model->uid);
             $result = ['type' => 1, 'personDatas' => $personDatas, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
         } else {
-             $result = ['type' => 0, 'model' => "", 'mobileNumber' => $datas->mobileNumber, 'status' => "checkingPerson"];
+            $result = ['type' => 0, 'model' => "", 'mobileNumber' => $datas->mobileNumber, 'status' => "checkingPerson"];
         }
         return $this->commonService->sendResponse($result, "");
     }
@@ -55,19 +53,17 @@ class PersonService
     {
         Log::info('PersonService > findCredential function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $checkPersonMobile=$this->personInterface->checkPersonByMobile($datas->mobileNumber);
-        if(!empty($checkPersonMobile)){
-            $checkPersonEmail=$this->personInterface->checkPersonEmailByUid($datas->email,$checkPersonMobile->uid);
+        $checkPersonMobile = $this->personInterface->checkPersonByMobile($datas->mobileNumber);
+        if (!empty($checkPersonMobile)) {
+            $checkPersonEmail = $this->personInterface->checkPersonEmailByUid($datas->email, $checkPersonMobile->uid);
         }
-        $personAllDetails=$this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email,$datas->mobileNumber);
-        if( $checkPersonMobile  &&  $checkPersonEmail){
-            $result=['type'=>1,'personData'=>$datas,'uid'=>$checkPersonMobile->uid,'status'=>'ExactPerson'];
-        }
-        else if(!empty($personAllDetails)){
-            $result=['type'=>2,'personData'=>$personAllDetails,'status'=>'MappedPerson'];
-        }
-        else{
-            $result=['type'=>3,'status'=>'freshUser'];
+        $personAllDetails = $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email, $datas->mobileNumber);
+        if ($checkPersonMobile && $checkPersonEmail) {
+            $result = ['type' => 1, 'personData' => $datas, 'uid' => $checkPersonMobile->uid, 'status' => 'ExactPerson'];
+        } else if (!empty($personAllDetails)) {
+            $result = ['type' => 2, 'personData' => $personAllDetails, 'status' => 'MappedPerson'];
+        } else {
+            $result = ['type' => 3, 'status' => 'freshUser'];
         }
         return $this->commonService->sendResponse($result, "");
     }
@@ -107,7 +103,6 @@ class PersonService
         Log::info('PersonService > storePerson function Inside.' . json_encode($datas));
         //    dd($datas);
         $datas['personUid'] = isset($datas['personUid']) ? $datas['personUid'] : null;
-
 
         $datas = (object) $datas;
 
@@ -156,8 +151,6 @@ class PersonService
             $personAddressId = $this->convertToPersonAddressId();
         }
 
-
-
         $allModels = [
             'personModel' => $personModel,
             'personDetailModel' => $personDetailModel,
@@ -171,12 +164,11 @@ class PersonService
             'personEducationModel' => $personEducationModel,
             'personProfessionModel' => $personProfessionModel,
             'personCommonAddressModel' => $personCommonAddressModel,
-            'personAddressId' => $personAddressId
+            'personAddressId' => $personAddressId,
 
         ];
         $personData = $this->personInterface->storePerson($allModels);
         log::info('allModels' . json_encode($personData));
-
 
         Log::info('PersonService > storePerson function Return.' . json_encode($personData));
         if ($type) {
@@ -211,14 +203,13 @@ class PersonService
         Log::info('PersonService > checkPersonEmail function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $checkEmailByUid = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->personUid);
-        $findEmailByPereson=$this->personInterface->findEmailByPersonEmail($datas->email);
+        $findEmailByPereson = $this->personInterface->findEmailByPersonEmail($datas->email);
         Log::info('PersonService > checkPersonEmail function Return.' . json_encode($checkEmailByUid));
         if ($checkEmailByUid) {
             $result = ['type' => 1, 'personDatas' => $checkEmailByUid, 'mobileNumber' => $datas->mobileNumber, 'status' => "Email_In"];
-        } elseif($findEmailByPereson){
-            $result = ['type' => 2, 'personDatas' =>$findEmailByPereson, 'status' => "mutipleperson"];
-        }
-        else {
+        } elseif ($findEmailByPereson) {
+            $result = ['type' => 2, 'personDatas' => $findEmailByPereson, 'status' => "mutipleperson"];
+        } else {
             $result = ['type' => 0, 'personDatas' => '', 'status' => "Email Not Our System"];
         }
         return $this->commonService->sendResponse($result, '');
@@ -251,7 +242,7 @@ class PersonService
             } else {
                 return $this->commonService->sendError(['tempId' => $tempPersonModel->id, 'mobileNumber' => $tempPersonModel->mobile_no]);
             }
-        } else { }
+        } else {}
     }
     public function convertToPersonModel($datas)
     {
@@ -286,7 +277,6 @@ class PersonService
         if (isset($datas->email)) {
             $model->email = isset($datas->email) ? $datas->email : "";
         }
-
 
         $salutation = isset($datas->salutation) ? $datas->salutation : "";
         if ($salutation) {
@@ -346,14 +336,13 @@ class PersonService
         $model->salutation_id = $datas->salutationId;
         $model->first_name = $datas->firstName;
         $model->middle_name = isset($datas->middleName) ? $datas->middleName : '';
-        $model->last_name =  isset($datas->lastName) ? $datas->lastName : '';
+        $model->last_name = isset($datas->lastName) ? $datas->lastName : '';
         $model->nick_name = isset($datas->nickName) ? $datas->nickName : '';
         // $model->dob = $datas->dob;
-        $model->birth_place =  isset($datas->birthCity) ? $datas->birthCity : '';
-        $model->marital_id =  isset($datas->maritalStatus) ? $datas->maritalStatus:Null;
+        $model->birth_place = isset($datas->birthCity) ? $datas->birthCity : '';
+        $model->marital_id = isset($datas->maritalStatus) ? $datas->maritalStatus : null;
         $model->gender_id = isset($datas->genderId) ? $datas->genderId : '';
         $model->blood_group_id = isset($datas->bloodGroup) ? $datas->bloodGroup : '';
-
 
         Log::info('PersonService > convertToPersonDetailModel function Return.' . json_encode($model));
 
@@ -380,7 +369,7 @@ class PersonService
         Log::info('PersonService > convertToPersonEmailModel function Inside.' . json_encode($datas));
         if ($datas->personUid) {
             $model = $this->personInterface->getPersonEmailByUid($datas->personUid);
-            $model->email =  $datas->email;
+            $model->email = $datas->email;
             $model->email_cachet = 1;
         } else {
             $model = new PersonEmail();
@@ -420,7 +409,6 @@ class PersonService
             }
         }
 
-
         return $orgModel;
         Log::info('PersonService > convertToPersonMobileModelAnother function Return.' . json_encode($orgModel));
     }
@@ -437,7 +425,6 @@ class PersonService
                 array_push($orgModel, $model[$i]);
             }
         }
-
 
         return $orgModel;
         Log::info('PersonService > convertToPersonWebLink function Return.' . json_encode($orgModel));
@@ -483,14 +470,14 @@ class PersonService
         for ($i = 0; $i < count($datas->Qualification); $i++) {
             if ($datas->Qualification[$i]) {
                 $model[$i] = new PersonEducation();
-                $model[$i]->qualification = $datas->Qualification[$i];           
+                $model[$i]->qualification = $datas->Qualification[$i];
                 $model[$i]->education_place = $datas->university[$i];
                 $model[$i]->year_of_pass = $datas->passedYear[$i];
                 $model[$i]->Mark = $datas->mark[$i];
                 array_push($orgModel, $model[$i]);
             }
         }
-        return $orgModel;   
+        return $orgModel;
         Log::info('PersonService > convertToPersonEducation function Return.' . json_encode($orgModel));
     }
     public function convertToPersonProfession($datas)
@@ -567,18 +554,18 @@ class PersonService
     }
     public function mobileOtpValidated($persondatas)
     {
-   
+
         Log::info('PersonService > mobileOtpValidated function Inside.' . json_encode($persondatas));
         $datas = (object) $persondatas;
         $model = $this->personInterface->getOtpByUid($datas->uid);
         Log::info('PersonService > mobileOtpValidated getOtpByUid function Return.' . json_encode($model));
         if ($datas->otp == $model->otp_received) {
             $status = PersonMobile::where("uid", $datas->uid)->update(['mobile_cachet' => 1, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
-            $result=['personData'=>$persondatas,'status'=>'OtpValidateSuccess','type'=>1 ];
-        }else{
-            $result=['personData'=>"",'status'=>'OtpValidatefailed','type'=>0 ];
+            $result = ['personData' => $persondatas, 'status' => 'OtpValidateSuccess', 'type' => 1];
+        } else {
+            $result = ['personData' => "", 'status' => 'OtpValidatefailed', 'type' => 0];
         }
-        return $this->commonService->sendResponse($result,'');
+        return $this->commonService->sendResponse($result, '');
 
     }
     public function personDatas($datas)
@@ -597,7 +584,7 @@ class PersonService
         $personData = $this->personInterface->getPersonDatasByUid($datas->uid);
         $personUpdate = $this->updatePerson($personData, $datas);
         $saveperson = $this->personInterface->savePersonDatas($personUpdate);
-        $gender = $this->commonService->getAllGender(); 
+        $gender = $this->commonService->getAllGender();
         $bloodGroup = $this->commonService->getAllBloodGroup();
         $result = ['gender' => $gender, 'bloodGroup' => $bloodGroup, 'personData' => $personData];
         Log::info('PersonService > personUpdate function Return.' . json_encode($result));
@@ -669,27 +656,53 @@ class PersonService
             return $this->commonService->sendError($uid, '');
         }
     }
+
     public function personProfileDetails($datas)
     {
+
         Log::info('PersonService > personProfileDetails function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $personDetails = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
-        $personAddressByUid=$this->personInterface->personAddressByuid($datas->uid);
-        $personMasterData=$this->commonService->getPersonMasterData();
-        $secondMobileAndEmail=$this->personInterface->personSecondMobileAndEmailByUid($datas->uid);
-        $personMasterData['PersonDatas']= $personDetails;
-        $personMasterData['PersonAddress']= $personAddressByUid;
-        $personMasterData['secondMobileAndEmail']= $secondMobileAndEmail;
+        $personAddressByUid = $this->personInterface->personAddressByuid($datas->uid);
+        $personMasterData = $this->commonService->getPersonMasterData();
+        $secondMobileAndEmail = $this->personInterface->personSecondMobileAndEmailByUid($datas->uid);
+        $personMasterData['PersonDatas'] = $personDetails;
+        $personMasterData['PersonAddress'] = $personAddressByUid;
+        $personMasterData['secondMobileAndEmail'] = $secondMobileAndEmail;
 
         Log::info('PersonService > personProfileDetails function Return.' . json_encode($personMasterData));
         return $this->commonService->sendResponse($personMasterData, '');
     }
+
     public function getDetailedAllPerson($datas)
     {
         Log::info('PersonService > getDetailedAllPerson function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $personAllDetails=$this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email,$datas->mobileNumber);
+        $personAllDetails = $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email, $datas->mobileNumber);
         return $this->commonService->sendResponse($personAllDetails, '');
 
     }
+    public function userProfileDatas($datas)
+    {
+        Log::info('PersonService > userProfileDatas function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $userProfiles = $this->personInterface->getAllDatasInUser($datas->uid);
+        $entities = collect($userProfiles)->map(function ($users) {
+            $personDetails = $users['personDetails'];
+            $primaryMobile=$users['mobile'];
+            $primaryEmail=$users['email'];
+            $profilePic=$users['profilePic'];
+            $personGender=$users['personDetails']['gender'];
+            $personbloodGroup=$users['personDetails']['bloodGroup'];
+            $primaryAddress=$users['personAddress']['ParentComAddress'];  
+            $personEducation=$users['personEducation'];
+            $personProfession=$users['personProfession'];
+          
+
+            $data=['userDeatils'=>$personDetails,'primaryMobile'=>$primaryMobile,'primaryEmail'=>$primaryEmail,'profilePic'=>$profilePic,'userGender'=>$personGender,'userBloodGroup'=>$personbloodGroup,'primaryAddress'=>$primaryAddress,'UserEducation'=>$personEducation,'userProfession'=> $personProfession];
+            
+            return $data;
+        });
+        return $this->commonService->sendResponse($entities, '');
     }
+}

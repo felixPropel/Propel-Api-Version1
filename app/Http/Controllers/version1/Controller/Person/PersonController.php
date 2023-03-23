@@ -152,6 +152,12 @@ public function personToUser(Request $request)
     Log::info('PersonController > personToUser function Return.' . json_encode($response));
     return  $response;
 }
+public function userProfileDatas(Request $request){
+    Log::info('PersonController > userProfileDatas function Inside.' . json_encode($request->all()));
+    $response=$this->personService->userProfileDatas($request->all());
+    Log::info('PersonController > userProfileDatas function Return.' . json_encode($response));
+    return  $response;
+}
 public function userCreation(Request $request)
 {
     Log::info('PersonController > userCreation function Inside.' . json_encode($request->all()));

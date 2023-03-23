@@ -22,3 +22,6 @@ Route::post('emailOtpValidation', 'App\Http\Controllers\version1\Controller\Pers
 Route::post('personProfiles', 'App\Http\Controllers\version1\Controller\Person\PersonController@personProfiles')->name('personProfiles');
 Route::post('profileUpdate', 'App\Http\Controllers\version1\Controller\Person\PersonController@profileUpdate')->name('profileUpdate');
 Route::post('getDetailedAllPerson', 'App\Http\Controllers\version1\Controller\Person\PersonController@getDetailedAllPerson')->name('getDetailedAllPerson');
+Route::post('changePassword', 'App\Http\Controllers\version1\Controller\User\UserController@changePassword')->name('changePassword');
+Route::post('userProfileDatas', 'App\Http\Controllers\version1\Controller\Person\PersonController@userProfileDatas')->name('userProfileDatas');
+
