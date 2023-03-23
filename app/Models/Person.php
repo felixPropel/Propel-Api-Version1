@@ -26,5 +26,20 @@ class Person extends Model
     {
         return $this->hasOne(PersonDetails::class,'uid','uid');
     }
-    
+    public function profilePic()
+    {
+        return $this->hasOne('App\Models\PersonProfilePic', 'uid','uid');
+    }
+    public function personAddress()
+    {
+        return $this->hasOne('App\Models\PersonAddress', 'uid','uid');
+    }
+    public function personEducation()
+    {
+        return $this->hasMany('App\Models\PersonEducation', 'uid','uid');
+    }
+    public function personProfession()
+    {
+        return $this->hasMany('App\Models\PersonProfession', 'uid','uid');
+    }
 }
