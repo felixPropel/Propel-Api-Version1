@@ -9,4 +9,9 @@ class PersonProfilePic extends Model
 {
     use HasFactory;
     protected $table = 'person_profile_pics';
+    
+    public function ParentPerson()
+    {
+        return $this->belongsTo(Person::class, 'uid', 'uid');
+    }
 }

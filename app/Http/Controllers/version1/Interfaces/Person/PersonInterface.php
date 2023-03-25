@@ -34,5 +34,6 @@ interface PersonInterface
    public  function personSecondMobileAndEmailByUid($uid);
    public function findEmailByPersonEmail($email);
    public function getAllDatasInUser($uid);
+   public function getPersonProfileByUid($uid);
 
 }

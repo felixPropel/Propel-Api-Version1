@@ -11,6 +11,7 @@ use App\Models\PersonLanguage;
 use App\Models\PersonMobile;
 use App\Models\PropertyAddress;
 use App\Models\TempPerson;
+use App\Models\PersonProfilePic;
 use App\Models\User;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -301,5 +302,9 @@ class PersonRepository implements PersonInterface
     public function getAllDatasInUser($uid)
     {
         return Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personDetails.gender', 'personDetails.bloodGroup', 'personAddress', 'personAddress.ParentComAddress','personEducation','personProfession')->where('uid', $uid)->get();
+    }
+    public function getPersonProfileByUid($uid)
+    {
+        return PersonProfilePic::where('uid',$uid)->first();
     }
 }

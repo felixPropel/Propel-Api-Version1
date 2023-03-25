@@ -18,6 +18,7 @@ use App\Models\PersonMobile;
 use App\Models\PersonProfession;
 use App\Models\PropertyAddress;
 use App\Models\TempPerson;
+use App\Models\PersonProfilePic;
 use App\Models\WebLink;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -110,6 +111,7 @@ class PersonService
         $personDetailModel = $this->convertToPersonDetailModel($datas);
         $personEmailModel = $this->convertToPersonEmailModel($datas);
         $personMobileModel = $this->convertToPersonMobileModel($datas);
+        $personProfileModel = $this->convertTopersonProfileModel($datas);
 
         $personAnotherEmailModel = array();
 
@@ -180,6 +182,35 @@ class PersonService
                 return $this->commonService->sendError($personData['data'], $personData['message']);
             }
         }
+    }
+ 
+    public function convertTopersonProfileModel($datas)
+    {
+        if ($datas->profilePhoto) {
+            Log::info('PersonService > convertTopersonProfileModel function Inside.' . json_encode($datas->profilePhoto));
+            $image = $datas->profilePhoto;
+            $file = null;
+            \File::put(public_path() . '\assets\\profile\\' . $image, $file);
+            if ($datas->personUid) {
+                $model = $this->personInterface->getPersonProfileByUid($datas->personUid);
+            }
+            if ($model) {
+                $model->profile_pic = $image;
+                $model->status = 1;
+                $model->profile_cachet = 1;
+                $model->save();
+                return $model;
+            }else{
+                $model = new PersonProfilePic();
+                $model->uid=$datas->personUid;
+                $model->profile_pic = $image;
+                $model->status = 1;
+                $model->profile_cachet = 1;
+                $model->save();
+                return $model;
+            }
+           
+        } 
     }
     public function resendOtp($datas)
     {
@@ -689,18 +720,17 @@ class PersonService
         $userProfiles = $this->personInterface->getAllDatasInUser($datas->uid);
         $entities = collect($userProfiles)->map(function ($users) {
             $personDetails = $users['personDetails'];
-            $primaryMobile=$users['mobile'];
-            $primaryEmail=$users['email'];
-            $profilePic=$users['profilePic'];
-            $personGender=$users['personDetails']['gender'];
-            $personbloodGroup=$users['personDetails']['bloodGroup'];
-            $primaryAddress=$users['personAddress']['ParentComAddress'];  
-            $personEducation=$users['personEducation'];
-            $personProfession=$users['personProfession'];
-          
+            $primaryMobile = $users['mobile'];
+            $primaryEmail = $users['email'];
+            $profilePic = $users['profilePic'];
+            $personGender = $users['personDetails']['gender'];
+            $personbloodGroup = $users['personDetails']['bloodGroup'];
+            $primaryAddress = $users['personAddress']['ParentComAddress'];
+            $personEducation = $users['personEducation'];
+            $personProfession = $users['personProfession'];
 
-            $data=['userDeatils'=>$personDetails,'primaryMobile'=>$primaryMobile,'primaryEmail'=>$primaryEmail,'profilePic'=>$profilePic,'userGender'=>$personGender,'userBloodGroup'=>$personbloodGroup,'primaryAddress'=>$primaryAddress,'UserEducation'=>$personEducation,'userProfession'=> $personProfession];
-            
+            $data = ['userDeatils' => $personDetails, 'primaryMobile' => $primaryMobile, 'primaryEmail' => $primaryEmail, 'profilePic' => $profilePic, 'userGender' => $personGender, 'userBloodGroup' => $personbloodGroup, 'primaryAddress' => $primaryAddress, 'UserEducation' => $personEducation, 'userProfession' => $personProfession];
+
             return $data;
         });
         return $this->commonService->sendResponse($entities, '');
