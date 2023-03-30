@@ -10,13 +10,13 @@ interface PersonInterface
     public function storeTempPerson($model);
     public function findTempPersonById($id);
     public function checkPersonEmailByUid($email,$uid);
-    public function getOtpByUid($uid);//re
+    public function getOtpByUid($uid,$mobile);//re
     public function emailOtpValidation($uid);//re
     public function getPersonEmailByUid($uid);//re
     public function getPersonDatasByUid($uid);
     public function savePersonDatas($model);
     public function savePerson($model);
-   public function getMobileNumberByUid($uid);
+   public function getMobileNumberByUid($uid,$mobile);
    public function getEmailByUid($uid);
    public function getAnniversaryDate($uid);
    public function saveAnniversaryDate($model);
@@ -35,5 +35,7 @@ interface PersonInterface
    public function findEmailByPersonEmail($email);
    public function getAllDatasInUser($uid);
    public function getPersonProfileByUid($uid);
+   public function checkPersonByEmail($email);
+   public function getPerviousPrimaryMobileNumber($uid);
 
 }

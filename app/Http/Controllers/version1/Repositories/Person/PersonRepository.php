@@ -137,13 +137,12 @@ class PersonRepository implements PersonInterface
     {
         return PersonEmail::where(['uid' => $uid, 'email' => $email])->first();
     }
-    public function getOtpByUid($uid)
+    public function getOtpByUid($uid,$mobile)
     {
-        return PersonMobile::where('uid', $uid)->first();
+        return PersonMobile::where(['uid'=> $uid,'mobile_no'=>$mobile])->first();
     }
     public function emailOtpValidation($uid)
     {
-
         return PersonEmail::where('uid', $uid)->first();
     }
     public function findEmailByPersonEmail($email)
@@ -157,7 +156,6 @@ class PersonRepository implements PersonInterface
     }
     public function getPersonEmailByUid($uid)
     {
-
         return PersonEmail::where('uid', $uid)->first();
     }
     public function getPersonDatasByUid($uid)
@@ -167,21 +165,18 @@ class PersonRepository implements PersonInterface
     public function getPersonByUid($uid)
     {
         return Person::where('uid', $uid)->first();
-
     }
     public function savePersonDatas($model)
     {
-
         return $model->save();
     }
     public function savePerson($model)
     {
-
         return $model->save();
     }
-    public function getMobileNumberByUid($uid)
+    public function getMobileNumberByUid($uid,$mobile)
     {
-        return PersonMobile::where('uid', $uid)->first();
+     return PersonMobile::where(['uid'=> $uid,'mobile_no'=>$mobile,['deleted_at', '=', Null]])->first();
     }
     public function getEmailByUid($uid)
     {
@@ -297,7 +292,7 @@ class PersonRepository implements PersonInterface
     }
     public function checkPersonByMobile($mobile)
     {
-        return PersonMobile::where(['mobile_no' => $mobile, 'mobile_cachet' => 1])->first();
+        return PersonMobile::where(['mobile_no' => $mobile,  ['mobile_cachet', '=', '1']])->first();
     }
     public function getAllDatasInUser($uid)
     {
@@ -307,4 +302,33 @@ class PersonRepository implements PersonInterface
     {
         return PersonProfilePic::where('uid',$uid)->first();
     }
+    public function checkPersonByEmail($email)
+    {
+        return PersonEmail::where(['email' => $email, ['email_cachet', '=', '1']])->first();
+    }
+    public function getPerviousPrimaryMobileNumber($uid)
+    {
+        $model= PersonMobile::where(['uid' => $uid, ['mobile_cachet', '=', '1']])->first();
+        if($model){
+            $model->mobile_cachet=2;
+            $model->save();
+        }
+        else{
+            $model=NUll;
+        }
+        return $model;
+    }
+    public function getPerviousPrimaryEmail($uid)
+    {
+        $model= PersonEmail::where(['uid' => $uid, ['email_cachet', '=', '1']])->first();
+        if($model){
+            $model->email_cachet=2;
+            $model->save();
+        }
+        else{
+            $model=NUll;
+        }
+        return $model;
+    }
+
 }

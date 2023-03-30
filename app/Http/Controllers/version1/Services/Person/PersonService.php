@@ -16,9 +16,9 @@ use App\Models\PersonEmail;
 use App\Models\PersonLanguage;
 use App\Models\PersonMobile;
 use App\Models\PersonProfession;
+use App\Models\PersonProfilePic;
 use App\Models\PropertyAddress;
 use App\Models\TempPerson;
-use App\Models\PersonProfilePic;
 use App\Models\WebLink;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -183,7 +183,7 @@ class PersonService
             }
         }
     }
- 
+
     public function convertTopersonProfileModel($datas)
     {
         if ($datas->profilePhoto) {
@@ -200,17 +200,17 @@ class PersonService
                 $model->profile_cachet = 1;
                 $model->save();
                 return $model;
-            }else{
+            } else {
                 $model = new PersonProfilePic();
-                $model->uid=$datas->personUid;
+                $model->uid = $datas->personUid;
                 $model->profile_pic = $image;
                 $model->status = 1;
                 $model->profile_cachet = 1;
                 $model->save();
                 return $model;
             }
-           
-        } 
+
+        }
     }
     public function resendOtp($datas)
     {
@@ -383,7 +383,7 @@ class PersonService
     {
         Log::info('PersonService > convertToPersonMobileModel function Inside.' . json_encode($datas));
         if ($datas->personUid) {
-            $model = $this->personInterface->getMobileNumberByUid($datas->personUid);
+            $model = $this->personInterface->getMobileNumberByUid($datas->personUid,$datas->mobileNumber);
             $model->mobile_no = $datas->mobileNumber;
             $model->mobile_cachet = 1;
         } else {
@@ -583,21 +583,19 @@ class PersonService
             return $model;
         }
     }
-    public function mobileOtpValidated($persondatas)
+    public function otpValidationForMobile($datas)
     {
-
-        Log::info('PersonService > mobileOtpValidated function Inside.' . json_encode($persondatas));
-        $datas = (object) $persondatas;
-        $model = $this->personInterface->getOtpByUid($datas->uid);
-        Log::info('PersonService > mobileOtpValidated getOtpByUid function Return.' . json_encode($model));
+        Log::info('PersonService > otpValidationForMobile function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $model = $this->personInterface->getOtpByUid($datas->uid, $datas->mobile_no);
+        Log::info('PersonService > otpValidationForMobile  getOtpByUid function Return.' . json_encode($model));
         if ($datas->otp == $model->otp_received) {
-            $status = PersonMobile::where("uid", $datas->uid)->update(['mobile_cachet' => 1, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
-            $result = ['personData' => $persondatas, 'status' => 'OtpValidateSuccess', 'type' => 1];
+            $status = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['mobile_cachet' => 2, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
+            $result = ['personData' => $datas, 'status' => 'OtpValidateSuccess', 'type' => 1];
         } else {
             $result = ['personData' => "", 'status' => 'OtpValidatefailed', 'type' => 0];
         }
-        return $this->commonService->sendResponse($result, '');
-
+        return $result;
     }
     public function personDatas($datas)
     {
@@ -676,18 +674,20 @@ class PersonService
 
     public function emailOtpValidation($datas)
     {
+
         Log::info('PersonService > emailOtpValidation function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $uid = $datas->uid;
-        $model = $this->personInterface->getPersonEmailByUid($datas->uid);
+        $model = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->uid);
         Log::info('PersonService > emailOtpValidation function Return.' . json_encode($model));
         if ($model->otp_received == $datas->otp) {
-            return $this->commonService->sendResponse($uid, '');
+            $result = ['status' => 'Otp verified', 'type' => 1, 'uid' => $uid];
         } else {
-            return $this->commonService->sendError($uid, '');
-        }
-    }
+            $result = ['status' => 'Otp verified Failed', 'type' => 0, 'uid' => $uid];
 
+        }
+        return $result;
+    }
     public function personProfileDetails($datas)
     {
 
@@ -734,5 +734,127 @@ class PersonService
             return $data;
         });
         return $this->commonService->sendResponse($entities, '');
+    }
+    public function sendingOtp()
+    {
+        $otp = random_int(1000, 9999);
+        return $otp;
+    }
+    public function addOtherMobileNumber($datas)
+    {
+        $datas = (object) $datas;
+        $checkPrimaryMobile = $this->personInterface->checkPersonByMobile($datas->mobileNo);
+        if ($checkPrimaryMobile) {
+            $model = ['users' => 'This Number Is Already Exists'];
+        } else {
+            $model = new PersonMobile;
+            $model->uid = $datas->PersonUid;
+            $model->mobile_no = $datas->mobileNo;
+            $model->mobile_cachet = 0;
+            $model->otp_received = $this->sendingOtp();
+            $model->save();
+        }
+        return $this->commonService->sendResponse($model, '');
+    }
+    public function resendOtpForMobile($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->personInterface->getMobileNumberByUid($datas->uid, $datas->mobile_no);
+        if ($model) {
+            $mobile = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['otp_received' => $this->sendingOtp(), 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
+            $data = ['Message' => ' Resend OTP Successfully'];
+        } else {
+            $data = ['Message' => 'Data Not Found'];
+        }
+        return $this->commonService->sendResponse($data, '');
+    }
+    public function deleteForMobileNumberByUid($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->personInterface->getMobileNumberByUid($datas->uid,$datas->mobile_no);
+        if ($model) {
+            $mobile = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['mobile_cachet' => 3, 'deleted_at' => Carbon::now()]);
+            $data = ['Message' => ' MobileNumber is Deleted '];
+        } else {
+            $data = ['Message' => 'MobileNumber Not Found'];
+        }
+        return $this->commonService->sendResponse($data, '');
+    }
+    public function addOtherEmail($datas)
+    {
+        $datas = (object) $datas;
+        $checkPrimaryEmail = $this->personInterface->checkPersonByEmail($datas->email);
+        if ($checkPrimaryEmail) {
+            $model = ['users' => 'This email Is Already Exists'];
+        } else {
+            $model = new PersonEmail;
+            $model->uid = $datas->PersonUid;
+            $model->email = $datas->email;
+            $model->email_cachet = 0;
+            $model->otp_received = $this->sendingOtp();
+            $model->save();
+        }
+        return $this->commonService->sendResponse($model, '');
+    }
+    public function resendOtpForEmail($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->uid);
+        if ($model) {
+            $mobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['otp_received' => $this->sendingOtp(), 'email_validation_updated_on' => Carbon::now()]);
+            $data = ['Message' => ' Resend OTP Successfully'];
+        } else {
+            $data = ['Message' => 'Data Not Found'];
+        }
+        return $this->commonService->sendResponse($data, '');
+    }
+    public function deleteForEmailByUid($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->uid);
+        if ($model) {
+            $mobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_cachet' => 3, 'deleted_at' => Carbon::now()]);
+            $data = ['Message' => ' Email is Deleted '];
+        } else {
+            $data = ['Message' => 'Email Not Found'];
+        }
+        return $this->commonService->sendResponse($data, '');
+    }
+    public function mobileNumberChangeAsPrimary($datas)
+    {
+        $datas = (object) $datas;
+        $otpValidation = $this->otpValidationForMobile($datas);
+        if ($otpValidation['type'] == 1) {
+            $perviousMobile = $this->personInterface->getPerviousPrimaryMobileNumber($datas->uid);
+            if ($perviousMobile) {
+                $updateMobile = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['mobile_cachet' => 1, 'mobileno_updated_on' => Carbon::now(), 'validation_updated_on' => Carbon::now()]);
+                $message = ['status' => 'primary changed Successfully'];
+            } else {
+                $message = 'primary Not in Tables';
+            }
+            $result = $message;
+        } else {
+            $result = 'OTP Validation Failed ';
+        }
+        return $this->commonService->sendResponse($result, '');
+    }
+
+    public function emailChangeAsPrimary($datas)
+    {
+        $datas = (object) $datas;
+        $otpValidation = $this->emailOtpValidation($datas);
+        if ($otpValidation['type'] == 1) {
+            $perviousMobile = $this->personInterface->getPerviousPrimaryEmail($datas->uid);
+            if ($perviousMobile) {
+                $updateMobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_cachet' => 1, 'email_updated_on' => Carbon::now(), 'email_validation_updated_on' => Carbon::now()]);
+                $message = ['status' => 'primary changed Successfully'];
+            } else {
+                $message = 'primary Not in Tables';
+            }
+            $result = $message;
+        } else {
+            $result = 'OTP Validation Failed ';
+        }
+        return $this->commonService->sendResponse($result, '');
     }
 }

@@ -102,11 +102,11 @@ public function personMobileOtp(Request $request)
     Log::info('PersonController > personMobileOtp function Return.' . json_encode($response));
     return  $response; 
 }
-public function mobileOtpValidated(Request $request)
+public function otpValidationForMobile(Request $request)
 {
-    Log::info('PersonController > mobileOtpValidated function Inside.' . json_encode($request->all()));
-    $response=$this->personService->mobileOtpValidated($request->all());
-    Log::info('PersonController > mobileOtpValidated function Return.' . json_encode($response));
+    Log::info('PersonController > otpValidationForMobile function Inside.' . json_encode($request->all()));
+    $response=$this->personService->otpValidationForMobile($request->all());
+    Log::info('PersonController > otpValidationForMobile  function Return.' . json_encode($response));
     return  $response; 
 }
 public function generateEmailOtp(Request $request)
@@ -177,6 +177,63 @@ public function profileUpdate(Request $request)
     Log::info('PersonController > profileUpdate function Inside.' . json_encode($request->all()));
     $response=$this->personService->storePerson($request->all());
     Log::info('PersonController > profileUpdate function Return.' .json_encode($response));
+    return  $response;
+}
+public function addOtherMobileNumber(Request $request)
+{
+    Log::info('PersonController > addOtherMobileNumber function Inside.' . json_encode($request->all()));
+    $response=$this->personService->addOtherMobileNumber($request->all());
+    Log::info('PersonController > addOtherMobileNumber function Return.' .json_encode($response));
+    return  $response;
+}
+public function resendOtpForMobile(Request $request)
+{
+    Log::info('PersonController > resendOtpForMobile function Inside.' . json_encode($request->all()));
+    $response=$this->personService->resendOtpForMobile($request->all());
+    Log::info('PersonController > resendOtpForMobile function Return.' .json_encode($response));
+    return  $response;
+}
+public function deleteForMobileNumberByUid(Request $request)
+{
+    Log::info('PersonController > deleteForMobileNumberByUid function Inside.' . json_encode($request->all()));
+    $response=$this->personService->deleteForMobileNumberByUid($request->all());
+    Log::info('PersonController > deleteForMobileNumberByUid function Return.' .json_encode($response));
+    return  $response;
+}
+public function addOtherEmail(Request $request)
+{
+    Log::info('PersonController > addOtherEmail function Inside.' . json_encode($request->all()));
+    $response=$this->personService->addOtherEmail($request->all());
+    Log::info('PersonController > addOtherEmail function Return.' .json_encode($response));
+    return  $response;
+}
+public function resendOtpForEmail(Request $request)
+{
+    Log::info('PersonController > resendOtpForEmail function Inside.' . json_encode($request->all()));
+    $response=$this->personService->resendOtpForEmail($request->all());
+    Log::info('PersonController > resendOtpForEmail function Return.' .json_encode($response));
+    return  $response;
+}
+public function deleteForEmailByUid(Request $request)
+{
+    Log::info('PersonController > deleteForEmailByUid function Inside.' . json_encode($request->all()));
+    $response=$this->personService->deleteForEmailByUid($request->all());
+    Log::info('PersonController > deleteForEmailByUid function Return.' .json_encode($response));
+    return  $response;
+}
+public function mobileNumberChangeAsPrimary(Request $request)
+{
+    Log::info('PersonController > mobileNumberChangeAsPrimary function Inside.' . json_encode($request->all()));
+    $response=$this->personService->mobileNumberChangeAsPrimary($request->all());
+    Log::info('PersonController > mobileNumberChangeAsPrimary function Return.' .json_encode($response));
+    return  $response;
+}
+
+public function emailChangeAsPrimary(Request $request)
+{
+    Log::info('PersonController > emailChangeAsPrimary function Inside.' . json_encode($request->all()));
+    $response=$this->personService->emailChangeAsPrimary($request->all());
+    Log::info('PersonController > emailChangeAsPrimary function Return.' .json_encode($response));
     return  $response;
 }
     /**
