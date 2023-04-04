@@ -743,15 +743,18 @@ class PersonService
     public function addOtherMobileNumber($datas)
     {
         $datas = (object) $datas;
+        Log::info('PersonService > addOtherMobileNumber123 function Inside.' . json_encode($datas->PersonUid));
+
         $checkPrimaryMobile = $this->personInterface->checkPersonByMobile($datas->mobileNo);
         if ($checkPrimaryMobile) {
-            $model = ['users' => 'This Number Is Already Exists'];
+            $model = ['users' => 'This Number Is Already Exists','type'=>1];
         } else {
             $model = new PersonMobile;
             $model->uid = $datas->PersonUid;
             $model->mobile_no = $datas->mobileNo;
-            $model->mobile_cachet = 0;
+            $model->mobile_cachet = 2;
             $model->otp_received = $this->sendingOtp();
+            $model->validation_updated_on=NULL;
             $model->save();
         }
         return $this->commonService->sendResponse($model, '');
@@ -761,10 +764,10 @@ class PersonService
         $datas = (object) $datas;
         $model = $this->personInterface->getMobileNumberByUid($datas->uid, $datas->mobile_no);
         if ($model) {
-            $mobile = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['otp_received' => $this->sendingOtp(), 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
-            $data = ['Message' => ' Resend OTP Successfully'];
+            $mobile = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['otp_received' => $this->sendingOtp(), 'mobile_validation' => NUll, 'validation_updated_on' => NUll]);
+            $data = ['Message' => ' Resend OTP Successfully','type'=>1];
         } else {
-            $data = ['Message' => 'Data Not Found'];
+            $data = ['Message' => 'Data Not Found','type'=>0];
         }
         return $this->commonService->sendResponse($data, '');
     }
@@ -785,13 +788,14 @@ class PersonService
         $datas = (object) $datas;
         $checkPrimaryEmail = $this->personInterface->checkPersonByEmail($datas->email);
         if ($checkPrimaryEmail) {
-            $model = ['users' => 'This email Is Already Exists'];
+            $model = ['users' => 'This email Is Already Exists','type'=>1];
         } else {
             $model = new PersonEmail;
             $model->uid = $datas->PersonUid;
             $model->email = $datas->email;
-            $model->email_cachet = 0;
+            $model->email_cachet = 2;
             $model->otp_received = $this->sendingOtp();
+            $model->email_validation_updated_on=NULL;
             $model->save();
         }
         return $this->commonService->sendResponse($model, '');
@@ -828,17 +832,16 @@ class PersonService
             $perviousMobile = $this->personInterface->getPerviousPrimaryMobileNumber($datas->uid);
             if ($perviousMobile) {
                 $updateMobile = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['mobile_cachet' => 1, 'mobileno_updated_on' => Carbon::now(), 'validation_updated_on' => Carbon::now()]);
-                $message = ['status' => 'primary changed Successfully'];
+                $message = ['status' => 'primary changed Successfully','type'=>1];
             } else {
-                $message = 'primary Not in Tables';
+                $message = ['status'=>'primary Not in Tables','type'=>0];
             }
             $result = $message;
         } else {
-            $result = 'OTP Validation Failed ';
+            $result = ['message'=>'OTP Validation Failed ','type'=>0];
         }
         return $this->commonService->sendResponse($result, '');
     }
-
     public function emailChangeAsPrimary($datas)
     {
         $datas = (object) $datas;
