@@ -284,8 +284,8 @@ class PersonRepository implements PersonInterface
     }
     public function personSecondMobileAndEmailByUid($uid)
     {
-        $mobile = PersonMobile::where(['uid' => $uid, ['mobile_cachet', '!=', '1']])->get();
-        $email = PersonEmail::where(['uid' => $uid, ['email_cachet', '!=', '1']])->get();
+        $mobile = PersonMobile::where(['uid' => $uid, ['mobile_cachet', '=', '2']])->get();
+        $email = PersonEmail::where(['uid' => $uid, ['email_cachet', '=', '2']])->get();
         $model['mobile'] = $mobile;
         $model['email'] = $email;
         return $model;
