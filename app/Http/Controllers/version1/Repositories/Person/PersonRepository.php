@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use App\Models\TempMobile;
 
 class PersonRepository implements PersonInterface
 {
@@ -330,5 +331,50 @@ class PersonRepository implements PersonInterface
         }
         return $model;
     }
+    public function storeTempMobileNumber($model)
+    {
+        try {
+            $result = DB::transaction(function () use ($model) {
 
+                $model->save();
+                return [
+                    'message' => "Success",
+                    'data' => $model,
+                ];
+            });
+            return $result;
+        } catch (\Exception $e) {
+            return [
+                'message' => "Failed",
+                'data' => $e,
+            ];
+        }
+    }
+public function geMobileOtpByTempId($id ,$mobile)
+{
+    return TempMobile::where(['id' => $id,'mobile_no'=>$mobile])->first();
 }
+public function removeTempMobileById($id)
+{
+    return TempMobile::where('id',$id)->delete();
+}
+public function addedOtherMobileNoInPerson($model)
+{
+    try {
+        $result = DB::transaction(function () use ($model) {
+
+            $model->save();
+            return [
+                'message' => "Success",
+                'data' => $model,
+            ];
+        });
+        return $result;
+    } catch (\Exception $e) {
+        return [
+            'message' => "Failed",
+            'data' => $e,
+        ];
+    }
+}
+}   

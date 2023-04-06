@@ -236,6 +236,20 @@ public function emailChangeAsPrimary(Request $request)
     Log::info('PersonController > emailChangeAsPrimary function Return.' .json_encode($response));
     return  $response;
 }
+public function resendOtpForTempMobileNo(Request $request)
+{
+    Log::info('PersonController > resendOtpForTempMobileNo function Inside.' . json_encode($request->all()));
+    $response=$this->personService->resendOtpForTempMobileNo($request->all());
+    Log::info('PersonController > resendOtpForTempMobileNo function Return.' .json_encode($response));
+    return  $response;
+}
+public function OtpValidationForTempMobile(Request $request)
+{
+    Log::info('PersonController > OtpValidationForTempMobile function Inside.' . json_encode($request->all()));
+    $response=$this->personService->OtpValidationForTempMobile($request->all());
+    Log::info('PersonController > OtpValidationForTempMobile function Return.' .json_encode($response));
+    return  $response;
+}
     /**
      * Display a listing of the resource.
      *

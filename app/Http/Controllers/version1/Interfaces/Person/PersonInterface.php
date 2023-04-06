@@ -37,5 +37,9 @@ interface PersonInterface
    public function getPersonProfileByUid($uid);
    public function checkPersonByEmail($email);
    public function getPerviousPrimaryMobileNumber($uid);
+   public function storeTempMobileNumber($model);
+   public function geMobileOtpByTempId($id,$mobile);
+   public function removeTempMobileById($id);
+   public function addedOtherMobileNoInPerson($model);
 
 }

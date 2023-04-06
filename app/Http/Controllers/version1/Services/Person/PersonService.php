@@ -18,6 +18,7 @@ use App\Models\PersonMobile;
 use App\Models\PersonProfession;
 use App\Models\PersonProfilePic;
 use App\Models\PropertyAddress;
+use App\Models\TempMobile;
 use App\Models\TempPerson;
 use App\Models\WebLink;
 use Carbon\Carbon;
@@ -743,22 +744,20 @@ class PersonService
     }
     public function addOtherMobileNumber($datas)
     {
-        $datas = (object) $datas;
-        Log::info('PersonService > addOtherMobileNumber123 function Inside.' . json_encode($datas->PersonUid));
 
+        $datas = (object) $datas;
+        Log::info('PersonService > addOtherMobileNumber function Inside.' . json_encode($datas->PersonUid));
         $checkPrimaryMobile = $this->personInterface->checkPersonByMobile($datas->mobileNo);
         if ($checkPrimaryMobile) {
-            $model = ['users' => 'This Number Is Already Exists', 'type' => 1];
+            $result = ['users' => 'This Number Is Already Exists', 'type' => 1];
         } else {
-            $model = new PersonMobile;
-            $model->uid = $datas->PersonUid;
+            $model = new tempMobile;
             $model->mobile_no = $datas->mobileNo;
-            $model->mobile_cachet = 2;
             $model->otp_received = $this->sendingOtp();
-            $model->validation_updated_on = null;
-            $model->save();
+            $model->stage = 1;
+            $result = $this->personInterface->storeTempMobileNumber($model);
         }
-        return $this->commonService->sendResponse($model, '');
+        return $result;
     }
     public function resendOtpForMobile($datas)
     {
@@ -860,5 +859,36 @@ class PersonService
             $result = 'OTP Validation Failed ';
         }
         return $this->commonService->sendResponse($result, '');
+    }
+    public function resendOtpForTempMobileNo($datas)
+    {
+        $datas = (object) $datas;
+        $tempMobile = $this->personInterface->geMobileOtpByTempId($datas->mobileTempId, $datas->number);
+        if ($tempMobile) {
+            $model = TempMobile::where(['id' => $datas->mobileTempId, 'mobile_no' => $datas->number])->update(['otp_received' => $this->sendingOtp()]);
+        }
+        return $this->commonService->sendResponse($model, '');
+    }
+    public function OtpValidationForTempMobile($datas)
+    {
+        $datas = (object) $datas;
+        $tempMobile = $this->personInterface->geMobileOtpByTempId($datas->mobileTempId, $datas->number);
+        if ($tempMobile->otp_received == $datas->otp) {
+            $removeTempMobile = $this->personInterface->removeTempMobileById($datas->mobileTempId);
+            if ($removeTempMobile) {
+                $model = new PersonMobile;
+                $model->uid = $datas->personUid;
+                $model->mobile_no = $tempMobile->mobile_no;
+                $model->mobile_cachet = 2;
+                $model->mobile_validation = 1;
+                $model->validation_updated_on = Carbon::now();
+                $result = $this->personInterface->addedOtherMobileNoInPerson($model);
+            } else {
+                $result = ['message' => 'Failed', 'status' => 'TempMobile Data is Found'];
+            }
+        } else {
+            $result = ['message' => 'Failed', 'status' => 'OTP validation Failedd'];
+        }
+        return $result;
     }
 }

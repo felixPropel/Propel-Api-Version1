@@ -33,4 +33,7 @@ Route::post('addOtherEmail', 'App\Http\Controllers\version1\Controller\Person\Pe
 Route::post('resendOtpForEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForEmail')->name('resendOtpForEmail');
 Route::post('deleteForEmailByUid', 'App\Http\Controllers\version1\Controller\Person\PersonController@deleteForEmailByUid')->name('deleteForEmailByUid');
 Route::post('emailChangeAsPrimary', 'App\Http\Controllers\version1\Controller\Person\PersonController@emailChangeAsPrimary')->name('emailChangeAsPrimary');
+Route::post('resendOtpForTempMobileNo', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForTempMobileNo')->name('resendOtpForTempMobileNo');
+Route::post('OtpValidationForTempMobile', 'App\Http\Controllers\version1\Controller\Person\PersonController@OtpValidationForTempMobile')->name('OtpValidationForTempMobile');
+
 //user Profile End 
