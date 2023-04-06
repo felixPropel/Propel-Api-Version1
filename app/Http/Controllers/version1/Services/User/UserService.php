@@ -5,16 +5,11 @@ namespace App\Http\Controllers\version1\Services\User;
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
-use App\Models\Person;
 use App\Models\PersonDetails;
-use App\Models\PersonEmail;
-use App\Models\PersonMobile;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class UserService
 {
@@ -77,20 +72,23 @@ class UserService
         $datas = (object) $datas;
         $user = $this->userInterface->findUserDataByUid($datas->uid);
         Log::info('UserService > changePassword function Return.' . json_encode($user));
-        if ($user) {
-            $password = Hash::make($datas->password);
-            $user->password = $password;
-            $model = $this->userInterface->storeUser($user);
-
-            if ($model['message'] == "Success") {
-                $userModel = $model['data'];
-                $personModel = $this->personInterface->getPersonPrimaryDataByUid($userModel->uid);
-
-                return $this->commonService->sendResponse( $personModel, $model['message']);
+        if (Hash::check($datas->oldPassword, $user->password)) {
+            if ($datas->password == $datas->passwordConfirmation) {
+                $password = Hash::make($datas->password);
+                $user->password = $password;
+                $model = $this->userInterface->storeUser($user);
+                $model['status']='Password Changed Successfully';
+                return $model;
             } else {
-                return $this->commonService->sendError($model['data'], $model['message']);
+                $model = ['message' => 'Failed', 'status' => 'confirm Password MisMatched'];
+                return $model;
             }
+            return $model;
+        } else {
+            $model = ['message' => 'Failed', 'status' => 'old Password MisMatched'];
+            return $model;
         }
+        return $this->commonService->sendResponse($model, '');
     }
     public function convertToUserModel($personModel, $datas)
     {
@@ -107,17 +105,17 @@ class UserService
     public function userCreation($datas)
     {
         Log::info('UserService > userCreation function Inside.' . json_encode($datas));
-        $datas = (object) $datas ;
-        $mobile=$this->personInterface->getMobileNumberByUid($datas->uid);
-        $email=$this->personInterface->getEmailByUid($datas->uid);
-        $getPersonName=$this->personInterface->getPersonDatasByUid($datas->uid);
-        $createuser=$this->UserCreate($mobile->mobile_no,$email->email,$datas);
-        $saveUser=$this->userInterface->savedUser($createuser);
-        $result=['personName'=>$getPersonName->first_name,'mobileNumber'=>$mobile->mobile_no];
+        $datas = (object) $datas;
+        $mobile = $this->personInterface->getMobileNumberByUid($datas->uid);
+        $email = $this->personInterface->getEmailByUid($datas->uid);
+        $getPersonName = $this->personInterface->getPersonDatasByUid($datas->uid);
+        $createuser = $this->UserCreate($mobile->mobile_no, $email->email, $datas);
+        $saveUser = $this->userInterface->savedUser($createuser);
+        $result = ['personName' => $getPersonName->first_name, 'mobileNumber' => $mobile->mobile_no];
         Log::info('UserService > userCreation function Return.' . json_encode($result));
-        return $this->commonService->sendResponse($result,'');
+        return $this->commonService->sendResponse($result, '');
     }
-    public function UserCreate($mobile,$email,$datas)
+    public function UserCreate($mobile, $email, $datas)
     {
         Log::info('UserService > UserCreate function Inside.' . json_encode($datas));
         $model = new User();
