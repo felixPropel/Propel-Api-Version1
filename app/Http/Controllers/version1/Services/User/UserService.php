@@ -4,6 +4,7 @@ namespace App\Http\Controllers\version1\Services\User;
 
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
+use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Models\PersonDetails;
 use App\Models\User;
@@ -13,11 +14,12 @@ use Illuminate\Support\Facades\Validator;
 
 class UserService
 {
-    public function __construct(UserInterface $userInterface, PersonInterface $personInterface, CommonService $commonService)
+    public function __construct(UserInterface $userInterface, PersonInterface $personInterface, CommonService $commonService, OrganizationInterface $OrganizationInterface)
     {
         $this->userInterface = $userInterface;
         $this->personInterface = $personInterface;
         $this->commonService = $commonService;
+        $this->OrganizationInterface=$OrganizationInterface;
     }
     public function loginUser($objdatas)
     {
@@ -39,7 +41,8 @@ class UserService
         if ($user) {
             if (Hash::check($datas->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-                $response = ['token' => $token, 'uid' => $uid];
+                $defaultOrg=$this->OrganizationInterface->getPerviousDefaultOrganization($uid);
+                $response = ['token' => $token, 'uid' => $uid,'defaultOrg'=>$defaultOrg];
                 return $this->commonService->sendResponse($response, "");
             } else {
                 $response = ["message" => "Password mismatch", 'username' => $user_name, 'uid' => $uid];

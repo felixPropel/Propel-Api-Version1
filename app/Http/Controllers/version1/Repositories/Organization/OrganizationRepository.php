@@ -21,7 +21,7 @@ class OrganizationRepository implements OrganizationInterface
 {
     public function getOrganizationAccountByUid($uid)
     {
-        return UserOrganizationRelational::select('organizations.id as orgId','organization_details.org_name')
+        return UserOrganizationRelational::select('organizations.id as orgId','organization_details.org_name','user_organization_relationals.default_org')
             ->leftjoin('organizations', 'organizations.id', '=', 'user_organization_relationals.organization_id')
             ->leftjoin('organization_details', 'organization_details.org_id', '=', 'organizations.id')
             ->where('uid', $uid)
@@ -78,4 +78,16 @@ class OrganizationRepository implements OrganizationInterface
     
         return OrganizationDatabase::where('org_id',$id)->first();
       }
+      public function getPerviousDefaultOrganization($uid)
+      {
+        return UserOrganizationRelational::select('organization_details.org_name','user_organization_relationals.default_org')
+        ->leftjoin('organization_details', 'organization_details.org_id', '=', 'user_organization_relationals.organization_id')
+        ->where(['uid'=>$uid ,['default_org','=','1']])
+        ->first();
+      }
+      public function changeDefaultOrganization($uid)
+      {
+          return UserOrganizationRelational::where(['uid'=>$uid,['default_org','=','1']])->first();
+      }
+
 }

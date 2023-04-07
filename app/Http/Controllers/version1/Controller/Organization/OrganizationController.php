@@ -48,5 +48,12 @@ class OrganizationController extends Controller
         Log::info('OrganizationController > getDataBaseNameBy id function Return.' . json_encode($response));
         return $response;
     }
+    public function setDefaultOrganization(Request $request)
+    {
+        Log::info('OrganizationController > setDefaultOrganization function Inside.' . json_encode($request->all()));
+        $response = $this->service->setDefaultOrganization($request->all());
+        Log::info('OrganizationController > setDefaultOrganization id function Return.' . json_encode($response));
+        return $response;
+    }
 
 }

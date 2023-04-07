@@ -35,5 +35,7 @@ Route::post('deleteForEmailByUid', 'App\Http\Controllers\version1\Controller\Per
 Route::post('emailChangeAsPrimary', 'App\Http\Controllers\version1\Controller\Person\PersonController@emailChangeAsPrimary')->name('emailChangeAsPrimary');
 Route::post('resendOtpForTempMobileNo', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForTempMobileNo')->name('resendOtpForTempMobileNo');
 Route::post('OtpValidationForTempMobile', 'App\Http\Controllers\version1\Controller\Person\PersonController@OtpValidationForTempMobile')->name('OtpValidationForTempMobile');
+Route::post('resendOtpForTempEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForTempEmail')->name('resendOtpForTempEmail');
+Route::post('OtpValidationForTempEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@OtpValidationForTempEmail')->name('OtpValidationForTempEmail');
 
 //user Profile End 
