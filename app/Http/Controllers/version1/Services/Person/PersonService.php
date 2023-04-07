@@ -19,6 +19,7 @@ use App\Models\PersonProfession;
 use App\Models\PersonProfilePic;
 use App\Models\PropertyAddress;
 use App\Models\TempMobile;
+use App\Models\TempEmail;
 use App\Models\TempPerson;
 use App\Models\WebLink;
 use Carbon\Carbon;
@@ -746,16 +747,17 @@ class PersonService
     {
 
         $datas = (object) $datas;
-        Log::info('PersonService > addOtherMobileNumber function Inside.' . json_encode($datas->PersonUid));
+        Log::info('PersonService > addOtherMobileNumber function Inside.' . json_encode($datas->mobileNo));
         $checkPrimaryMobile = $this->personInterface->checkPersonByMobile($datas->mobileNo);
         if ($checkPrimaryMobile) {
-            $result = ['users' => 'This Number Is Already Exists', 'type' => 1];
+            $result = ['users' => 'This Number Is Already Exists', 'type' => 0];
         } else {
-            $model = new tempMobile;
+            $model = new TempMobile;
             $model->mobile_no = $datas->mobileNo;
             $model->otp_received = $this->sendingOtp();
             $model->stage = 1;
             $result = $this->personInterface->storeTempMobileNumber($model);
+            $result['type']=1;
         }
         return $result;
     }
@@ -788,17 +790,16 @@ class PersonService
         $datas = (object) $datas;
         $checkPrimaryEmail = $this->personInterface->checkPersonByEmail($datas->email);
         if ($checkPrimaryEmail) {
-            $model = ['users' => 'This email Is Already Exists', 'type' => 1];
+            $result = ['users' => 'This email Is Already Exists', 'type' => 0];
         } else {
-            $model = new PersonEmail;
-            $model->uid = $datas->PersonUid;
+            $model = new TempEmail;
             $model->email = $datas->email;
-            $model->email_cachet = 2;
             $model->otp_received = $this->sendingOtp();
-            $model->email_validation_updated_on = null;
-            $model->save();
+            $model->stage = 1;
+            $result = $this->personInterface->storeTempEmail($model);
+            $result['type']=1;
         }
-        return $this->commonService->sendResponse($model, '');
+        return $result;
     }
     public function resendOtpForEmail($datas)
     {
@@ -850,20 +851,20 @@ class PersonService
             $perviousMobile = $this->personInterface->getPerviousPrimaryEmail($datas->uid);
             if ($perviousMobile) {
                 $updateMobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_cachet' => 1, 'email_updated_on' => Carbon::now(), 'email_validation_updated_on' => Carbon::now()]);
-                $message = ['status' => 'primary changed Successfully'];
+                $message = ['status' => 'primary changed Successfully','type'=> 1];
             } else {
-                $message = 'primary Not in Tables';
+                $message = ['status'=>'primary Not in Tables','type'=>0];
             }
             $result = $message;
         } else {
-            $result = 'OTP Validation Failed ';
+            $result =['status'=>'primary Not in Tables','type'=>0];
         }
         return $this->commonService->sendResponse($result, '');
     }
     public function resendOtpForTempMobileNo($datas)
     {
         $datas = (object) $datas;
-        $tempMobile = $this->personInterface->geMobileOtpByTempId($datas->mobileTempId, $datas->number);
+        $tempMobile = $this->personInterface->getMobileOtpByTempId($datas->mobileTempId, $datas->number);
         if ($tempMobile) {
             $model = TempMobile::where(['id' => $datas->mobileTempId, 'mobile_no' => $datas->number])->update(['otp_received' => $this->sendingOtp()]);
         }
@@ -872,7 +873,7 @@ class PersonService
     public function OtpValidationForTempMobile($datas)
     {
         $datas = (object) $datas;
-        $tempMobile = $this->personInterface->geMobileOtpByTempId($datas->mobileTempId, $datas->number);
+        $tempMobile = $this->personInterface->getMobileOtpByTempId($datas->mobileTempId, $datas->number);
         if ($tempMobile->otp_received == $datas->otp) {
             $removeTempMobile = $this->personInterface->removeTempMobileById($datas->mobileTempId);
             if ($removeTempMobile) {
@@ -891,4 +892,36 @@ class PersonService
         }
         return $result;
     }
+     public function OtpValidationForTempEmail($datas)
+    {
+        $datas = (object) $datas;
+        $tempEmail = $this->personInterface->getEmailOtpByTempId($datas->emailTempId, $datas->email);
+        if ($tempEmail->otp_received == $datas->otp) {
+            $removeTempEmail = $this->personInterface->removeTempEmailById($datas->emailTempId);
+            if ($removeTempEmail) {
+                $model = new PersonEmail;
+                $model->uid = $datas->personUid;
+                $model->email = $tempEmail->email;
+                $model->email_cachet = 2;
+                $model->email_validation_status = 1;
+                $model->email_validation_updated_on = Carbon::now();
+                $result = $this->personInterface->addedEmailInPerson($model);
+            } else {
+                $result = ['message' => 'Failed', 'status' => 'TempEmail Data is Found'];
+            }
+        } else {
+            $result = ['message' => 'Failed', 'status' => 'OTP validation Failed'];
+        }
+        return $result;
+    }
+    public function resendOtpForTempEmail($datas)
+    {
+        $datas = (object) $datas;
+        $tempEmail = $this->personInterface->getEmailOtpByTempId($datas->emailTempId, $datas->email);
+        if ($tempEmail) {
+            $model = TempEmail::where(['id' => $datas->emailTempId, 'email' => $datas->email])->update(['otp_received' => $this->sendingOtp()]);
+        }
+        return $this->commonService->sendResponse($model, '');
+    }
 }
+

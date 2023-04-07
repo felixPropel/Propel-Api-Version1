@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use App\Models\TempMobile;
+use App\Models\TempEmail;
 
 class PersonRepository implements PersonInterface
 {
@@ -350,7 +351,7 @@ class PersonRepository implements PersonInterface
             ];
         }
     }
-public function geMobileOtpByTempId($id ,$mobile)
+public function getMobileOtpByTempId($id ,$mobile)
 {
     return TempMobile::where(['id' => $id,'mobile_no'=>$mobile])->first();
 }
@@ -358,7 +359,53 @@ public function removeTempMobileById($id)
 {
     return TempMobile::where('id',$id)->delete();
 }
+public function removeTempEmailById($id)
+{
+    return TempEmail::where('id',$id)->delete();
+}
 public function addedOtherMobileNoInPerson($model)
+{
+    try {
+        $result = DB::transaction(function () use ($model) {
+
+            $model->save();
+            return [
+                'message' => "Success",
+                'data' => $model,
+            ];
+        });
+        return $result;
+    } catch (\Exception $e) {
+        return [
+            'message' => "Failed",
+            'data' => $e,
+        ];
+    }
+}
+public function storeTempEmail($model)
+{
+     try {
+        $result = DB::transaction(function () use ($model) {
+
+            $model->save();
+            return [
+                'message' => "Success",
+                'data' => $model,
+            ];
+        });
+        return $result;
+    } catch (\Exception $e) {
+        return [
+            'message' => "Failed",
+            'data' => $e,
+        ];
+    }
+}
+public function getEmailOtpByTempId($id ,$email)
+{
+    return TempEmail::where(['id' => $id,'email'=>$email])->first();
+}
+public function addedEmailInPerson($model)
 {
     try {
         $result = DB::transaction(function () use ($model) {

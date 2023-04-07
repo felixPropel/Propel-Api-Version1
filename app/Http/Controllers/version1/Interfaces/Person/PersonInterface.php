@@ -38,8 +38,12 @@ interface PersonInterface
    public function checkPersonByEmail($email);
    public function getPerviousPrimaryMobileNumber($uid);
    public function storeTempMobileNumber($model);
-   public function geMobileOtpByTempId($id,$mobile);
+   public function getMobileOtpByTempId($id,$mobile);
    public function removeTempMobileById($id);
    public function addedOtherMobileNoInPerson($model);
+   public function storeTempEmail($model);
+   public function getEmailOtpByTempId($id,$email);
+   public function removeTempEmailById($id);
+   public function addedEmailInPerson($model);
 
 }

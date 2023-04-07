@@ -250,6 +250,20 @@ public function OtpValidationForTempMobile(Request $request)
     Log::info('PersonController > OtpValidationForTempMobile function Return.' .json_encode($response));
     return  $response;
 }
+public function resendOtpForTempEmail(Request $request)
+{
+    Log::info('PersonController > resendOtpForTempEmail function Inside.' . json_encode($request->all()));
+    $response=$this->personService->resendOtpForTempEmail($request->all());
+    Log::info('PersonController > resendOtpForTempEmail function Return.' .json_encode($response));
+    return  $response;
+}
+public function OtpValidationForTempEmail(Request $request)
+{
+    Log::info('PersonController > OtpValidationForTempEmail function Inside.' . json_encode($request->all()));
+    $response=$this->personService->OtpValidationForTempEmail($request->all());
+    Log::info('PersonController > OtpValidationForTempEmail function Return.' .json_encode($response));
+    return  $response;
+}
     /**
      * Display a listing of the resource.
      *
