@@ -10,5 +10,5 @@ Developer:R.Dhana
  php artisan migrate --path=/database/migrations/2023_04_06_090826_create_temp_mobiles_table.php
 
 
- ALTER TABLE user_organization_relations
-ADD  default_org  SET DEFAULT null;
+ ALTER TABLE user_organization_relationals
+ADD default_org VARCHAR(255) DEFAULT NULL;
