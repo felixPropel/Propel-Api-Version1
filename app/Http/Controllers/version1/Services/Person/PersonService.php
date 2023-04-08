@@ -18,8 +18,8 @@ use App\Models\PersonMobile;
 use App\Models\PersonProfession;
 use App\Models\PersonProfilePic;
 use App\Models\PropertyAddress;
-use App\Models\TempMobile;
 use App\Models\TempEmail;
+use App\Models\TempMobile;
 use App\Models\TempPerson;
 use App\Models\WebLink;
 use Carbon\Carbon;
@@ -757,7 +757,7 @@ class PersonService
             $model->otp_received = $this->sendingOtp();
             $model->stage = 1;
             $result = $this->personInterface->storeTempMobileNumber($model);
-            $result['type']=1;
+            $result['type'] = 1;
         }
         return $result;
     }
@@ -797,7 +797,7 @@ class PersonService
             $model->otp_received = $this->sendingOtp();
             $model->stage = 1;
             $result = $this->personInterface->storeTempEmail($model);
-            $result['type']=1;
+            $result['type'] = 1;
         }
         return $result;
     }
@@ -851,13 +851,13 @@ class PersonService
             $perviousMobile = $this->personInterface->getPerviousPrimaryEmail($datas->uid);
             if ($perviousMobile) {
                 $updateMobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_cachet' => 1, 'email_updated_on' => Carbon::now(), 'email_validation_updated_on' => Carbon::now()]);
-                $message = ['status' => 'primary changed Successfully','type'=> 1];
+                $message = ['status' => 'primary changed Successfully', 'type' => 1];
             } else {
-                $message = ['status'=>'primary Not in Tables','type'=>0];
+                $message = ['status' => 'primary Not in Tables', 'type' => 0];
             }
             $result = $message;
         } else {
-            $result =['status'=>'primary Not in Tables','type'=>0];
+            $result = ['status' => 'primary Not in Tables', 'type' => 0];
         }
         return $this->commonService->sendResponse($result, '');
     }
@@ -892,7 +892,7 @@ class PersonService
         }
         return $result;
     }
-     public function OtpValidationForTempEmail($datas)
+    public function OtpValidationForTempEmail($datas)
     {
         $datas = (object) $datas;
         $tempEmail = $this->personInterface->getEmailOtpByTempId($datas->emailTempId, $datas->email);
@@ -924,4 +924,3 @@ class PersonService
         return $this->commonService->sendResponse($model, '');
     }
 }
-

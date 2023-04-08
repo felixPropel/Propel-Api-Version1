@@ -80,7 +80,7 @@ class OrganizationRepository implements OrganizationInterface
       }
       public function getPerviousDefaultOrganization($uid)
       {
-        return UserOrganizationRelational::select('organization_details.org_name','user_organization_relationals.default_org')
+        return UserOrganizationRelational::select('organization_details.org_name','user_organization_relationals.organization_id')
         ->leftjoin('organization_details', 'organization_details.org_id', '=', 'user_organization_relationals.organization_id')
         ->where(['uid'=>$uid ,['default_org','=','1']])
         ->first();
