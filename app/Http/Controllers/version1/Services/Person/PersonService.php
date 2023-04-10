@@ -113,7 +113,7 @@ class PersonService
         $personDetailModel = $this->convertToPersonDetailModel($datas);
         $personEmailModel = $this->convertToPersonEmailModel($datas);
         $personMobileModel = $this->convertToPersonMobileModel($datas);
-        $personProfileModel = $this->convertTopersonProfileModel($datas);
+        $personProfileModel = $this->convertToPersonProfileModel($datas);
 
         $personAnotherEmailModel = array();
 
@@ -185,19 +185,16 @@ class PersonService
             }
         }
     }
-
-    public function convertTopersonProfileModel($datas)
+    public function convertToPersonProfileModel($datas)
     {
-        if ($datas->profilePhoto) {
-            Log::info('PersonService > convertTopersonProfileModel function Inside.' . json_encode($datas->profilePhoto));
-            $image = $datas->profilePhoto;
-            $file = null;
-            \File::put(public_path() . '\assets\\profile\\' . $image, $file);
+        if ($datas->image) {
+            Log::info('PersonService > convertToPersonProfileModel function Inside.' . json_encode($datas->image));
+            // $uploadedFile = $datas->image->store('public/profiles/');
             if ($datas->personUid) {
                 $model = $this->personInterface->getPersonProfileByUid($datas->personUid);
             }
             if ($model) {
-                $model->profile_pic = $image;
+                $model->profile_pic = $datas->image;
                 $model->status = 1;
                 $model->profile_cachet = 1;
                 $model->save();
@@ -205,7 +202,7 @@ class PersonService
             } else {
                 $model = new PersonProfilePic();
                 $model->uid = $datas->personUid;
-                $model->profile_pic = $image;
+                $model->profile_pic = $datas->image;
                 $model->status = 1;
                 $model->profile_cachet = 1;
                 $model->save();
@@ -684,9 +681,9 @@ class PersonService
         Log::info('PersonService > emailOtpValidation function Return.' . json_encode($model));
         if ($model->otp_received == $datas->otp) {
             $email = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_validation_status' => 1, 'email_validation_updated_on' => Carbon::now()]);
-            $result = ['status' => 'Otp verified', 'type' => 1, 'uid' => $uid];
+            $result = ['status' => 'Otp Verified', 'type' => 1, 'uid' => $uid];
         } else {
-            $result = ['status' => 'Otp verified Failed', 'type' => 0, 'uid' => $uid];
+            $result = ['status' => 'Otp Verified Failed', 'type' => 0, 'uid' => $uid];
 
         }
         return $result;
@@ -807,9 +804,9 @@ class PersonService
         $model = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->uid);
         if ($model) {
             $mobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['otp_received' => $this->sendingOtp(), 'email_validation_updated_on' => null]);
-            $data = ['Message' => ' Resend OTP Successfully'];
+            $data = ['Message' => ' Resend OTP Successfully', 'type' => 1];
         } else {
-            $data = ['Message' => 'Data Not Found'];
+            $data = ['Message' => 'Data Not Found', 'type' => 0];
         }
         return $this->commonService->sendResponse($data, '');
     }
@@ -851,7 +848,7 @@ class PersonService
             $perviousMobile = $this->personInterface->getPerviousPrimaryEmail($datas->uid);
             if ($perviousMobile) {
                 $updateMobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_cachet' => 1, 'email_updated_on' => Carbon::now(), 'email_validation_updated_on' => Carbon::now()]);
-                $message = ['status' => 'primary changed Successfully', 'type' => 1];
+                $message = ['status' => 'primary Changed Successfully', 'type' => 1];
             } else {
                 $message = ['status' => 'primary Not in Tables', 'type' => 0];
             }
@@ -888,7 +885,7 @@ class PersonService
                 $result = ['message' => 'Failed', 'status' => 'TempMobile Data is Found'];
             }
         } else {
-            $result = ['message' => 'Failed', 'status' => 'OTP validation Failedd'];
+            $result = ['message' => 'Failed', 'status' => 'OTP validation Failed'];
         }
         return $result;
     }
