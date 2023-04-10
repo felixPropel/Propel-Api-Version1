@@ -416,7 +416,14 @@ class PersonService
         $orgModel = [];
         Log::info('PersonService > convertToPersonEmailModelAnother function Inside.' . json_encode($datas));
         for ($i = 0; $i < count($datas->secondEmail); $i++) {
-            if ($datas->secondEmail[$i]) {
+            $checkEmail= $this->personInterface->checkSecondaryEmailByUid($datas->secondEmail[$i], $datas->personUid);
+            if ($checkEmail) {
+                $checkEmail->uid = $datas->personUid;
+                $checkEmail->email = $datas->secondEmail[$i];
+                $checkEmail->email_cachet =2;
+                $checkEmail->save();
+            }
+           else {
                 $model[$i] = new PersonEmail();
                 $model[$i]->email = $datas->secondEmail[$i];
                 $model[$i]->email_cachet = 2;
@@ -431,14 +438,19 @@ class PersonService
         $orgModel = [];
         Log::info('PersonService > convertToPersonMobileModelAnother function Inside.' . json_encode($datas));
         for ($i = 0; $i < count($datas->secondNumber); $i++) {
-            if ($datas->secondNumber[$i]) {
+            $checkMobile = $this->personInterface->checkSecondaryMobileNumberByUid($datas->secondNumber[$i], $datas->personUid);
+            if ($checkMobile) {
+                $checkMobile->uid = $datas->personUid;
+                $checkMobile->mobile_no = $datas->secondNumber[$i];
+                $checkMobile->mobile_cachet =2;
+                $checkMobile->save();
+            } else {
                 $model[$i] = new PersonMobile();
                 $model[$i]->mobile_no = $datas->secondNumber[$i];
                 $model[$i]->mobile_cachet = 2;
                 array_push($orgModel, $model[$i]);
             }
         }
-
         return $orgModel;
         Log::info('PersonService > convertToPersonMobileModelAnother function Return.' . json_encode($orgModel));
     }

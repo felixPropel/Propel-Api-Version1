@@ -32,7 +32,7 @@ interface PersonInterface
    public function personAddressByuid($uid);
    public function getPersonByUid($uid);
    public  function personSecondMobileAndEmailByUid($uid);
-   public function findEmailByPersonEmail($email);
+   public function findEmailByPersonEmail($email); 
    public function getAllDatasInUser($uid);
    public function getPersonProfileByUid($uid);
    public function checkPersonByEmail($email);
@@ -45,5 +45,7 @@ interface PersonInterface
    public function getEmailOtpByTempId($id,$email);
    public function removeTempEmailById($id);
    public function addedEmailInPerson($model);
+   public function checkSecondaryMobileNumberByUid($mobile,$uid);
+   public function checkSecondaryEmailByUid($email,$uid);
 
 }

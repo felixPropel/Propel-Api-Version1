@@ -425,4 +425,13 @@ public function addedEmailInPerson($model)
         ];
     }
 }
+public function checkSecondaryMobileNumberByUid($mobile,$uid)
+{
+    return  PersonMobile::where(['uid' => $uid,'mobile_no'=>$mobile,['mobile_cachet', '=', '2']])->first();
+}
+public function checkSecondaryEmailByUid($email,$uid)
+{
+    return  PersonEmail::where(['uid' => $uid,'email'=>$email,['email_cachet', '=', '2']])->first();
+
+}
 }   
