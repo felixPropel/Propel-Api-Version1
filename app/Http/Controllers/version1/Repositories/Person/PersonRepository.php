@@ -12,6 +12,7 @@ use App\Models\PersonMobile;
 use App\Models\PropertyAddress;
 use App\Models\TempPerson;
 use App\Models\PersonProfilePic;
+use App\Models\PersonAddress;
 use App\Models\User;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -114,10 +115,9 @@ class PersonRepository implements PersonInterface
                 }
                 for ($i = 0; $i < count($personCommonAddressModel); $i++) {
                     $personCommonAddressModel[$i]->save();
-                }
-                if (!empty($personCommonAddressModel[$i])) {
-                    $personAddressId->ParentPerson()->associate($personModel, 'uid', 'uid');
+                     $personAddressId->ParentComAddress()->associate($personCommonAddressModel[$i], 'property_address_id','id');
                     $personAddressId->save();
+                    
                 }
                 return [
                     'message' => "Success",
@@ -433,5 +433,11 @@ public function checkSecondaryEmailByUid($email,$uid)
 {
     return  PersonEmail::where(['uid' => $uid,'email'=>$email,['email_cachet', '=', '2']])->first();
 
+}
+public function checkPerivousAddressById($addressId,$uid)
+{
+    $porpertyAddress =PropertyAddress::where('id',$addressId)->delete();
+    $personAddress = PersonAddress::where(['uid' => $uid,'property_address_id'=>$addressId])->delete();
+    return 0;
 }
 }   

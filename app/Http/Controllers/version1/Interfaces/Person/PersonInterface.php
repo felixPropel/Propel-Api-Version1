@@ -47,5 +47,6 @@ interface PersonInterface
    public function addedEmailInPerson($model);
    public function checkSecondaryMobileNumberByUid($mobile,$uid);
    public function checkSecondaryEmailByUid($email,$uid);
+   public function checkPerivousAddressById($addressId,$uid);
 
 }

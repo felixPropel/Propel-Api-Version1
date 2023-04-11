@@ -148,12 +148,18 @@ class PersonService
         $personCommonAddressModel = array();
 
         if (!empty($datas->addressOf)) {
+            $addressId = isset($datas->propertyAddressId) ? $datas->propertyAddressId : null;
+            Log::info('PersonService > addressId function Inside.' . json_encode($addressId));
+            for ($i = 0; $i < count($datas->propertyAddressId); $i++) {
+                $perviousAddress = $this->personInterface->checkPerivousAddressById($datas->propertyAddressId[$i], $datas->personUid);
+            }
             $personCommonAddressModel = $this->convertToPersonCommonAddress($datas);
+            $personAddressId = $this->convertToPersonAddressId($datas);
         }
-        $personAddressId = array();
-        if (!empty($datas->addressOf)) {
-            $personAddressId = $this->convertToPersonAddressId();
-        }
+        // $personAddressId = array();
+        // if (!empty($datas->addressOf)) {
+          
+        // }
 
         $allModels = [
             'personModel' => $personModel,
@@ -187,7 +193,7 @@ class PersonService
     }
     public function convertToPersonProfileModel($datas)
     {
-        if ($datas->image) {
+        if (isset($datas->image)) {
             Log::info('PersonService > convertToPersonProfileModel function Inside.' . json_encode($datas->image));
             // $uploadedFile = $datas->image->store('public/profiles/');
             if ($datas->personUid) {
@@ -416,14 +422,13 @@ class PersonService
         $orgModel = [];
         Log::info('PersonService > convertToPersonEmailModelAnother function Inside.' . json_encode($datas));
         for ($i = 0; $i < count($datas->secondEmail); $i++) {
-            $checkEmail= $this->personInterface->checkSecondaryEmailByUid($datas->secondEmail[$i], $datas->personUid);
+            $checkEmail = $this->personInterface->checkSecondaryEmailByUid($datas->secondEmail[$i], $datas->personUid);
             if ($checkEmail) {
                 $checkEmail->uid = $datas->personUid;
                 $checkEmail->email = $datas->secondEmail[$i];
-                $checkEmail->email_cachet =2;
+                $checkEmail->email_cachet = 2;
                 $checkEmail->save();
-            }
-           else {
+            } else {
                 $model[$i] = new PersonEmail();
                 $model[$i]->email = $datas->secondEmail[$i];
                 $model[$i]->email_cachet = 2;
@@ -442,7 +447,7 @@ class PersonService
             if ($checkMobile) {
                 $checkMobile->uid = $datas->personUid;
                 $checkMobile->mobile_no = $datas->secondNumber[$i];
-                $checkMobile->mobile_cachet =2;
+                $checkMobile->mobile_cachet = 2;
                 $checkMobile->save();
             } else {
                 $model[$i] = new PersonMobile();
@@ -454,7 +459,7 @@ class PersonService
         return $orgModel;
         Log::info('PersonService > convertToPersonMobileModelAnother function Return.' . json_encode($orgModel));
     }
-    public function convertToPersonWebLink($datas)
+    public function convertToPersonWebLink($datas)  
     {
         $orgModel = [];
         Log::info('PersonService > convertToPersonWebLink function Inside.' . json_encode($datas));
@@ -541,7 +546,7 @@ class PersonService
         return $orgModel;
         Log::info('PersonService > convertToPersonProfession function Return.' . json_encode($orgModel));
     }
-    public function convertToPersonCommonAddress($datas)
+    public function convertToPersonCommonAddress($datas)   
     {
         $orgModel = [];
         Log::info('PersonService > convertToPersonCommonAddress function Inside.' . json_encode($datas));
@@ -565,9 +570,11 @@ class PersonService
         return $orgModel;
         Log::info('PersonService > convertToPersonCommonAddress function Return.' . json_encode($orgModel));
     }
-    public function convertToPersonAddressId()
+
+    public function convertToPersonAddressId($datas)
     {
         $model = new PersonAddress();
+        $model->uid=$datas->personUid;
         $model->address_cachet = 1;
         return $model;
         Log::info('PersonService > convertToPersonAddressId function Inside.' . json_encode($model));
@@ -758,8 +765,11 @@ class PersonService
         $datas = (object) $datas;
         Log::info('PersonService > addOtherMobileNumber function Inside.' . json_encode($datas->mobileNo));
         $checkPrimaryMobile = $this->personInterface->checkPersonByMobile($datas->mobileNo);
+        $checkMobile = $this->personInterface->checkSecondaryMobileNumberByUid($datas->mobileNo, $datas->personUid);
         if ($checkPrimaryMobile) {
-            $result = ['users' => 'This Number Is Already Exists', 'type' => 0];
+            $result = ['users' => 'This Number Is Already Exists in Other User ', 'type' => 0];
+        } else if ($checkMobile) {
+            $result = ['users' => 'This Number Is Already Exists in yours ', 'type' => 2];
         } else {
             $model = new TempMobile;
             $model->mobile_no = $datas->mobileNo;
@@ -798,8 +808,12 @@ class PersonService
     {
         $datas = (object) $datas;
         $checkPrimaryEmail = $this->personInterface->checkPersonByEmail($datas->email);
+        $checkEmail = $this->personInterface->checkSecondaryEmailByUid($datas->email, $datas->personUid);
+
         if ($checkPrimaryEmail) {
-            $result = ['users' => 'This email Is Already Exists', 'type' => 0];
+            $result = ['users' => 'This email Is Already Exists in Other User', 'type' => 0];
+        } else if ($checkEmail) {
+            $result = ['users' => 'This email Is Already Exists in Your', 'type' => 2];
         } else {
             $model = new TempEmail;
             $model->email = $datas->email;
