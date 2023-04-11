@@ -573,11 +573,15 @@ class PersonService
 
     public function convertToPersonAddressId($datas)
     {
-        $model = new PersonAddress();
-        $model->uid=$datas->personUid;
-        $model->address_cachet = 1;
-        return $model;
-        Log::info('PersonService > convertToPersonAddressId function Inside.' . json_encode($model));
+        $orgModel = [];
+        for ($i = 0; $i < count($datas->addressOf); $i++) {
+        $model[$i] = new PersonAddress();
+        $model[$i]->uid=$datas->personUid;  
+        $model[$i]->address_cachet = 1;
+        array_push($orgModel, $model[$i]);
+        }
+        return  $orgModel;
+        Log::info('PersonService > convertToPersonAddressId function Inside.' . json_encode($orgModel));
     }
 
     public function personMobileOtp($datas)

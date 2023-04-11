@@ -4,22 +4,22 @@ namespace App\Http\Controllers\version1\Repositories\Person;
 
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Models\Person;
+use App\Models\PersonAddress;
 use App\Models\personAnniversary;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
 use App\Models\PersonLanguage;
 use App\Models\PersonMobile;
-use App\Models\PropertyAddress;
-use App\Models\TempPerson;
 use App\Models\PersonProfilePic;
-use App\Models\PersonAddress;
+use App\Models\PropertyAddress;
+use App\Models\TempEmail;
+use App\Models\TempMobile;
+use App\Models\TempPerson;
 use App\Models\User;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
-use App\Models\TempMobile;
-use App\Models\TempEmail;
 
 class PersonRepository implements PersonInterface
 {
@@ -115,10 +115,14 @@ class PersonRepository implements PersonInterface
                 }
                 for ($i = 0; $i < count($personCommonAddressModel); $i++) {
                     $personCommonAddressModel[$i]->save();
-                     $personAddressId->ParentComAddress()->associate($personCommonAddressModel[$i], 'property_address_id','id');
-                    $personAddressId->save();
-                    
                 }
+                        for ($i = 0; $i < count($personAddressId); $i++) {
+                            $personAddressId[$i]->ParentComAddress()->associate($personCommonAddressModel[$i], 'property_address_id', 'id');
+                            $personAddressId[$i]->save();
+                        }
+
+                    
+          
                 return [
                     'message' => "Success",
                     'data' => $personModel,
@@ -139,9 +143,9 @@ class PersonRepository implements PersonInterface
     {
         return PersonEmail::where(['uid' => $uid, 'email' => $email])->first();
     }
-    public function getOtpByUid($uid,$mobile)
+    public function getOtpByUid($uid, $mobile)
     {
-        return PersonMobile::where(['uid'=> $uid,'mobile_no'=>$mobile])->first();
+        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->first();
     }
     public function emailOtpValidation($uid)
     {
@@ -176,18 +180,18 @@ class PersonRepository implements PersonInterface
     {
         return $model->save();
     }
-    public function getMobileNumberByUid($uid,$mobile)
+    public function getMobileNumberByUid($uid, $mobile)
     {
-     return PersonMobile::where(['uid'=> $uid,'mobile_no'=>$mobile,['deleted_at', '=', Null]])->first();
+        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile, ['deleted_at', '=', null]])->first();
     }
     public function getEmailByUid($uid)
     {
         return PersonEmail::where('uid', $uid)->first();
     }
     public function getPersonPrimaryDataByUid($uid)
-    {   
+    {
 
-        return Person::select('*')->leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid','person_profile_pics.profile_pic')
+        return Person::select('*')->leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid', 'person_profile_pics.profile_pic')
             ->leftjoin('person_emails', 'person_emails.uid', '=', 'persons.uid')
             ->leftjoin('person_details', 'person_details.uid', '=', 'persons.uid')
             ->leftjoin('person_profile_pics', 'person_profile_pics.uid', '=', 'persons.uid')
@@ -295,15 +299,15 @@ class PersonRepository implements PersonInterface
     }
     public function checkPersonByMobile($mobile)
     {
-        return PersonMobile::where(['mobile_no' => $mobile,  ['mobile_cachet', '=', '1']])->first();
+        return PersonMobile::where(['mobile_no' => $mobile, ['mobile_cachet', '=', '1']])->first();
     }
     public function getAllDatasInUser($uid)
     {
-        return Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personDetails.gender', 'personDetails.bloodGroup', 'personAddress', 'personAddress.ParentComAddress','personEducation','personProfession')->where('uid', $uid)->get();
+        return Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personDetails.gender', 'personDetails.bloodGroup', 'personAddress', 'personAddress.ParentComAddress', 'personEducation', 'personProfession')->where('uid', $uid)->get();
     }
     public function getPersonProfileByUid($uid)
     {
-        return PersonProfilePic::where('uid',$uid)->first();
+        return PersonProfilePic::where('uid', $uid)->first();
     }
     public function checkPersonByEmail($email)
     {
@@ -311,25 +315,23 @@ class PersonRepository implements PersonInterface
     }
     public function getPerviousPrimaryMobileNumber($uid)
     {
-        $model= PersonMobile::where(['uid' => $uid, ['mobile_cachet', '=', '1']])->first();
-        if($model){
-            $model->mobile_cachet=2;
+        $model = PersonMobile::where(['uid' => $uid, ['mobile_cachet', '=', '1']])->first();
+        if ($model) {
+            $model->mobile_cachet = 2;
             $model->save();
-        }
-        else{
-            $model=NUll;
+        } else {
+            $model = null;
         }
         return $model;
     }
     public function getPerviousPrimaryEmail($uid)
     {
-        $model= PersonEmail::where(['uid' => $uid, ['email_cachet', '=', '1']])->first();
-        if($model){
-            $model->email_cachet=2;
+        $model = PersonEmail::where(['uid' => $uid, ['email_cachet', '=', '1']])->first();
+        if ($model) {
+            $model->email_cachet = 2;
             $model->save();
-        }
-        else{
-            $model=NUll;
+        } else {
+            $model = null;
         }
         return $model;
     }
@@ -352,92 +354,92 @@ class PersonRepository implements PersonInterface
             ];
         }
     }
-public function getMobileOtpByTempId($id ,$mobile)
-{
-    return TempMobile::where(['id' => $id,'mobile_no'=>$mobile])->first();
-}
-public function removeTempMobileById($id)
-{
-    return TempMobile::where('id',$id)->delete();
-}
-public function removeTempEmailById($id)
-{
-    return TempEmail::where('id',$id)->delete();
-}
-public function addedOtherMobileNoInPerson($model)
-{
-    try {
-        $result = DB::transaction(function () use ($model) {
+    public function getMobileOtpByTempId($id, $mobile)
+    {
+        return TempMobile::where(['id' => $id, 'mobile_no' => $mobile])->first();
+    }
+    public function removeTempMobileById($id)
+    {
+        return TempMobile::where('id', $id)->delete();
+    }
+    public function removeTempEmailById($id)
+    {
+        return TempEmail::where('id', $id)->delete();
+    }
+    public function addedOtherMobileNoInPerson($model)
+    {
+        try {
+            $result = DB::transaction(function () use ($model) {
 
-            $model->save();
+                $model->save();
+                return [
+                    'message' => "Success",
+                    'data' => $model,
+                ];
+            });
+            return $result;
+        } catch (\Exception $e) {
             return [
-                'message' => "Success",
-                'data' => $model,
+                'message' => "Failed",
+                'data' => $e,
             ];
-        });
-        return $result;
-    } catch (\Exception $e) {
-        return [
-            'message' => "Failed",
-            'data' => $e,
-        ];
+        }
+    }
+    public function storeTempEmail($model)
+    {
+        try {
+            $result = DB::transaction(function () use ($model) {
+
+                $model->save();
+                return [
+                    'message' => "Success",
+                    'data' => $model,
+                ];
+            });
+            return $result;
+        } catch (\Exception $e) {
+            return [
+                'message' => "Failed",
+                'data' => $e,
+            ];
+        }
+    }
+    public function getEmailOtpByTempId($id, $email)
+    {
+        return TempEmail::where(['id' => $id, 'email' => $email])->first();
+    }
+    public function addedEmailInPerson($model)
+    {
+        try {
+            $result = DB::transaction(function () use ($model) {
+
+                $model->save();
+                return [
+                    'message' => "Success",
+                    'data' => $model,
+                ];
+            });
+            return $result;
+        } catch (\Exception $e) {
+            return [
+                'message' => "Failed",
+                'data' => $e,
+            ];
+        }
+    }
+    public function checkSecondaryMobileNumberByUid($mobile, $uid)
+    {
+        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile, ['mobile_cachet', '=', '2']])->first();
+    }
+    public function checkSecondaryEmailByUid($email, $uid)
+    {
+        return PersonEmail::where(['uid' => $uid, 'email' => $email, ['email_cachet', '=', '2']])->first();
+
+    }
+    public function checkPerivousAddressById($addressId, $uid)
+    {
+        $porpertyAddress = PropertyAddress::where('id', $addressId)->delete();
+        $personAddress = PersonAddress::where(['uid' => $uid, 'property_address_id' => $addressId])->delete();
+        return 0;
     }
 }
-public function storeTempEmail($model)
-{
-     try {
-        $result = DB::transaction(function () use ($model) {
-
-            $model->save();
-            return [
-                'message' => "Success",
-                'data' => $model,
-            ];
-        });
-        return $result;
-    } catch (\Exception $e) {
-        return [
-            'message' => "Failed",
-            'data' => $e,
-        ];
-    }
-}
-public function getEmailOtpByTempId($id ,$email)
-{
-    return TempEmail::where(['id' => $id,'email'=>$email])->first();
-}
-public function addedEmailInPerson($model)
-{
-    try {
-        $result = DB::transaction(function () use ($model) {
-
-            $model->save();
-            return [
-                'message' => "Success",
-                'data' => $model,
-            ];
-        });
-        return $result;
-    } catch (\Exception $e) {
-        return [
-            'message' => "Failed",
-            'data' => $e,
-        ];
-    }
-}
-public function checkSecondaryMobileNumberByUid($mobile,$uid)
-{
-    return  PersonMobile::where(['uid' => $uid,'mobile_no'=>$mobile,['mobile_cachet', '=', '2']])->first();
-}
-public function checkSecondaryEmailByUid($email,$uid)
-{
-    return  PersonEmail::where(['uid' => $uid,'email'=>$email,['email_cachet', '=', '2']])->first();
-
-}
-public function checkPerivousAddressById($addressId,$uid)
-{
-    $porpertyAddress =PropertyAddress::where('id',$addressId)->delete();
-    $personAddress = PersonAddress::where(['uid' => $uid,'property_address_id'=>$addressId])->delete();
-    return 0;
-}
-}   
