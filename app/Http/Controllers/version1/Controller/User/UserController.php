@@ -48,6 +48,13 @@ class UserController extends Controller
         Log::info('UserController > changePassword function Return.' . json_encode($response));
         return $response;
     }
+    public function setNewPassword(Request $request)
+    {        
+        Log::info('UserController > setNewPassword function Inside.' . json_encode($request->all()));
+        $response = $this->userService->setNewPassword($request->all());
+        Log::info('UserController > setNewPassword function Return.' . json_encode($response));
+        return $response;
+    }
     /**
      * Show the form for creating a new resource.
      *

@@ -162,7 +162,7 @@ class PersonRepository implements PersonInterface
     }
     public function getPersonEmailByUid($uid)
     {
-        return PersonEmail::where('uid', $uid)->first();
+        return PersonEmail::where(['uid'=>$uid , ['email_cachet', '=', 1]])->first();
     }
     public function getPersonDatasByUid($uid)
     {

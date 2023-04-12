@@ -93,6 +93,26 @@ class UserService
         }
         return $this->commonService->sendResponse($model, '');
     }
+    public function setNewPassword($datas)
+    {
+        Log::info('UserService > setNewPassword function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $user = $this->userInterface->findUserDataByUid($datas->uid);
+        Log::info('UserService > setNewPassword function Return.' . json_encode($user));
+        if ($user) {
+            $password = Hash::make($datas->password);
+            $user->password = $password;
+            $model = $this->userInterface->storeUser($user);
+            if ($model['message'] == "Success") {
+                $userModel = $model['data'];
+                $personModel = $this->personInterface->getPersonPrimaryDataByUid($userModel->uid);
+                return $this->commonService->sendResponse( $personModel, $model['message']);
+            } else {
+                return $this->commonService->sendError($model['data'], $model['message']);
+            }
+        }
+
+    }
     public function convertToUserModel($personModel, $datas)
     {
         Log::info('UserService > convertToUserModel function Inside.' . json_encode($datas));
