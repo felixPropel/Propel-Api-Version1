@@ -11,6 +11,8 @@ Route::post('storeTempPerson', 'App\Http\Controllers\version1\Controller\Person\
 Route::post('personOtpValidation', 'App\Http\Controllers\version1\Controller\Person\PersonController@personOtpValidation')->name('personOtpValidation');
 //Searching Part Ended
 Route::post('generateEmailOtp', 'App\Http\Controllers\version1\Controller\Person\PersonController@generateEmailOtp')->name('generateEmailOtp');
+Route::post('checkUserOrPerson', 'App\Http\Controllers\version1\Controller\Person\PersonController@checkUserOrPerson')->name('checkUserOrPerson');
+
 Route::post('checkPersonEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@checkPersonEmail')->name('checkPersonEmail');
 Route::post('personMobileOtp', 'App\Http\Controllers\version1\Controller\Person\PersonController@personMobileOtp')->name('personMobileOtp');
 Route::post('personDatas', 'App\Http\Controllers\version1\Controller\Person\PersonController@personDatas')->name('personDatas');

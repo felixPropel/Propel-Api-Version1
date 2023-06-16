@@ -75,15 +75,24 @@ class PersonRepository implements PersonInterface
                 $personProfessionModel = $allModels['personProfessionModel'];
                 $personCommonAddressModel = $allModels['personCommonAddressModel'];
                 $personAddressId = $allModels['personAddressId'];
+                $personAnniversaryDate = $allModels['personAnniversaryDate'];
+
 
                 $personModel->save();
                 $personDetailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
+
                 $personMobileModel->ParentPerson()->associate($personModel, 'uid', 'uid');
+
                 $personEmailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
+
+                $personAnniversaryDate->ParentPerson()->associate($personModel, 'uid', 'uid');
+
 
                 $personDetailModel->save();
                 $personMobileModel->save();
                 $personEmailModel->save();
+                $personAnniversaryDate->save();
+
 
                 for ($i = 0; $i < count($personAnotherEmailModel); $i++) {
                     $personAnotherEmailModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
@@ -97,6 +106,7 @@ class PersonRepository implements PersonInterface
                     $personWebLinkModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personWebLinkModel[$i]->save();
                 }
+
                 for ($i = 0; $i < count($personOtherLanguage); $i++) {
                     $personOtherLanguage[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personOtherLanguage[$i]->save();
@@ -116,16 +126,14 @@ class PersonRepository implements PersonInterface
                 for ($i = 0; $i < count($personCommonAddressModel); $i++) {
                     $personCommonAddressModel[$i]->save();
                 }
-                        for ($i = 0; $i < count($personAddressId); $i++) {
-                            $personAddressId[$i]->ParentComAddress()->associate($personCommonAddressModel[$i], 'property_address_id', 'id');
-                            $personAddressId[$i]->save();
-                        }
+                for ($i = 0; $i < count($personAddressId); $i++) {
+                    $personAddressId[$i]->ParentComAddress()->associate($personCommonAddressModel[$i], 'property_address_id', 'id');
+                    $personAddressId[$i]->save();
+                }
 
-                    
-          
                 return [
                     'message' => "Success",
-                    'data' => $personModel,
+                    'data' => $personDetailModel,
                 ];
             });
             return $result;
@@ -162,7 +170,7 @@ class PersonRepository implements PersonInterface
     }
     public function getPersonEmailByUid($uid)
     {
-        return PersonEmail::where(['uid'=>$uid , ['email_cachet', '=', 1]])->first();
+        return PersonEmail::where(['uid' => $uid, ['email_cachet', '=', 1]])->first();
     }
     public function getPersonDatasByUid($uid)
     {
@@ -184,21 +192,21 @@ class PersonRepository implements PersonInterface
     {
         return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile, ['deleted_at', '=', null]])->first();
     }
-    public function getEmailByUid($uid)
-    {
-        return PersonEmail::where('uid', $uid)->first();
-    }
+
     public function getPersonPrimaryDataByUid($uid)
     {
 
-        return Person::select('*')->leftjoin('person_mobiles', 'person_mobiles.uid', '=', 'persons.uid', 'person_profile_pics.profile_pic')
-            ->leftjoin('person_emails', 'person_emails.uid', '=', 'persons.uid')
-            ->leftjoin('person_details', 'person_details.uid', '=', 'persons.uid')
-            ->leftjoin('person_profile_pics', 'person_profile_pics.uid', '=', 'persons.uid')
-            ->where('person_mobiles.mobile_cachet', 1)
-            ->where('person_emails.email_cachet', 1)
-            ->where('persons.uid', $uid)
-            ->first();
+        $model = Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personLanguage', 'personAnniversaryDate')
+            ->whereHas('mobile', function ($query) {
+                $query->where('mobile_cachet', 1);
+            })
+            ->whereHas('email', function ($query) {
+                $query->where('email_cachet', 1);
+            })
+            ->where('uid', $uid)
+            ->first()->toArray();
+        return $model;
+
     }
     public function getAnniversaryDate($uid)
     {
@@ -312,6 +320,10 @@ class PersonRepository implements PersonInterface
     public function checkPersonByEmail($email)
     {
         return PersonEmail::where(['email' => $email, ['email_cachet', '=', '1']])->first();
+    }
+    public function getPrimaryMobileNumberByUid($uid)
+    {
+        return PersonMobile::where(['uid' => $uid, ['mobile_cachet', '=', '1']])->first();
     }
     public function getPerviousPrimaryMobileNumber($uid)
     {

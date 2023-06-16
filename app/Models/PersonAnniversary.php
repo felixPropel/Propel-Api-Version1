@@ -9,4 +9,8 @@ class personAnniversary extends Model
 {
     use HasFactory;
     protected $table = 'person_anniversarys';
+    public function ParentPerson()
+    {
+        return $this->belongsTo(Person::class, 'uid', 'uid');
+    }
 }

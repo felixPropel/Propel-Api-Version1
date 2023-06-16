@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\version1\Services\User;
 
+use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
-use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Models\PersonDetails;
 use App\Models\User;
@@ -19,7 +19,7 @@ class UserService
         $this->userInterface = $userInterface;
         $this->personInterface = $personInterface;
         $this->commonService = $commonService;
-        $this->OrganizationInterface=$OrganizationInterface;
+        $this->OrganizationInterface = $OrganizationInterface;
     }
     public function loginUser($objdatas)
     {
@@ -37,12 +37,11 @@ class UserService
         $uid = $user->uid;
         $user_name = PersonDetails::where('uid', $uid)->pluck('first_name')->first();
         Log::info('UserService > loginUser function Return.' . json_encode($user));
-
         if ($user) {
             if (Hash::check($datas->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-                $defaultOrg=$this->OrganizationInterface->getPerviousDefaultOrganization($uid);
-                $response = ['token' => $token, 'uid' => $uid,'defaultOrg'=>$defaultOrg];
+                $defaultOrg = $this->OrganizationInterface->getPerviousDefaultOrganization($uid);
+                $response = ['token' => $token, 'uid' => $uid, 'defaultOrg' => $defaultOrg];
                 return $this->commonService->sendResponse($response, "");
             } else {
                 $response = ["message" => "Password mismatch", 'username' => $user_name, 'uid' => $uid];
@@ -80,7 +79,7 @@ class UserService
                 $password = Hash::make($datas->password);
                 $user->password = $password;
                 $model = $this->userInterface->storeUser($user);
-                $model['status']='Password Changed Successfully';
+                $model['status'] = 'Password Changed Successfully';
                 return $model;
             } else {
                 $model = ['message' => 'Failed', 'status' => 'confirm Password MisMatched'];
@@ -106,7 +105,7 @@ class UserService
             if ($model['message'] == "Success") {
                 $userModel = $model['data'];
                 $personModel = $this->personInterface->getPersonPrimaryDataByUid($userModel->uid);
-                return $this->commonService->sendResponse( $personModel, $model['message']);
+                return $this->commonService->sendResponse($personModel, $model['message']);
             } else {
                 return $this->commonService->sendError($model['data'], $model['message']);
             }
@@ -127,11 +126,13 @@ class UserService
     }
     public function userCreation($datas)
     {
+
         Log::info('UserService > userCreation function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $mobile = $this->personInterface->getMobileNumberByUid($datas->uid);
-        $email = $this->personInterface->getEmailByUid($datas->uid);
+        $mobile = $this->personInterface->getPrimaryMobileNumberByUid($datas->uid);
+        $email = $this->personInterface->getPersonEmailByUid($datas->uid);
         $getPersonName = $this->personInterface->getPersonDatasByUid($datas->uid);
+
         $createuser = $this->UserCreate($mobile->mobile_no, $email->email, $datas);
         $saveUser = $this->userInterface->savedUser($createuser);
         $result = ['personName' => $getPersonName->first_name, 'mobileNumber' => $mobile->mobile_no];
@@ -141,8 +142,13 @@ class UserService
     public function UserCreate($mobile, $email, $datas)
     {
         Log::info('UserService > UserCreate function Inside.' . json_encode($datas));
-        $model = new User();
-        $model->uid = $datas->uid;
+        $model =$this->userInterface->findUserDataByUid($datas->uid);
+        if ($model) {
+            $model->uid = $datas->uid;
+        } else {
+            $model = new User();
+            $model->uid = $datas->uid;
+        }
         $model->primary_email = $email;
         $model->primary_mobile = $mobile;
         $model->password = Hash::make($datas->password);

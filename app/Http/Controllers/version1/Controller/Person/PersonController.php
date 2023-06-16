@@ -100,21 +100,28 @@ public function personMobileOtp(Request $request)
     Log::info('PersonController > personMobileOtp function Inside.' . json_encode($request->all()));
     $response=$this->personService->personMobileOtp($request->all());
     Log::info('PersonController > personMobileOtp function Return.' . json_encode($response));
-    return  $response; 
+    return  $response;
+}
+public function checkUserOrPerson(Request $request)
+{
+    Log::info('PersonController > checkUserOrPerson function Inside.' . json_encode($request->all()));
+    $response=$this->personService->checkUserOrPerson($request->all());
+    Log::info('PersonController > checkUserOrPerson function Return.' . json_encode($response));
+    return  $response;
 }
 public function otpValidationForMobile(Request $request)
 {
     Log::info('PersonController > otpValidationForMobile function Inside.' . json_encode($request->all()));
     $response=$this->personService->otpValidationForMobile($request->all());
     Log::info('PersonController > otpValidationForMobile  function Return.' . json_encode($response));
-    return  $response; 
+    return  $response;
 }
 public function generateEmailOtp(Request $request)
 {
     Log::info('PersonController > mobileOtpValidated function Inside.' . json_encode($request->all()));
     $response=$this->personService->generateEmailOtp($request->all());
     Log::info('PersonController > mobileOtpValidated function Return.' . json_encode($response));
-    return  $response; 
+    return  $response;
 }
 
 public function emailOtpValidation(Request $request)

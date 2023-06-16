@@ -17,7 +17,6 @@ interface PersonInterface
     public function savePersonDatas($model);
     public function savePerson($model);
    public function getMobileNumberByUid($uid,$mobile);
-   public function getEmailByUid($uid);
    public function getAnniversaryDate($uid);
    public function saveAnniversaryDate($model);
    public function motherTongueByUid($uid);
@@ -32,7 +31,7 @@ interface PersonInterface
    public function personAddressByuid($uid);
    public function getPersonByUid($uid);
    public  function personSecondMobileAndEmailByUid($uid);
-   public function findEmailByPersonEmail($email); 
+   public function findEmailByPersonEmail($email);
    public function getAllDatasInUser($uid);
    public function getPersonProfileByUid($uid);
    public function checkPersonByEmail($email);
@@ -48,5 +47,6 @@ interface PersonInterface
    public function checkSecondaryMobileNumberByUid($mobile,$uid);
    public function checkSecondaryEmailByUid($email,$uid);
    public function checkPerivousAddressById($addressId,$uid);
+   public function getPrimaryMobileNumberByUid($uid);
 
 }

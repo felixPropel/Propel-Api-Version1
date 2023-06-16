@@ -10,6 +10,7 @@ use App\Http\Controllers\version1\Services\Common\SmsService;
 use App\Models\IdDocumentType;
 use App\Models\Person;
 use App\Models\PersonAddress;
+use App\Models\personAnniversary;
 use App\Models\PersonDetails;
 use App\Models\PersonEducation;
 use App\Models\PersonEmail;
@@ -51,7 +52,6 @@ class PersonService
         }
         return $this->commonService->sendResponse($result, "");
     }
-
     public function findCredential($datas)
     {
         Log::info('PersonService > findCredential function Inside.' . json_encode($datas));
@@ -103,8 +103,8 @@ class PersonService
     public function storePerson($datas, $type = null)
     {
 
-        Log::info('PersonService > storePerson function Inside.' . json_encode($datas));
-        //    dd($datas);
+        Log::info('PersonService > storePerson1 function Inside.' . json_encode($datas));
+
         $datas['personUid'] = isset($datas['personUid']) ? $datas['personUid'] : null;
 
         $datas = (object) $datas;
@@ -114,6 +114,7 @@ class PersonService
         $personEmailModel = $this->convertToPersonEmailModel($datas);
         $personMobileModel = $this->convertToPersonMobileModel($datas);
         $personProfileModel = $this->convertToPersonProfileModel($datas);
+        $personAnniversaryDate = $this->convertToPersonAnniversaryDate($datas);
 
         $personAnotherEmailModel = array();
 
@@ -129,7 +130,7 @@ class PersonService
             $personWebLink = $this->convertToPersonWebLink($datas);
         }
         $personOtherLanguage = array();
-        if (!empty($datas->otherLanguage)) {
+        if (!empty($datas->otherLanguage) || !empty($datas->motherLanguage) ) {
             $personOtherLanguage = $this->convertToPersonOtherLanguage($datas);
         }
         $personIdDocument = array();
@@ -146,7 +147,7 @@ class PersonService
         }
 
         $personCommonAddressModel = array();
-
+        $personAddressId = array();
         if (!empty($datas->addressOf)) {
             $addressId = isset($datas->propertyAddressId) ? $datas->propertyAddressId : null;
             Log::info('PersonService > addressId function Inside.' . json_encode($addressId));
@@ -158,7 +159,7 @@ class PersonService
         }
         // $personAddressId = array();
         // if (!empty($datas->addressOf)) {
-          
+
         // }
 
         $allModels = [
@@ -175,6 +176,7 @@ class PersonService
             'personProfessionModel' => $personProfessionModel,
             'personCommonAddressModel' => $personCommonAddressModel,
             'personAddressId' => $personAddressId,
+            'personAnniversaryDate' => $personAnniversaryDate,
 
         ];
         $personData = $this->personInterface->storePerson($allModels);
@@ -191,6 +193,25 @@ class PersonService
             }
         }
     }
+    public function convertToPersonAnniversaryDate($datas)
+    {
+        if ($datas->anniversaryDate) {
+            Log::info('PersonService > PersonAnniversaryDate.' . json_encode($datas->personUid));
+            $model = $this->personInterface->getAnniversaryDate($datas->personUid);
+            if ($model) {
+                $model->uid = $datas->personUid;
+            } else {
+                $model = new personAnniversary();
+                $model->uid = $datas->personUid;
+            }
+            $date = Carbon::createFromFormat('d-m-Y', $datas->anniversaryDate)->format('Y-m-d');
+            $model->anniversary_date = $date;
+            $model->occasions_id = null;
+            Log::info('PersonService > PersonAnniversaryDate .' . json_encode($model));
+            return $model;
+        }
+    }
+
     public function convertToPersonProfileModel($datas)
     {
         if (isset($datas->image)) {
@@ -259,7 +280,6 @@ class PersonService
         if ($tempPersonModel) {
             if ($datas->otp == $tempPersonModel->otp) {
                 $personalDatas = json_decode($tempPersonModel->personal_data, true);
-
                 $mobileNumber = isset($tempPersonModel['mobile_no']) ? $tempPersonModel['mobile_no'] : "";
                 $email = isset($tempPersonModel['email']) ? $tempPersonModel['email'] : "";
                 $salutation = isset($personalDatas['salutation']) ? $personalDatas['salutation'] : "";
@@ -273,7 +293,6 @@ class PersonService
                 $personDatas = ['mobileNumber' => $mobileNumber, 'email' => $email, 'salutationId' => $salutation, 'firstName' => $firstName, 'middleName' => $middleName, 'lastName' => $lastName, 'nickName' => $nickName, 'genderId' => $gender, 'bloodGroup' => $bloodGroup, 'dob' => $dob];
                 $personModel = $this->storePerson($personDatas);
                 $tempPersonModel->delete();
-
                 return $personModel;
             } else {
                 return $this->commonService->sendError(['tempId' => $tempPersonModel->id, 'mobileNumber' => $tempPersonModel->mobile_no]);
@@ -374,7 +393,8 @@ class PersonService
         $model->middle_name = isset($datas->middleName) ? $datas->middleName : '';
         $model->last_name = isset($datas->lastName) ? $datas->lastName : '';
         $model->nick_name = isset($datas->nickName) ? $datas->nickName : '';
-        // $model->dob = $datas->dob;
+        $date = Carbon::createFromFormat('d-m-Y', $datas->dob)->format('Y-m-d');
+        $model->dob = isset($date) ? $date : '';
         $model->birth_place = isset($datas->birthCity) ? $datas->birthCity : '';
         $model->marital_id = isset($datas->maritalStatus) ? $datas->maritalStatus : null;
         $model->gender_id = isset($datas->genderId) ? $datas->genderId : '';
@@ -459,14 +479,15 @@ class PersonService
         return $orgModel;
         Log::info('PersonService > convertToPersonMobileModelAnother function Return.' . json_encode($orgModel));
     }
-    public function convertToPersonWebLink($datas)  
+    public function convertToPersonWebLink($datas)
     {
         $orgModel = [];
         Log::info('PersonService > convertToPersonWebLink function Inside.' . json_encode($datas));
-        for ($i = 0; $i < count($datas->webLinks); $i++) {
-            if ($datas->webLinks[$i]) {
+        $link[0] = $datas->webLinks;
+        for ($i = 0; $i < count($link); $i++) {
+            if ($link[$i]) {
                 $model[$i] = new WebLink();
-                $model[$i]->web_add = $datas->webLinks[$i];
+                $model[$i]->web_add = $link[$i];
                 $model[$i]->web_cachet = 1;
                 $model[$i]->status = 1;
                 array_push($orgModel, $model[$i]);
@@ -480,17 +501,42 @@ class PersonService
     {
         $orgModel = [];
         Log::info('PersonService > convertToPersonOtherLanguage function Inside.' . json_encode($datas));
-        for ($i = 0; $i < count($datas->otherLanguage); $i++) {
-            if ($datas->otherLanguage[$i]) {
-                $model[$i] = new PersonLanguage();
-                $model[$i]->language_id = $datas->otherLanguage[$i];
-                $model[$i]->mother_tongue = $datas->motherLanguage;
-                $model[$i]->status = 1;
-                array_push($orgModel, $model[$i]);
+        if (isset($datas->otherLanguage)) {
+            $models = $this->personInterface->motherTongueByUid($datas->personUid);
+            if (count($models)) {
+                foreach ($models as $model) {
+                    $model->delete();
+                }
+            }
+            for ($i = 0; $i < count($datas->otherLanguage); $i++) {
+                if ($datas->otherLanguage[$i]) {
+                    $result[$i] = new PersonLanguage();
+                    $result[$i]->language_id = $datas->otherLanguage[$i];
+                    $result[$i]->mother_tongue = $datas->motherLanguage;
+                    $result[$i]->status = 1;
+                    array_push($orgModel, $result[$i]);
+                }
+            }
+        }
+        if ($datas->motherLanguage && empty($orgModel)) {
+            $language[0] = $datas->motherLanguage;
+            $models = $this->personInterface->motherTongueByUid($datas->personUid);
+            if (count($models)) {
+                foreach ($models as $model) {
+                    $model->delete();
+                }
+            }
+            for ($i = 0; $i < count($language); $i++) {
+                if ($language[$i]) {
+                    $result[$i] = new PersonLanguage();
+                    $result[$i]->mother_tongue = $language[$i];
+                    $result[$i]->status = 1;
+                    array_push($orgModel, $result[$i]);
+                }
             }
         }
         return $orgModel;
-        Log::info('PersonService > convertToPersonOtherLanguage function Return.' . json_encode($orgModel));
+        Log::info('PersonService > convertToPersonOtherLanguage123 function Return.' . json_encode($orgModel));
     }
     public function convertToPersonIdDocumnet($datas)
     {
@@ -546,7 +592,7 @@ class PersonService
         return $orgModel;
         Log::info('PersonService > convertToPersonProfession function Return.' . json_encode($orgModel));
     }
-    public function convertToPersonCommonAddress($datas)   
+    public function convertToPersonCommonAddress($datas)
     {
         $orgModel = [];
         Log::info('PersonService > convertToPersonCommonAddress function Inside.' . json_encode($datas));
@@ -575,15 +621,27 @@ class PersonService
     {
         $orgModel = [];
         for ($i = 0; $i < count($datas->addressOf); $i++) {
-        $model[$i] = new PersonAddress();
-        $model[$i]->uid=$datas->personUid;  
-        $model[$i]->address_cachet = 1;
-        array_push($orgModel, $model[$i]);
+            $model[$i] = new PersonAddress();
+            $model[$i]->uid = $datas->personUid;
+            $model[$i]->address_cachet = 1;
+            array_push($orgModel, $model[$i]);
         }
-        return  $orgModel;
+        return $orgModel;
         Log::info('PersonService > convertToPersonAddressId function Inside.' . json_encode($orgModel));
     }
-
+    public function checkUserOrPerson($datas)
+    {
+        Log::info('PersonService > checkUserOrPerson function Inside.' . json_encode($datas));
+        $personDatas = (object) $datas;
+        $checkUser = $this->personInterface->checkUserByUID($personDatas->uid);
+        if ($checkUser) {
+            $personName = $this->personInterface->getPersonDatasByUid($personDatas->uid);
+            return $this->commonService->sendResponse($personName, 'ExactUser');
+        } else {
+            $mobileOtp = $this->personMobileOtp($datas);
+            return $mobileOtp;
+        }
+    }
     public function personMobileOtp($datas)
     {
         Log::info('PersonService > personMobileOtp function Inside.' . json_encode($datas));
@@ -605,15 +663,20 @@ class PersonService
             return $model;
         }
     }
-    public function otpValidationForMobile($datas)
+    public function otpValidationForMobile($datas, $type = null)
     {
         Log::info('PersonService > otpValidationForMobile function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $model = $this->personInterface->getOtpByUid($datas->uid, $datas->mobile_no);
         Log::info('PersonService > otpValidationForMobile  getOtpByUid function Return.' . json_encode($model));
         if ($datas->otp == $model->otp_received) {
-            $status = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['mobile_cachet' => 2, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
-            $result = ['personData' => $datas, 'status' => 'OtpValidateSuccess', 'type' => 1];
+            if ($type) {
+                $status = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['mobile_cachet' => 2, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
+                $result = ['personData' => $datas, 'status' => 'OtpValidateSuccess', 'type' => 1];
+            } else {
+                $result = ['personData' => $datas, 'status' => 'OtpValidateSuccess', 'type' => 1];
+            }
+
         } else {
             $result = ['personData' => "", 'status' => 'OtpValidatefailed', 'type' => 0];
         }
@@ -664,7 +727,7 @@ class PersonService
         $convertPerson = $this->convertPerson($person, $datas);
         $savePerson = $this->personInterface->savePerson($convertPerson);
         Log::info('PersonService > personToUser function Return.' . json_encode($datas->uid));
-        return $this->commonService->sendResponse($datas->uid, '');
+        return $this->commonService->sendResponse($person, '');
     }
     public function convertPerson($person, $datas)
     {
@@ -682,21 +745,19 @@ class PersonService
         Log::info('PersonService > generateEmailOtp function Inside.' . json_encode($uid));
         $data = $this->personInterface->getPersonEmailByUid($uid);
         $otp = substr(str_shuffle("123456789"), 0, 5);
-        $model = PersonEmail::where("uid", $uid)->update(["otp_received" => $otp, "email_validation_status" => 0]);
+        $model = PersonEmail::where(["uid" => $uid, 'email' => $data->email])->update(["otp_received" => $otp]);
         Log::info('PersonService > generateEmailOtp function Return.' . json_encode($model));
         if ($model) {
-            $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uid['uid'], 'email' => $data->email]];
+            $getUserName = $this->personInterface->getPersonDatasByUid($uid);
+            $response = ["message" => 'OK', 'route' => 'email_otp', "param" => ['uid' => $uid['uid'], 'email' => $data->email, 'personName' => $getUserName['first_name']]];
             return response($response, 200);
         } else {
             $response = ["message" => 'Mail Not Send'];
             return response($response, 400);
         }
-
     }
-
     public function emailOtpValidation($datas)
     {
-
         Log::info('PersonService > emailOtpValidation function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $uid = $datas->uid;
@@ -713,7 +774,6 @@ class PersonService
     }
     public function personProfileDetails($datas)
     {
-
         Log::info('PersonService > personProfileDetails function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $personDetails = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
@@ -748,7 +808,7 @@ class PersonService
             $profilePic = $users['profilePic'];
             $personGender = $users['personDetails']['gender'];
             $personbloodGroup = $users['personDetails']['bloodGroup'];
-            $primaryAddress = $users['personAddress']['ParentComAddress'];
+            $primaryAddress = isset($users['personAddress']['ParentComAddress']) ? $users['personAddress']['ParentComAddress'] : '';
             $personEducation = $users['personEducation'];
             $personProfession = $users['personProfession'];
 
@@ -855,7 +915,7 @@ class PersonService
     public function mobileNumberChangeAsPrimary($datas)
     {
         $datas = (object) $datas;
-        $otpValidation = $this->otpValidationForMobile($datas);
+        $otpValidation = $this->otpValidationForMobile($datas, $type = 'SecondMobileNumber');
         if ($otpValidation['type'] == 1) {
             $perviousMobile = $this->personInterface->getPerviousPrimaryMobileNumber($datas->uid);
             if ($perviousMobile) {

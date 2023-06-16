@@ -26,6 +26,10 @@ class Person extends Model
     {
         return $this->hasOne(PersonDetails::class,'uid','uid');
     }
+    public function personAnniversaryDate()
+    {
+        return $this->hasOne(personAnniversary::class,'uid','uid');
+    }
     public function profilePic()
     {
         return $this->hasOne('App\Models\PersonProfilePic', 'uid','uid');
@@ -41,5 +45,9 @@ class Person extends Model
     public function personProfession()
     {
         return $this->hasMany('App\Models\PersonProfession', 'uid','uid');
+    }
+    public function personLanguage()
+    {
+        return $this->hasMany('App\Models\PersonLanguage', 'uid','uid');
     }
 }
