@@ -71,7 +71,7 @@ class HrmDepartmentService
         $model->department_name = $data->name;
         $model->parent_dept_id = isset($data->parent_dept_id) ? $data->parent_dept_id : null;
         $model->description = $data->description;
-        $model->active_state = 1;
+        $model->active_state =isset($data->status) ? 1 : 0;
 
         return $model;
     }

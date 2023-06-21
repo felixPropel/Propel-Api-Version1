@@ -311,7 +311,7 @@ class PersonRepository implements PersonInterface
     }
     public function getAllDatasInUser($uid)
     {
-        return Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personDetails.gender', 'personDetails.bloodGroup', 'personAddress', 'personAddress.ParentComAddress', 'personEducation', 'personProfession')->where('uid', $uid)->get();
+        return Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personDetails.gender', 'personDetails.bloodGroup', 'personAddress', 'personAddress.ParentComAddress', 'personEducation', 'personProfession')->where('uid', $uid)->first();
     }
     public function getPersonProfileByUid($uid)
     {

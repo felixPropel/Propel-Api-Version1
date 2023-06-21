@@ -801,7 +801,9 @@ class PersonService
         Log::info('PersonService > userProfileDatas function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $userProfiles = $this->personInterface->getAllDatasInUser($datas->uid);
-        $entities = collect($userProfiles)->map(function ($users) {
+        $users = $userProfiles;
+
+     //   $entities = collect($userProfiles)->map(function ($users) {
             $personDetails = $users['personDetails'];
             $primaryMobile = $users['mobile'];
             $primaryEmail = $users['email'];
@@ -814,9 +816,10 @@ class PersonService
 
             $data = ['userDeatils' => $personDetails, 'primaryMobile' => $primaryMobile, 'primaryEmail' => $primaryEmail, 'profilePic' => $profilePic, 'userGender' => $personGender, 'userBloodGroup' => $personbloodGroup, 'primaryAddress' => $primaryAddress, 'UserEducation' => $personEducation, 'userProfession' => $personProfession];
 
-            return $data;
-        });
-        return $this->commonService->sendResponse($entities, '');
+          //  return $data;
+       // });
+
+        return $this->commonService->sendResponse($data, '');
     }
     public function sendingOtp()
     {

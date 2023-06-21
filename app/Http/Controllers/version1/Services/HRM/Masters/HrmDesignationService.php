@@ -64,7 +64,7 @@ class HrmDesignationService
         $model->no_of_posting =$data->no_of_posting;
         $model->dept_id =$data->department;
         $model->description = $data->description;
-        $model->active_state=isset($data->active_state)? 1 : 0;
+        $model->active_state=isset($data->status)? 1 : 0;
         return $model;
     }
     public function findById($orgId,$id)
