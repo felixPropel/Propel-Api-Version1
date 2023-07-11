@@ -72,6 +72,7 @@ class PersonService
     }
     public function storeTempPerson($datas)
     {
+
         Log::info('PersonService > storeTempPerson function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $tempId = isset($datas->tempId) ? $datas->tempId : 0;
@@ -94,6 +95,7 @@ class PersonService
                 $storeTempPerson1 = $this->resendOtp($temp);
                 log::info('personservice > ' . json_encode($storeTempPerson1));
                 return $storeTempPerson1;
+
             }
             return $this->commonService->sendResponse($responseData, $storeTempPerson['message']);
         } else {
@@ -103,7 +105,7 @@ class PersonService
     public function storePerson($datas, $type = null)
     {
 
-        Log::info('PersonService > storePerson1 function Inside.' . json_encode($datas));
+        Log::info('PersonService > storePerson function Inside.' . json_encode($datas));
 
         $datas['personUid'] = isset($datas['personUid']) ? $datas['personUid'] : null;
 
@@ -118,37 +120,38 @@ class PersonService
 
         $personAnotherEmailModel = array();
 
-        if (!empty($datas->secondEmail)) {
+        if (isset($datas->secondEmail) && !in_array(null, $datas->secondEmail)) {
             $personAnotherEmailModel = $this->convertToPersonEmailModelAnother($datas);
         }
         $personAnotherMobileModel = array();
-        if (!empty($datas->secondNumber)) {
+        if (isset($datas->secondNumber) && !in_array(null, $datas->secondNumber)) {
             $personAnotherMobileModel = $this->convertToPersonMobileModelAnother($datas);
         }
         $personWebLink = array();
-        if (!empty($datas->webLinks)) {
+        if (isset($datas->webLinks) && !in_array(null, $datas->webLinks)) {
             $personWebLink = $this->convertToPersonWebLink($datas);
         }
         $personOtherLanguage = array();
-        if (!empty($datas->otherLanguage) || !empty($datas->motherLanguage) ) {
+         if ((isset($datas->otherLanguage) && $datas->otherLanguage !== null) || isset($datas->motherLanguage) && !in_array(null, $datas->motherLanguage)) {
             $personOtherLanguage = $this->convertToPersonOtherLanguage($datas);
         }
+
         $personIdDocument = array();
-        if (!empty($datas->idDocumentType)) {
-            $personIdDocument = $this->convertToPersonIdDocumnet($datas);
+        if ((isset($datas->idDocumentType) && $datas->idDocumentType !== null)) {
+            $personIdDocument = $this->convertToPersonIdDocument($datas);
         }
         $personEducationModel = array();
-        if (!empty($datas->Qualification)) {
+        if (isset($datas->Qualification) && !in_array(null, $datas->Qualification)) {
             $personEducationModel = $this->convertToPersonEducation($datas);
         }
         $personProfessionModel = array();
-        if (!empty($datas->ProfessionDepartment)) {
+        if (isset($datas->ProfessionDepartment) && !in_array(null, $datas->ProfessionDepartment)) {
             $personProfessionModel = $this->convertToPersonProfession($datas);
         }
 
         $personCommonAddressModel = array();
         $personAddressId = array();
-        if (!empty($datas->addressOf)) {
+        if ((isset($datas->addressOf) && $datas->addressOf !== null)) {
             $addressId = isset($datas->propertyAddressId) ? $datas->propertyAddressId : null;
             Log::info('PersonService > addressId function Inside.' . json_encode($addressId));
             for ($i = 0; $i < count($datas->propertyAddressId); $i++) {
@@ -156,12 +159,9 @@ class PersonService
             }
             $personCommonAddressModel = $this->convertToPersonCommonAddress($datas);
             $personAddressId = $this->convertToPersonAddressId($datas);
+            Log::info('PersonService > personAddressId function Return.' . json_encode($personAddressId));
+
         }
-        // $personAddressId = array();
-        // if (!empty($datas->addressOf)) {
-
-        // }
-
         $allModels = [
             'personModel' => $personModel,
             'personDetailModel' => $personDetailModel,
@@ -195,7 +195,7 @@ class PersonService
     }
     public function convertToPersonAnniversaryDate($datas)
     {
-        if ($datas->anniversaryDate) {
+        if (isset($datas->anniversaryDate)) {
             Log::info('PersonService > PersonAnniversaryDate.' . json_encode($datas->personUid));
             $model = $this->personInterface->getAnniversaryDate($datas->personUid);
             if ($model) {
@@ -204,7 +204,7 @@ class PersonService
                 $model = new personAnniversary();
                 $model->uid = $datas->personUid;
             }
-            $date = Carbon::createFromFormat('d-m-Y', $datas->anniversaryDate)->format('Y-m-d');
+             $date = Carbon::createFromFormat('d-m-Y', $datas->anniversaryDate)->format('Y-m-d');
             $model->anniversary_date = $date;
             $model->occasions_id = null;
             Log::info('PersonService > PersonAnniversaryDate .' . json_encode($model));
@@ -273,9 +273,11 @@ class PersonService
     }
     public function personOtpValidation($datas)
     {
+
         Log::info('PersonService > personOtpValidation function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $tempPersonModel = $this->personInterface->findTempPersonById($datas->tempId);
+
         Log::info('PersonService > personOtpValidation function Return.' . json_encode($tempPersonModel));
         if ($tempPersonModel) {
             if ($datas->otp == $tempPersonModel->otp) {
@@ -456,7 +458,7 @@ class PersonService
             }
         }
         return $orgModel;
-        Log::info('PersonService > convertToPersonEmailModelAnother function Return.' . json_encode($orgModel));
+        Log::info('PersonService > convertToPersonEmailModelAnother3 function Return.' . json_encode($orgModel));
     }
     public function convertToPersonMobileModelAnother($datas)
     {
@@ -483,7 +485,7 @@ class PersonService
     {
         $orgModel = [];
         Log::info('PersonService > convertToPersonWebLink function Inside.' . json_encode($datas));
-        $link[0] = $datas->webLinks;
+        $link = $datas->webLinks;
         for ($i = 0; $i < count($link); $i++) {
             if ($link[$i]) {
                 $model[$i] = new WebLink();
@@ -493,17 +495,18 @@ class PersonService
                 array_push($orgModel, $model[$i]);
             }
         }
-
         return $orgModel;
-        Log::info('PersonService > convertToPersonWebLink function Return.' . json_encode($orgModel));
+        Log::info('PersonService > convertToPersonWebLinkEnd function Return.' . json_encode($orgModel));
     }
     public function convertToPersonOtherLanguage($datas)
     {
         $orgModel = [];
         Log::info('PersonService > convertToPersonOtherLanguage function Inside.' . json_encode($datas));
         if (isset($datas->otherLanguage)) {
-            $models = $this->personInterface->motherTongueByUid($datas->personUid);
-            if (count($models)) {
+            if($datas->personUid){
+                $models = $this->personInterface->motherTongueByUid($datas->personUid);
+            }
+            if (isset($models) && count($models)) {
                 foreach ($models as $model) {
                     $model->delete();
                 }
@@ -519,9 +522,11 @@ class PersonService
             }
         }
         if ($datas->motherLanguage && empty($orgModel)) {
-            $language[0] = $datas->motherLanguage;
-            $models = $this->personInterface->motherTongueByUid($datas->personUid);
-            if (count($models)) {
+            $language = $datas->motherLanguage;
+            if($datas->personUid){
+                $models = $this->personInterface->motherTongueByUid($datas->personUid);
+            }
+            if (isset($models) && count($models)) {
                 foreach ($models as $model) {
                     $model->delete();
                 }
@@ -538,10 +543,10 @@ class PersonService
         return $orgModel;
         Log::info('PersonService > convertToPersonOtherLanguage123 function Return.' . json_encode($orgModel));
     }
-    public function convertToPersonIdDocumnet($datas)
+    public function convertToPersonIdDocument($datas)
     {
         $orgModel = [];
-        Log::info('PersonService > convertToPersonIdDocumnet function Inside.' . json_encode($datas));
+        Log::info('PersonService > convertToPersonIdDocument function Inside.' . json_encode($datas));
         for ($i = 0; $i < count($datas->idDocumentType); $i++) {
             if ($datas->idDocumentType[$i]) {
                 $model[$i] = new IdDocumentType();
@@ -554,7 +559,7 @@ class PersonService
             }
         }
         return $orgModel;
-        Log::info('PersonService > convertToPersonIdDocumnet function Return.' . json_encode($orgModel));
+        Log::info('PersonService > convertToPersonIdDocument function Return.' . json_encode($orgModel));
     }
     public function convertToPersonEducation($datas)
     {
@@ -622,7 +627,7 @@ class PersonService
         $orgModel = [];
         for ($i = 0; $i < count($datas->addressOf); $i++) {
             $model[$i] = new PersonAddress();
-            $model[$i]->uid = $datas->personUid;
+            // $model[$i]->uid = $datas->personUid;
             $model[$i]->address_cachet = 1;
             array_push($orgModel, $model[$i]);
         }
@@ -790,6 +795,7 @@ class PersonService
 
     public function getDetailedAllPerson($datas)
     {
+
         Log::info('PersonService > getDetailedAllPerson function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $personAllDetails = $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email, $datas->mobileNumber);
@@ -803,21 +809,21 @@ class PersonService
         $userProfiles = $this->personInterface->getAllDatasInUser($datas->uid);
         $users = $userProfiles;
 
-     //   $entities = collect($userProfiles)->map(function ($users) {
-            $personDetails = $users['personDetails'];
-            $primaryMobile = $users['mobile'];
-            $primaryEmail = $users['email'];
-            $profilePic = $users['profilePic'];
-            $personGender = $users['personDetails']['gender'];
-            $personbloodGroup = $users['personDetails']['bloodGroup'];
-            $primaryAddress = isset($users['personAddress']['ParentComAddress']) ? $users['personAddress']['ParentComAddress'] : '';
-            $personEducation = $users['personEducation'];
-            $personProfession = $users['personProfession'];
+        //   $entities = collect($userProfiles)->map(function ($users) {
+        $personDetails = $users['personDetails'];
+        $primaryMobile = $users['mobile'];
+        $primaryEmail = $users['email'];
+        $profilePic = $users['profilePic'];
+        $personGender = $users['personDetails']['gender'];
+        $personbloodGroup = $users['personDetails']['bloodGroup'];
+        $primaryAddress = isset($users['personAddress']['ParentComAddress']) ? $users['personAddress']['ParentComAddress'] : '';
+        $personEducation = $users['personEducation'];
+        $personProfession = $users['personProfession'];
 
-            $data = ['userDeatils' => $personDetails, 'primaryMobile' => $primaryMobile, 'primaryEmail' => $primaryEmail, 'profilePic' => $profilePic, 'userGender' => $personGender, 'userBloodGroup' => $personbloodGroup, 'primaryAddress' => $primaryAddress, 'UserEducation' => $personEducation, 'userProfession' => $personProfession];
+        $data = ['userDeatils' => $personDetails, 'primaryMobile' => $primaryMobile, 'primaryEmail' => $primaryEmail, 'profilePic' => $profilePic, 'userGender' => $personGender, 'userBloodGroup' => $personbloodGroup, 'primaryAddress' => $primaryAddress, 'UserEducation' => $personEducation, 'userProfession' => $personProfession];
 
-          //  return $data;
-       // });
+        //  return $data;
+        // });
 
         return $this->commonService->sendResponse($data, '');
     }

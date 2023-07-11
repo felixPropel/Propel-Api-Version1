@@ -56,7 +56,7 @@ class UserService
     {
         Log::info('UserService > storeUser function Inside.' . json_encode($data));
         $datas = (object) $data;
-        $personModel = $this->personInterface->getPersonPrimaryDataByUid($datas->uId);
+        $personModel = $this->personInterface->getPrimaryMobileAndEmailbyUid($datas->uId);
         $model = $this->convertToUserModel($personModel, $datas);
         $storeUser = $this->userInterface->storeUser($model);
         Log::info('UserService > storeUser function Return.' . json_encode($storeUser));
@@ -116,10 +116,11 @@ class UserService
     {
         Log::info('UserService > convertToUserModel function Inside.' . json_encode($datas));
         Log::info('UserService > convertToUserModel function Inside.' . json_encode($personModel));
+        $personModel = (object) $personModel;
         $model = new User();
-        $model->uid = $personModel->uid;
-        $model->primary_email = $personModel->email;
-        $model->primary_mobile = $personModel->mobile_no;
+        $model->uid = $personModel->personUid;
+        $model->primary_email = $personModel->emailId;
+        $model->primary_mobile = $personModel->mobileId;
         $model->password = Hash::make($datas->password);
         Log::info('UserService > convertToUserModel function Return.' . json_encode($model));
         return $model;
@@ -142,7 +143,7 @@ class UserService
     public function UserCreate($mobile, $email, $datas)
     {
         Log::info('UserService > UserCreate function Inside.' . json_encode($datas));
-        $model =$this->userInterface->findUserDataByUid($datas->uid);
+        $model = $this->userInterface->findUserDataByUid($datas->uid);
         if ($model) {
             $model->uid = $datas->uid;
         } else {

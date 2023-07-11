@@ -1,6 +1,6 @@
 <?php
 
-namespace  App\Http\Controllers\version1\Services\HRM\Transaction;
+namespace App\Http\Controllers\version1\Services\HRM\Transaction;
 
 use App\Http\Controllers\version1\Interfaces\Common\commonInterface;
 use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDepartmentInterface;
@@ -11,16 +11,16 @@ use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Http\Controllers\version1\Services\Person\PersonService;
-use App\Models\PersonMobile;
-use App\Models\PersonEmail;
 use App\Models\HrmResource;
+use App\Models\HrmResourceReliveDetail;
 use App\Models\HrmResourceSr;
 use App\Models\HrmResourceTypeDesignation;
-use App\Models\HrmResourceReliveDetail;
 use App\Models\HrmResourceTypeDetail;
 use App\Models\Organization\UserOrganizationRelational;
+use App\Models\PersonEmail;
+use App\Models\PersonMobile;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+
 /**
  * Class HrmResourceService.
  * @package App\Services
@@ -85,6 +85,7 @@ class HrmResourceService
         $mobile = $datas->mobileNo;
         $email = $datas->email;
         $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email, $mobile);
+
         /*Some Important Types credential Type Start */
         /* 1.get All Person */
         /* 2.None*/
@@ -94,36 +95,35 @@ class HrmResourceService
         /* 6.SameOrganizationUser/employee*/
         /* 7. NotInSameOrganizationUser */
 
-
-
         /*Some Important Types credential Type End */
         if ($checkPerson) {
-            $uId = $checkPerson->uid;
-            $checkUserWithUid =  $this->personInterface->checkUserByUID($uId);
+            $uid = $checkPerson->uid;
+            $checkUserWithUid = $this->personInterface->checkUserByuid($uid);
             if ($checkUserWithUid) {
-                $userWithInOrganization = $this->hrmResourceInterface->findResourceByUid($uId);
+                $userWithInOrganization = $this->hrmResourceInterface->findResourceByUid($uid);
                 if ($userWithInOrganization) {
                     $results = ['type' => 6, 'status' => "SameOrganizationUser", 'data' => ""];
                 } else {
-                    $getUserName = $this->personInterface->getPersonDatasByUid($uId);
-                    $results = ['type' => 7, 'data' => $getUserName];
+                    $getUserName = $this->personInterface->getPersonDatasByUid($uid);
+                    $results = ['type' => 7, 'data' => $getUserName,'mobile'=>$checkUserWithUid];
                 }
                 return $this->commonService->sendResponse($results, '');
             } else {
-                $checkResource = $this->hrmResourceInterface->findResourceByUid($uId);
+                $checkResource = $this->hrmResourceInterface->findResourceByUid($uid);
                 if ($checkResource) {
-                    $resData = ['type' => 4, 'ResUid' => $uId];
+                    $resData = ['type' => 4, 'Resuid' => $uid];
                 } else {
-                    $resData = ['type' => 5, 'PersonUid' => $uId];
+                    $person_details=$this->personInterface->getPrimaryMobileAndEmailbyUid($uid);
+                    $resData = ['type' => 5, 'PersonDatas' => $person_details];
                 }
                 return $this->commonService->sendResponse($resData, '');
             }
-        } else { 
-            $getAllPersonByMobileAndEmail =  $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
-            if ($getAllPersonByMobileAndEmail){
-                $resData = ['type' => 1, 'AllPersons' => $getAllPersonByMobileAndEmail];
+        } else {
+            $getAllPersonByMobileAndEmail = $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
+            if ($getAllPersonByMobileAndEmail) {
+                $resData = ['type' => 1, 'PersonDatas' => $getAllPersonByMobileAndEmail];
             } else {
-                $resData = ['type' => 2 ,'status' => 'freshResource'];
+                $resData = ['type' => 2, 'status' => 'freshResource', 'mobile' => $mobile, 'email' => $email];
             }
         }
         return $this->commonService->sendResponse($resData, '');
@@ -161,12 +161,11 @@ class HrmResourceService
         $datas = (object) $datas;
         $cModel = $this->convertToResourceReliveModel($datas);
         $model = "";
-        dd($cModel);
+
     }
 
     public function convertToResourceReliveModel($datas)
     {
-
 
         $model = new HrmResourceReliveDetail();
         $model->reource_id = $datas->resourceId;
@@ -177,19 +176,21 @@ class HrmResourceService
     }
     public function save($datas, $orgId)
     {
+
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
 
         $orgdatas = (object) $datas;
-
         $personModelresponse = $this->personService->storePerson($datas, 'resource');
+
         if ($personModelresponse['message'] == "Success") {
+
             $personModel = $personModelresponse['data'];
-            $uId = $personModel->uid;
 
+            $uid = $personModel->uid;
+            Log::info('HrmResourceService > saveUid.' . json_encode($uid));
 
-            $convertToResourceModel = $this->convertToResourceModel($orgdatas, $uId);
+            $convertToResourceModel = $this->convertToResourceModel($orgdatas, $uid);
             //  $resourceModel = $this->hrmResourceInterface->saveResourceModel($convertToResourceModel);
-
             $convertToResourceTypeDetailModel = $this->convertToResourceTypeDetailModel($orgdatas);
             $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas);
             $convertToResourceWorking = $this->convertToResourceWorking($orgdatas);
@@ -200,15 +201,13 @@ class HrmResourceService
                 'resourceTypeDetailModel' => $convertToResourceTypeDetailModel,
                 'resourceDesignModel' => $convertToResourceDesignationModel,
                 'resourceWorkingModel' => $convertToResourceWorking,
-                'userAccountModel' => $convertToUserAccountModel
+                'userAccountModel' => $convertToUserAccountModel,
             ];
+
             $saveResourceModel = $this->hrmResourceInterface->saveResource($allModels);
 
             log::info('saveResource ' . json_encode($saveResourceModel));
             return $this->commonService->sendResponse($saveResourceModel, '');
-            // }else{
-
-            // }    
         }
     }
     public function convertToResourceModel($datas, $uid)
@@ -235,13 +234,13 @@ class HrmResourceService
         $model->designation_id = $datas->designationId;
         return $model;
     }
- 
+
     public function convertToResourceWorking($datas)
     {
         $model = new HrmResourceSr();
         $model->active_state = 1;
-        $model->date_of_joining= date('Y-m-d');
-        log::info('hrmResourceService   HrmResourceSr ' .json_encode($model->date_of_joining));
+        $model->date_of_joining = date('Y-m-d');
+        log::info('hrmResourceService   HrmResourceSr ' . json_encode($model->date_of_joining));
         return $model;
     }
     public function convertToUserAccountModel($orgId)
@@ -250,20 +249,20 @@ class HrmResourceService
         $model->organization_id = $orgId;
         return $model;
     }
-    public function resourceMobileOtp($datas, $orgId)
+    public function resourceMobileOtp($uid, $orgId)
     {
-        log::info('hrmResourceService   otp ' .json_encode($datas));
-        $datas = (object) $datas;
-        log::info('hrmResourceService object  otp ' .json_encode($datas));
+        log::info('hrmResourceService   otp ' . json_encode($uid));
+
+        log::info('hrmResourceService object  otp ' . json_encode($uid));
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $otp = random_int(1000, 9999);
-        $model = PersonMobile::where("uid", $datas->uid)->update(['otp_received' => $otp]);
+        $model = PersonMobile::where("uid", $uid)->update(['otp_received' => $otp]);
         if ($model) {
-            $result = ['type' => 1, 'status' => "OtpSuccessfully", 'datas' => $datas];
+            $result = ['type' => 1, 'status' => "OtpSuccessfully", 'uid' => $uid];
         } else {
             $result = ['type' => 2, 'status' => "OtpFailed", 'datas' => ""];
         }
-        return  $this->commonService->sendResponse($result, '');
+        return $this->commonService->sendResponse($result, '');
     }
     public function resourceEmailOtp($datas, $orgId)
     {
@@ -276,13 +275,13 @@ class HrmResourceService
         } else {
             $result = ['type' => 2, 'status' => "OtpFailed", 'datas' => ""];
         }
-        return  $this->commonService->sendResponse($result, '');
+        return $this->commonService->sendResponse($result, '');
     }
     public function resourceOtpValidate($datas, $orgId)
     {
         $datas = (object) $datas;
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-        $model = $this->personInterface->getMobileNumberByUid($datas->uid);
+        $model = $this->personInterface->getMobileNumberByuid($datas->uid,$datas->mobile);
         if ($model->otp_received == $datas->otp) {
             $saluationLists = $this->commonInterface->getSalutation();
             $bloodGroupLists = $this->commonInterface->getAllBloodGroup();
@@ -293,10 +292,10 @@ class HrmResourceService
             $hrmDesignationLists = $this->hrmDesInterface->findAll();
             $hrmResourceTypeLists = $this->hrmResourceTypeInterface->index();
             $languageLists = $this->commonInterface->getLanguage();
-            $getLanguageByuid = $this->personInterface->motherTongueByUid($datas->uid);
+            $getLanguageByuid = $this->personInterface->motherTongueByuid($datas->uid);
             $idDocumentTypes = $this->commonInterface->getAllDocumentType();
             $bankAccountTypes = $this->commonInterface->getAllBankAccountType();
-            $getPersonPrimaryData = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
+            $getPersonPrimaryData = $this->personInterface->getPersonPrimaryDataByuid($datas->uid);
             $anniversaryDate = $this->personInterface->getAnniversaryDate($datas->uid);
             $personAddress = $this->personInterface->personAddressByuid($datas->uid);
 
@@ -317,13 +316,13 @@ class HrmResourceService
                 'bankAccount' => $bankAccountTypes,
                 'otherLanguages' => $getLanguageByuid,
                 'anniversaryDate' => $anniversaryDate,
-                'personAddress' => $personAddress
+                'personAddress' => $personAddress,
             ];
         } else {
             $allDatas = ['Status' => 'OTP InValid', 'datas' => ''];
         }
 
-        return  $this->commonService->sendResponse($allDatas, '');
+        return $this->commonService->sendResponse($allDatas, '');
     }
     public function resourceEmailOtpValidate($datas, $orgId)
     {
@@ -340,10 +339,10 @@ class HrmResourceService
             $hrmDesignationLists = $this->hrmDesInterface->findAll();
             $hrmResourceTypeLists = $this->hrmResourceTypeInterface->index();
             $languageLists = $this->commonInterface->getLanguage();
-            $getLanguageByuid = $this->personInterface->motherTongueByUid($datas->uid);
+            $getLanguageByuid = $this->personInterface->motherTongueByuid($datas->uid);
             $idDocumentTypes = $this->commonInterface->getAllDocumentType();
             $bankAccountTypes = $this->commonInterface->getAllBankAccountType();
-            $getPersonPrimaryData = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
+            $getPersonPrimaryData = $this->personInterface->getPersonPrimaryDataByuid($datas->uid);
             $anniversaryDate = $this->personInterface->getAnniversaryDate($datas->uid);
             $personAddress = $this->personInterface->personAddressByuid($datas->uid);
 
@@ -364,12 +363,12 @@ class HrmResourceService
                 'bankAccount' => $bankAccountTypes,
                 'otherLanguages' => $getLanguageByuid,
                 'anniversaryDate' => $anniversaryDate,
-                'personAddress' => $personAddress
+                'personAddress' => $personAddress,
             ];
         } else {
             $allDatas = ['Status' => 'OTP InValid', 'datas' => ''];
         }
 
-        return  $this->commonService->sendResponse($allDatas, '');
+        return $this->commonService->sendResponse($allDatas, '');
     }
 }

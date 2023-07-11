@@ -58,6 +58,7 @@ class PersonRepository implements PersonInterface
     }
     public function storePerson($allModels)
     {
+
         try {
 
             $result = DB::transaction(function () use ($allModels) {
@@ -77,31 +78,32 @@ class PersonRepository implements PersonInterface
                 $personAddressId = $allModels['personAddressId'];
                 $personAnniversaryDate = $allModels['personAnniversaryDate'];
 
-
                 $personModel->save();
                 $personDetailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
 
                 $personMobileModel->ParentPerson()->associate($personModel, 'uid', 'uid');
 
                 $personEmailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
+                if ($personAnniversaryDate) {
+                    $personAnniversaryDate->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personAnniversaryDate->save();
 
-                $personAnniversaryDate->ParentPerson()->associate($personModel, 'uid', 'uid');
-
+                }
 
                 $personDetailModel->save();
                 $personMobileModel->save();
                 $personEmailModel->save();
-                $personAnniversaryDate->save();
-
 
                 for ($i = 0; $i < count($personAnotherEmailModel); $i++) {
                     $personAnotherEmailModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAnotherEmailModel[$i]->save();
                 }
+
                 for ($i = 0; $i < count($personAnotherMobileModel); $i++) {
                     $personAnotherMobileModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAnotherMobileModel[$i]->save();
                 }
+
                 for ($i = 0; $i < count($personWebLinkModel); $i++) {
                     $personWebLinkModel[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personWebLinkModel[$i]->save();
@@ -128,6 +130,7 @@ class PersonRepository implements PersonInterface
                 }
                 for ($i = 0; $i < count($personAddressId); $i++) {
                     $personAddressId[$i]->ParentComAddress()->associate($personCommonAddressModel[$i], 'property_address_id', 'id');
+                    $personAddressId[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAddressId[$i]->save();
                 }
 
@@ -254,7 +257,7 @@ class PersonRepository implements PersonInterface
     }
     public function findExactPersonWithEmailAndMobile($email, $mobile)
     {
-        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.');
+        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.' . json_encode($email));
 
         $model = Person::select('*')
             ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
@@ -452,6 +455,18 @@ class PersonRepository implements PersonInterface
     {
         $porpertyAddress = PropertyAddress::where('id', $addressId)->delete();
         $personAddress = PersonAddress::where(['uid' => $uid, 'property_address_id' => $addressId])->delete();
-        return 0;
+        return false;
+    }
+    public function getPrimaryMobileAndEmailbyUid($uid)
+    {
+       return Person::select('person_mobiles.mobile_no as mobileId','person_emails.email as emailId','persons.uid as personUid','person_details.first_name as personName')
+        ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
+        ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
+        ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
+        ->Where('persons.uid', $uid)
+        ->whereIn('person_mobiles.mobile_cachet', [1])
+        ->whereIn('person_emails.email_cachet', [1])
+        ->first();
+
     }
 }

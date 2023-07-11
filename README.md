@@ -12,3 +12,17 @@ Developer:R.Dhana
 
  ALTER TABLE user_organization_relationals
 ADD default_org VARCHAR(255) DEFAULT NULL;
+
+
+// Harish
+Tables column changes
+
+
+ALTER TABLE person_anniversarys
+ADD create_at timestamp NULL DEFAULT NULL;
+
+ALTER TABLE person_anniversarys
+MODIFY occasions_id INT NULL;
+
+ALTER TABLE person_languages
+MODIFY language_id INT NULL;
