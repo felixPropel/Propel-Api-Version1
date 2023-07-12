@@ -179,7 +179,7 @@ class PersonService
             'personAnniversaryDate' => $personAnniversaryDate,
 
         ];
-        $personData = $this->personInterface->storePerson($allModels);
+         $personData = $this->personInterface->storePerson($allModels);
         log::info('allModels' . json_encode($personData));
 
         Log::info('PersonService > storePerson function Return.' . json_encode($personData));
@@ -395,7 +395,8 @@ class PersonService
         $model->middle_name = isset($datas->middleName) ? $datas->middleName : '';
         $model->last_name = isset($datas->lastName) ? $datas->lastName : '';
         $model->nick_name = isset($datas->nickName) ? $datas->nickName : '';
-        // $model->dob = isset($datas->dob) ? $datas->dob: '';
+        $date = Carbon::createFromFormat('d-m-Y', $datas->dob)->format('Y-m-d');
+        $model->dob = isset($date) ? $date: '';
         $model->birth_place = isset($datas->birthCity) ? $datas->birthCity : '';
         $model->marital_id = isset($datas->maritalStatus) ? $datas->maritalStatus : null;
         $model->gender_id = isset($datas->genderId) ? $datas->genderId : '';
