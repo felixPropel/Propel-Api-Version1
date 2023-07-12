@@ -105,7 +105,7 @@ class HrmResourceService
                     $results = ['type' => 6, 'status' => "SameOrganizationUser", 'data' => ""];
                 } else {
                     $getUserName = $this->personInterface->getPersonDatasByUid($uid);
-                    $results = ['type' => 7, 'data' => $getUserName,'mobile'=>$checkUserWithUid];
+                    $results = ['type' => 7, 'data' => $getUserName, 'mobile' => $checkUserWithUid];
                 }
                 return $this->commonService->sendResponse($results, '');
             } else {
@@ -113,7 +113,7 @@ class HrmResourceService
                 if ($checkResource) {
                     $resData = ['type' => 4, 'Resuid' => $uid];
                 } else {
-                    $person_details=$this->personInterface->getPrimaryMobileAndEmailbyUid($uid);
+                    $person_details = $this->personInterface->getPrimaryMobileAndEmailbyUid($uid);
                     $resData = ['type' => 5, 'PersonDatas' => $person_details];
                 }
                 return $this->commonService->sendResponse($resData, '');
@@ -143,7 +143,6 @@ class HrmResourceService
     {
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $masterDatas = $this->commonService->getPersonMasterData();
-
         $hrmDepartmentLists = $this->hrmDeptInterface->findAll();
         $hrmDesignationLists = $this->hrmDesInterface->findAll();
         $hrmResourceTypeLists = $this->hrmResourceTypeInterface->index();
@@ -212,9 +211,13 @@ class HrmResourceService
     }
     public function convertToResourceModel($datas, $uid)
     {
-
-        $model = new HrmResource();
-        $model->uid = $uid;
+        $model = HrmResource::where('uid', $datas->personUid)->first();
+        if ($model) {
+            $model->uid = $datas->personUid;
+        } else {
+            $model = new HrmResource();
+            $model->uid = $uid;
+        }
         $model->resource_code = $datas->resourceCode;
         return $model;
     }
@@ -281,7 +284,7 @@ class HrmResourceService
     {
         $datas = (object) $datas;
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-        $model = $this->personInterface->getMobileNumberByuid($datas->uid,$datas->mobile);
+        $model = $this->personInterface->getMobileNumberByuid($datas->uid, $datas->mobile);
         if ($model->otp_received == $datas->otp) {
             $saluationLists = $this->commonInterface->getSalutation();
             $bloodGroupLists = $this->commonInterface->getAllBloodGroup();
@@ -370,5 +373,22 @@ class HrmResourceService
         }
 
         return $this->commonService->sendResponse($allDatas, '');
+    }
+    public function resourceMasterDataAndPersonData($datas, $orgId)
+    {
+        $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
+        $masterDatas = $this->commonService->getPersonMasterData();
+        $hrmDepartmentLists = $this->hrmDeptInterface->findAll();
+        $hrmDesignationLists = $this->hrmDesInterface->findAll();
+        $hrmResourceTypeLists = $this->hrmResourceTypeInterface->index();
+        $personDetails = $this->personService->personProfileDetails($datas);
+        $result = [
+            'masterDatas' => $masterDatas,
+            'hrmDepartmentLists' => $hrmDepartmentLists,
+            'hrmDesignationLists' => $hrmDesignationLists,
+            'hrmResourceTypeLists' => $hrmResourceTypeLists,
+            'personDetails' => $personDetails,
+        ];
+        return $this->commonService->sendResponse($result, '');
     }
 }

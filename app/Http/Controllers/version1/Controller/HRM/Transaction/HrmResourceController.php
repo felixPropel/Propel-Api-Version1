@@ -49,6 +49,15 @@ class HrmResourceController extends Controller
         return $response;
         Log::info('HrmResourceController>Store Return.' . json_encode($response));
     }
+    public function resourceMasterDataAndPersonData(Request $request,$orgId)
+    {
+
+        Log::info('HrmResourceController-> resourceMasterDataAndPersonData Inside OrgId .' . json_encode($orgId));
+        $response = $this->service->resourceMasterDataAndPersonData($request->all(),$orgId);
+        return $response;
+        Log::info('HrmResourceController>  resourceMasterDataAndPersonData  Return.' . json_encode($response));
+    }
+
     public function resourceRelive(Request $request,$orgId)
     {
     Log::info('findResourceWithCredentials-> resourceRelive Inside OrgId .' . json_encode($orgId));
@@ -56,7 +65,7 @@ class HrmResourceController extends Controller
     return $response;
     Log::info('HrmResourceController>Store Return.' . json_encode($response));
     }
-    
+
     public function create()
     {
         //
@@ -69,7 +78,7 @@ public function resourceMobileOtp(Request $request, $orgId)
     Log::info('HrmResourceController> resourceMobileOtp .' . json_encode($response));
 
 }
-  
+
 public function resourceEmailOtp(Request $request, $orgId)
 {
     Log::info('HrmResourceController > resourceEmailOtp.' . json_encode($request->all()));

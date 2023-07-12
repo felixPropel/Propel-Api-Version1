@@ -345,7 +345,7 @@ class PersonService
         $lastName = isset($datas->lastName) ? $datas->lastName : "";
         $nickName = isset($datas->nickName) ? $datas->nickName : "";
         $gender = isset($datas->gender) ? $datas->gender : "";
-        $dob = isset($datas->dob) ? $datas->dob : "";
+        $dob = isset($datas->dob ) ? $datas->dob  : "";
         $bloodGroup = isset($datas->bloodGroup) ? $datas->bloodGroup : "";
         $otp = isset($datas->otp) ? $datas->otp : "";
         $stage = isset($datas->stage) ? $datas->stage : "";
@@ -395,8 +395,7 @@ class PersonService
         $model->middle_name = isset($datas->middleName) ? $datas->middleName : '';
         $model->last_name = isset($datas->lastName) ? $datas->lastName : '';
         $model->nick_name = isset($datas->nickName) ? $datas->nickName : '';
-        $date = Carbon::createFromFormat('d-m-Y', $datas->dob)->format('Y-m-d');
-        $model->dob = isset($date) ? $date : '';
+        // $model->dob = isset($datas->dob) ? $datas->dob: '';
         $model->birth_place = isset($datas->birthCity) ? $datas->birthCity : '';
         $model->marital_id = isset($datas->maritalStatus) ? $datas->maritalStatus : null;
         $model->gender_id = isset($datas->genderId) ? $datas->genderId : '';
@@ -779,19 +778,20 @@ class PersonService
     }
     public function personProfileDetails($datas)
     {
+
         Log::info('PersonService > personProfileDetails function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $personDetails = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
         $personAddressByUid = $this->personInterface->personAddressByuid($datas->uid);
         $personMasterData = $this->commonService->getPersonMasterData();
         $secondMobileAndEmail = $this->personInterface->personSecondMobileAndEmailByUid($datas->uid);
-        $personMasterData['PersonDatas'] = $personDetails;
-        $personMasterData['PersonAddress'] = $personAddressByUid;
-        $personMasterData['secondMobileAndEmail'] = $secondMobileAndEmail;
-
         Log::info('PersonService > personProfileDetails function Return.' . json_encode($personMasterData));
-        return $this->commonService->sendResponse($personMasterData, '');
-    }
+        return [
+            'personDetail' => $personDetails,
+            'personAddressByUid' => $personAddressByUid,
+            'personMasterData' => $personMasterData,
+            'secondMobileAndEmail' => $secondMobileAndEmail,
+        ];    }
 
     public function getDetailedAllPerson($datas)
     {

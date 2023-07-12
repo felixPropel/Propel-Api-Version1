@@ -15,3 +15,4 @@ Route::post('resourceOtpValidate/{orgId}', 'App\Http\Controllers\version1\Contro
 Route::post('resourceRelive/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceRelive')->name('resourceRelive');
 Route::post('resourceEmailOtp/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceEmailOtp')->name('resourceEmailOtp');
 Route::post('resourceEmailOtpValidate/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceEmailOtpValidate')->name('resourceEmailOtpValidate');
+Route::post('resourceMasterDataAndPersonData/{orgId}', 'App\Http\Controllers\version1\Controller\HRM\Transaction\\HrmResourceController@resourceMasterDataAndPersonData')->name('resourceMasterDataAndPersonData');

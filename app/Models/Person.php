@@ -16,11 +16,11 @@ class Person extends Model
     }
     public function mobile()
     {
-        return $this->hasMany('App\Models\PersonMobile', 'uid', 'uid');
+        return $this->hasOne('App\Models\PersonMobile', 'uid', 'uid');
     }
     public function email()
     {
-        return $this->hasMany('App\Models\PersonEmail', 'uid', 'uid');
+        return $this->hasOne('App\Models\PersonEmail', 'uid', 'uid');
     }
     public function personDetails()
     {
