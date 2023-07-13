@@ -211,7 +211,7 @@ class HrmResourceService
     }
     public function convertToResourceModel($datas, $uid)
     {
-        $model = HrmResource::where('uid', $datas->personUid)->first();
+        $model = HrmResource::where('uid', isset($datas->personUid))->first();
         if ($model) {
             $model->uid = $datas->personUid;
         } else {
