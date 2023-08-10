@@ -6,7 +6,6 @@ use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
 use App\Http\Controllers\version1\Interfaces\Person\PersonInterface;
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
-use App\Models\PersonDetails;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -35,16 +34,19 @@ class UserService
 
         $user = User::where('primary_email', $datas->userName)->orWhere('primary_mobile', $datas->userName)->first();
         $uid = $user->uid;
-        $user_name = PersonDetails::where('uid', $uid)->pluck('first_name')->first();
+        $personDetail = $this->personInterface->getPersonPicAndPersonName($uid);
+        $nickName = $personDetail->nick_name ?? null;
+        $firstName = $personDetail->first_name ?? null;
+        $personPic = $personDetail->PersonPic->profile_pic ?? null;
         Log::info('UserService > loginUser function Return.' . json_encode($user));
         if ($user) {
             if (Hash::check($datas->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
                 $defaultOrg = $this->OrganizationInterface->getPerviousDefaultOrganization($uid);
-                $response = ['token' => $token, 'uid' => $uid, 'defaultOrg' => $defaultOrg];
+                $response = ['token' => $token, 'uid' => $uid, 'defaultOrg' => $defaultOrg, 'nickName' => $nickName, 'firstName' => $firstName, 'personPic' => $personPic];
                 return $this->commonService->sendResponse($response, "");
             } else {
-                $response = ["message" => "Password mismatch", 'username' => $user_name, 'uid' => $uid];
+                $response = ["message" => "Password mismatch", 'firstName' => $firstName, 'uid' => $uid];
                 return response($response, 422);
             }
         } else {

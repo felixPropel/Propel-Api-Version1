@@ -314,7 +314,7 @@ class PersonRepository implements PersonInterface
     }
     public function getAllDatasInUser($uid)
     {
-        return Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personDetails.gender', 'personDetails.bloodGroup', 'personAddress', 'personAddress.ParentComAddress', 'personEducation', 'personProfession')->where('uid', $uid)->first();
+        return Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personDetails.gender', 'personDetails.bloodGroup', 'personAddress', 'personAddress.ParentComAddress', 'personEducation', 'personProfession', 'personLanguage')->where('uid', $uid)->first();
     }
     public function getPersonProfileByUid($uid)
     {
@@ -459,14 +459,18 @@ class PersonRepository implements PersonInterface
     }
     public function getPrimaryMobileAndEmailbyUid($uid)
     {
-       return Person::select('person_mobiles.mobile_no as mobileId','person_emails.email as emailId','persons.uid as personUid','person_details.first_name as personName')
-        ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
-        ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
-        ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
-        ->Where('persons.uid', $uid)
-        ->whereIn('person_mobiles.mobile_cachet', [1])
-        ->whereIn('person_emails.email_cachet', [1])
-        ->first();
+        return Person::select('person_mobiles.mobile_no as mobileId', 'person_emails.email as emailId', 'persons.uid as personUid', 'person_details.first_name as personName')
+            ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
+            ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
+            ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
+            ->Where('persons.uid', $uid)
+            ->whereIn('person_mobiles.mobile_cachet', [1])
+            ->whereIn('person_emails.email_cachet', [1])
+            ->first();
 
+    }
+    public function getPersonPicAndPersonName($uid)
+    {
+       return personDetails::with('PersonPic')->where('uid', $uid)->first();
     }
 }

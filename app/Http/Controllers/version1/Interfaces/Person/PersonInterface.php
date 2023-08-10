@@ -49,5 +49,7 @@ interface PersonInterface
    public function checkPerivousAddressById($addressId,$uid);
    public function getPrimaryMobileNumberByUid($uid);
    public function getPrimaryMobileAndEmailbyUid($uid);
+   public function getPersonPicAndPersonName($uid);
+
 
 }
