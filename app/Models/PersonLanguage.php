@@ -9,10 +9,13 @@ class PersonLanguage extends Model
 {
     use HasFactory;
     protected $table = 'person_languages';
-    
+
     public function ParentPerson()
     {
         return $this->belongsTo(Person::class, 'uid', 'uid');
     }
-
+    public function PimsLanguage()
+    {
+        return $this->hasMany(Language::class, 'id', 'language_id');
+    }
 }

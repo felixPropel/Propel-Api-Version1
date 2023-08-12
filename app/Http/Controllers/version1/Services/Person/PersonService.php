@@ -24,8 +24,10 @@ use App\Models\TempMobile;
 use App\Models\TempPerson;
 use App\Models\WebLink;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Session;
 
 class PersonService
 {
@@ -132,7 +134,7 @@ class PersonService
             $personWebLink = $this->convertToPersonWebLink($datas);
         }
         $personOtherLanguage = array();
-         if ((isset($datas->otherLanguage) && $datas->otherLanguage !== null) || isset($datas->motherLanguage) && !in_array(null, $datas->motherLanguage)) {
+        if ((isset($datas->otherLanguage) && $datas->otherLanguage !== null) || isset($datas->motherLanguage) && !in_array(null, $datas->motherLanguage)) {
             $personOtherLanguage = $this->convertToPersonOtherLanguage($datas);
         }
 
@@ -177,9 +179,10 @@ class PersonService
             'personCommonAddressModel' => $personCommonAddressModel,
             'personAddressId' => $personAddressId,
             'personAnniversaryDate' => $personAnniversaryDate,
+            'personProfileModel' => $personProfileModel,
 
         ];
-         $personData = $this->personInterface->storePerson($allModels);
+        $personData = $this->personInterface->storePerson($allModels);
         log::info('allModels' . json_encode($personData));
 
         Log::info('PersonService > storePerson function Return.' . json_encode($personData));
@@ -204,38 +207,35 @@ class PersonService
                 $model = new personAnniversary();
                 $model->uid = $datas->personUid;
             }
-             $date = Carbon::createFromFormat('d-m-Y', $datas->anniversaryDate)->format('Y-m-d');
-            $model->anniversary_date = $date;
+            // $date = Carbon::createFromFormat('d-m-Y', $datas->anniversaryDate)->format('Y-m-d');
+            $model->anniversary_date = '2000-08-18';
             $model->occasions_id = null;
             Log::info('PersonService > PersonAnniversaryDate .' . json_encode($model));
             return $model;
         }
     }
-
     public function convertToPersonProfileModel($datas)
     {
-        if (isset($datas->image)) {
-            Log::info('PersonService > convertToPersonProfileModel function Inside.' . json_encode($datas->image));
-            // $uploadedFile = $datas->image->store('public/profiles/');
-            if ($datas->personUid) {
-                $model = $this->personInterface->getPersonProfileByUid($datas->personUid);
+        if (isset($datas->personProfile)) {
+            $personPic = $this->personInterface->getPersonProfileByUid($datas->personUid);
+            if ($personPic) {
+                $filePathToDelete = storage_path('app/public/Profiles/' . $personPic->profile_pic);
+                if (File::exists($filePathToDelete)) {
+                    File::delete($filePathToDelete);
+                    $personPic->delete();
+                }
             }
-            if ($model) {
-                $model->profile_pic = $datas->image;
-                $model->status = 1;
-                $model->profile_cachet = 1;
-                $model->save();
-                return $model;
-            } else {
-                $model = new PersonProfilePic();
-                $model->uid = $datas->personUid;
-                $model->profile_pic = $datas->image;
-                $model->status = 1;
-                $model->profile_cachet = 1;
-                $model->save();
-                return $model;
-            }
-
+            $decodedImageContents = base64_decode($datas->personProfile);
+            $uniqueFilename = date('YmdHis') . '_' . uniqid() . '.jpg';
+            $savePath = storage_path('app/public/Profiles/' . $uniqueFilename);
+            Log::info('PersonService >  savePath function Return.' . json_encode( $savePath));
+            File::put($savePath, $decodedImageContents);
+            $model = new PersonProfilePic();
+            $model->uid = $datas->personUid;
+            $model->profile_pic = $uniqueFilename;
+            $model->status = 1;
+            $model->profile_cachet = 1;
+            return $model;
         }
     }
     public function resendOtp($datas)
@@ -345,7 +345,7 @@ class PersonService
         $lastName = isset($datas->lastName) ? $datas->lastName : "";
         $nickName = isset($datas->nickName) ? $datas->nickName : "";
         $gender = isset($datas->gender) ? $datas->gender : "";
-        $dob = isset($datas->dob ) ? $datas->dob  : "";
+        $dob = isset($datas->dob) ? $datas->dob : "";
         $bloodGroup = isset($datas->bloodGroup) ? $datas->bloodGroup : "";
         $otp = isset($datas->otp) ? $datas->otp : "";
         $stage = isset($datas->stage) ? $datas->stage : "";
@@ -395,8 +395,8 @@ class PersonService
         $model->middle_name = isset($datas->middleName) ? $datas->middleName : '';
         $model->last_name = isset($datas->lastName) ? $datas->lastName : '';
         $model->nick_name = isset($datas->nickName) ? $datas->nickName : '';
-        $date = Carbon::createFromFormat('d-m-Y', $datas->dob)->format('Y-m-d');
-        $model->dob = isset($date) ? $date: '';
+        // $date = Carbon::createFromFormat('d-m-Y', $datas->dob)->format('Y-m-d');
+        $model->dob = '2000-08-18';
         $model->birth_place = isset($datas->birthCity) ? $datas->birthCity : '';
         $model->marital_id = isset($datas->maritalStatus) ? $datas->maritalStatus : null;
         $model->gender_id = isset($datas->genderId) ? $datas->genderId : '';
@@ -503,7 +503,7 @@ class PersonService
         $orgModel = [];
         Log::info('PersonService > convertToPersonOtherLanguage function Inside.' . json_encode($datas));
         if (isset($datas->otherLanguage)) {
-            if($datas->personUid){
+            if ($datas->personUid) {
                 $models = $this->personInterface->motherTongueByUid($datas->personUid);
             }
             if (isset($models) && count($models)) {
@@ -523,7 +523,7 @@ class PersonService
         }
         if ($datas->motherLanguage && empty($orgModel)) {
             $language = $datas->motherLanguage;
-            if($datas->personUid){
+            if ($datas->personUid) {
                 $models = $this->personInterface->motherTongueByUid($datas->personUid);
             }
             if (isset($models) && count($models)) {
@@ -792,7 +792,7 @@ class PersonService
             'personAddressByUid' => $personAddressByUid,
             'personMasterData' => $personMasterData,
             'secondMobileAndEmail' => $secondMobileAndEmail,
-        ];    }
+        ];}
 
     public function getDetailedAllPerson($datas)
     {

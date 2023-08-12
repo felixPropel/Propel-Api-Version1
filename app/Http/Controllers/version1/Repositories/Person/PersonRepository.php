@@ -77,19 +77,20 @@ class PersonRepository implements PersonInterface
                 $personCommonAddressModel = $allModels['personCommonAddressModel'];
                 $personAddressId = $allModels['personAddressId'];
                 $personAnniversaryDate = $allModels['personAnniversaryDate'];
-
+                $personProfileModel=$allModels['personProfileModel'];
                 $personModel->save();
                 $personDetailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
-
                 $personMobileModel->ParentPerson()->associate($personModel, 'uid', 'uid');
-
                 $personEmailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
                 if ($personAnniversaryDate) {
                     $personAnniversaryDate->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAnniversaryDate->save();
+                }
+                if ($personProfileModel) {
+                    $personProfileModel->ParentPerson()->associate($personModel, 'uid', 'uid');
+                    $personProfileModel->save();
 
                 }
-
                 $personDetailModel->save();
                 $personMobileModel->save();
                 $personEmailModel->save();
@@ -133,10 +134,9 @@ class PersonRepository implements PersonInterface
                     $personAddressId[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAddressId[$i]->save();
                 }
-
                 return [
                     'message' => "Success",
-                    'data' => $personDetailModel,
+                    'data' => $personProfileModel ?? $personDetailModel,
                 ];
             });
             return $result;
