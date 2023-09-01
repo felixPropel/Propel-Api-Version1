@@ -27,7 +27,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Session;
 
 class PersonService
 {
@@ -41,16 +40,19 @@ class PersonService
     }
     public function findMobileNumber($datas)
     {
+
         Log::info('PersonService > findMobileNumber function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $model = $this->userInterface->findUserDataByMobileNumber($datas->mobileNumber); // check user data
-        $personModel = $this->personInterface->checkPersonByMobile($datas->mobileNumber);
-        Log::info('PersonService > findMobileNumber function Return.' . json_encode($personModel));
+        $model = $this->userInterface->existUserByMobileNo($datas->mobileNumber);
+
+        Log::info('PersonService > findMobileNumber function Return.' . json_encode($model));
         if ($model) {
-            $personDatas = $this->personInterface->getPersonPrimaryDataByUid($model->uid);
-            $result = ['type' => 1, 'personDatas' => $personDatas, 'model' => $model, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
+            $userName = $model->personDetails->first_name;
+            $userUid = $model->personDetails->uid;
+            $userSatge = $model->existUser->stage;
+            $result = ['type' => 1, 'stage' => $userSatge, 'userName' => $userName, 'userUid' => $userUid, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
         } else {
-            $result = ['type' => 0, 'model' => "", 'mobileNumber' => $datas->mobileNumber, 'status' => "checkingPerson"];
+            $result = ['type' => 2, 'mobileNumber' => $datas->mobileNumber, 'status' => "checkingPerson"];
         }
         return $this->commonService->sendResponse($result, "");
     }
@@ -63,10 +65,11 @@ class PersonService
             $checkPersonEmail = $this->personInterface->checkPersonEmailByUid($datas->email, $checkPersonMobile->uid);
         }
         $personAllDetails = $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email, $datas->mobileNumber);
+
         if ($checkPersonMobile && $checkPersonEmail) {
             $result = ['type' => 1, 'personData' => $datas, 'uid' => $checkPersonMobile->uid, 'status' => 'ExactPerson'];
-        } else if (!empty($personAllDetails)) {
-            $result = ['type' => 2, 'personData' => $personAllDetails, 'status' => 'MappedPerson'];
+        } else if ($personAllDetails['mobile'] !== null || $personAllDetails['email'] !== null) {
+            $result = ['type' => 2, 'personData' => $personAllDetails, 'status' => 'mappedPerson'];
         } else {
             $result = ['type' => 3, 'status' => 'freshUser'];
         }
@@ -228,7 +231,7 @@ class PersonService
             $decodedImageContents = base64_decode($datas->personProfile);
             $uniqueFilename = date('YmdHis') . '_' . uniqid() . '.jpg';
             $savePath = storage_path('app/public/Profiles/' . $uniqueFilename);
-            Log::info('PersonService >  savePath function Return.' . json_encode( $savePath));
+            Log::info('PersonService >  savePath function Return.' . json_encode($savePath));
             File::put($savePath, $decodedImageContents);
             $model = new PersonProfilePic();
             $model->uid = $datas->personUid;
@@ -770,10 +773,10 @@ class PersonService
         Log::info('PersonService > emailOtpValidation function Return.' . json_encode($model));
         if ($model->otp_received == $datas->otp) {
             $email = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_validation_status' => 1, 'email_validation_updated_on' => Carbon::now()]);
+            $setSatge = $this->personInterface->setStageInUser($uid);
             $result = ['status' => 'Otp Verified', 'type' => 1, 'uid' => $uid];
         } else {
             $result = ['status' => 'Otp Verified Failed', 'type' => 0, 'uid' => $uid];
-
         }
         return $result;
     }

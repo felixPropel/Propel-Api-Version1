@@ -50,6 +50,8 @@ interface PersonInterface
    public function getPrimaryMobileNumberByUid($uid);
    public function getPrimaryMobileAndEmailbyUid($uid);
    public function getPersonPicAndPersonName($uid);
+   public function checkPersonExistence($uid);
+   public function setStageInUser($uid);
 
 
 }

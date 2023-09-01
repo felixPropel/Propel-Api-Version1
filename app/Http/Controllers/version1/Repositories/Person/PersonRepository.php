@@ -77,7 +77,7 @@ class PersonRepository implements PersonInterface
                 $personCommonAddressModel = $allModels['personCommonAddressModel'];
                 $personAddressId = $allModels['personAddressId'];
                 $personAnniversaryDate = $allModels['personAnniversaryDate'];
-                $personProfileModel=$allModels['personProfileModel'];
+                $personProfileModel = $allModels['personProfileModel'];
                 $personModel->save();
                 $personDetailModel->ParentPerson()->associate($personModel, 'uid', 'uid');
                 $personMobileModel->ParentPerson()->associate($personModel, 'uid', 'uid');
@@ -152,7 +152,7 @@ class PersonRepository implements PersonInterface
 
     public function checkPersonEmailByUid($email, $uid)
     {
-        return PersonEmail::where(['uid' => $uid, 'email' => $email])->first();
+        return PersonEmail::where(['uid' => $uid, 'email' => $email, 'email_cachet' => 1])->first();
     }
     public function getOtpByUid($uid, $mobile)
     {
@@ -273,20 +273,37 @@ class PersonRepository implements PersonInterface
     }
     public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile)
     {
-        $models = Person::select('persons.id as personId', 'persons.uid as personUid', 'person_details.first_name as personName', 'person_emails.email As emailId', 'person_mobiles.mobile_no as mobileId')
+        $mobile = Person::with('mobile')
+            ->whereHas('mobile', function ($query) use ($mobile) {
+                $query->whereIn('mobile_cachet', [1, 2])
+                    ->where('mobile_no', $mobile)
+                    ->select('uid');
+            })->first();
+
+        $email = Person::with('email')
+            ->whereHas('email', function ($query) use ($email) {
+                $query->whereIn('email_cachet', [1, 2])
+                    ->where('email', $email)
+                    ->select('uid');
+            })
+            ->first();
+        $mobileUid = $mobile?->uid;
+        $emailUid = $email?->uid;
+        return [
+            'mobile' => $mobileUid && !User::where('uid', $mobileUid)->exists() ? $this->personDataMapped($mobileUid) : null,
+            'email' => $emailUid && !User::where('uid', $emailUid)->exists() ? $this->personDataMapped($emailUid) : null,
+        ];
+    }
+    public function personDataMapped($uid)
+    {
+
+        return Person::select('persons.id as personId', 'persons.uid as personUid', 'person_details.first_name as personName', 'person_emails.email As emailId', 'person_mobiles.mobile_no as mobileId')
             ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
             ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
             ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
-            ->where('person_mobiles.mobile_no', $mobile)
-            ->OrWhere('person_emails.email', $email)
-            ->whereIn('person_mobiles.mobile_cachet', [1, 2])
-            ->whereIn('person_emails.email_cachet', [1, 2])
+            ->where('persons.uid', $uid)
             ->get();
-        if (count($models) == true) {
-            return $models;
-        } else {
-            return null;
-        }
+
     }
     public function checkUserByUID($uid)
     {
@@ -471,6 +488,15 @@ class PersonRepository implements PersonInterface
     }
     public function getPersonPicAndPersonName($uid)
     {
-       return personDetails::with('PersonPic')->where('uid', $uid)->first();
+        return personDetails::with('PersonPic')->where('uid', $uid)->first();
+    }
+    public function checkPersonExistence($uid)
+    {
+        return person::where(['uid' => $uid, 'existence' => 1])->first();
+
+    }
+    public function setStageInUser($uid)
+    {
+        return User::where('uid', $uid)->update(['stage' => 2]);
     }
 }

@@ -26,3 +26,35 @@ MODIFY occasions_id INT NULL;
 
 ALTER TABLE person_languages
 MODIFY language_id INT NULL;
+
+DB Changes By Harish(02/08/2023):
+
+1) create Table hrm_resource_activities:
+
+CREATE TABLE `hrm_resource_activities` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name`  VARCHAR(191) DEFAULT NULL,
+  `active_status_id` INT(11) NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+   `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+)
+
+2)create Table hrm_resource_activity_status:
+
+CREATE TABLE `hrm_resource_activity_statuses` (
+	  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	  `name`  VARCHAR(191) DEFAULT NULL,
+	  `active_status` INT(11) NOT NULL,
+	  `created_at` TIMESTAMP NULL DEFAULT NULL,
+	  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+	   `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+	  PRIMARY KEY (`id`)
+	)
+
+
+	Migrate Files:(1/09/23)
+
+	1) php artisan migrate:refresh --path=/database/
+migrations/DefaultMigrationFiles/2022_08_27_100404_create_temp_organizations_table.php

@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\version1\Repositories\User;
 
 use App\Http\Controllers\version1\Interfaces\User\UserInterface;
-use App\Models\User;
 use App\Models\Person;
-use App\Models\PersonDetails;
-use App\Models\PersonEmail;
-use App\Models\PersonMobile;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class UserRepository implements UserInterface
 {
-    public function findUserDataByMobileNumber($mobileNumber)
+    public function existUserByMobileNo($mobileNo)
     {
-        return User::where('primary_mobile', $mobileNumber)->first();
+       return Person::with('existUser','personDetails')
+            ->whereHas('existUser', fn($query) => $query->where('primary_mobile', $mobileNo))
+            ->first();
+
     }
     public function findUserDataByEmail($email)
     {
@@ -24,25 +24,25 @@ class UserRepository implements UserInterface
     {
         return User::where('uid', $uId)->first();
     }
-    public Function storeUser($model){
+    public function storeUser($model)
+    {
         try {
             $result = DB::transaction(function () use ($model) {
 
-                $model->save();              
+                $model->save();
                 return [
                     'message' => "Success",
-                    'data' =>$model
+                    'data' => $model,
                 ];
             });
 
             return $result;
         } catch (\Exception $e) {
 
-
             return [
 
                 'message' => "failed",
-                'data' => $e
+                'data' => $e,
             ];
         }
     }
@@ -50,5 +50,9 @@ class UserRepository implements UserInterface
     {
         return $model->save();
     }
+    public function verifyUserForMobile($datas)
+    {
+        return  User::where('primary_email', $datas->userName)->orWhere('primary_mobile', $datas->userName)->first();
 
+    }
 }

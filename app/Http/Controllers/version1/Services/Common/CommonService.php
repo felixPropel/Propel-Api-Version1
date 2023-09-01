@@ -65,11 +65,11 @@ class CommonService
     Log::info('CommonService > getAllBloodGroup function Return.' . json_encode($result));
     return $result;
   }
-  public function getDistrict($data)
+  public function getCityByStateId($data)
   {
-    Log::info('CommonService > getDistrict function Inside.' . json_encode($data->all()));
-    $result = $this->commonInterface->getDistrict($data['stateId']);
-    Log::info('CommonService > getDistrict function Return.' . json_encode($result));
+    Log::info('CommonService > getCityByStateId function Inside.' . json_encode($data));
+    $result = $this->commonInterface->getCityByStateId($data['stateId']);
+    Log::info('CommonService > getCityByStateId function Return.' . json_encode($result));
     return $result;
   }
 

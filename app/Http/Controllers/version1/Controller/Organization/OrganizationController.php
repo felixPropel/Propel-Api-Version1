@@ -20,18 +20,18 @@ class OrganizationController extends Controller
         Log::info('OrganizationController > store function Return.' . json_encode($response));
         return $response;
     }
-    public function getAllStates()
+    public function getAllStates()  
     {
         Log::info('OrganizationController > getAllStates function Inside.');
         $response = $this->commonService->getAllStates();
         Log::info('OrganizationController > getAllStates function Return.' . json_encode($response));
         return $response;
     }
-    public function getDistrict(Request $request)
+    public function getCityByStateId(Request $request)
     {
-        Log::info('OrganizationController > getDistrict function Inside.' . json_encode($request->all()));
-        $response = $this->commonService->getDistrict($request->all());
-        Log::info('OrganizationController > getDistrict function Return.' . json_encode($response));
+        Log::info('OrganizationController > getCityByStateId function Inside.' . json_encode($request->all()));
+        $response = $this->commonService->getCityByStateId($request->all());
+        Log::info('OrganizationController > getCityByStateId function Return.' . json_encode($response));
         return $response;
     }
     public function getOrganizationAccountByUid(Request $request)
@@ -53,6 +53,14 @@ class OrganizationController extends Controller
         Log::info('OrganizationController > setDefaultOrganization function Inside.' . json_encode($request->all()));
         $response = $this->service->setDefaultOrganization($request->all());
         Log::info('OrganizationController > setDefaultOrganization id function Return.' . json_encode($response));
+        return $response;
+    }
+    public function tempOrganizationStore(Request $request)
+    {
+      
+        Log::info('OrganizationController > tempOrganizationStore function Inside.' . json_encode($request->all()));
+        $response = $this->service->tempOrganizationStore($request->all());
+        Log::info('OrganizationController > tempOrganizationStore  function Return.' . json_encode($response));
         return $response;
     }
 

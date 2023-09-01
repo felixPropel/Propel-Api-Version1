@@ -12,7 +12,9 @@ use App\Models\Organization\OrganizationEmail;
 use App\Models\Organization\OrganizationWebAddress;
 use App\Models\Organization\UserOrganizationRelational;
 use App\Models\PropertyAddress;
+use App\Models\TempOrganization;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class OrganizationService
 {
@@ -35,7 +37,7 @@ class OrganizationService
         $generateOrganizationModel = $this->convertToOrganizationModel($datas);
         $generateOrganizationDetailModel = $this->convertToOrganizationDetailModel($datas);
         $generateOrganizationEmailModel = $this->convertToOrganizationEmailModel($datas);
-        $generateUserAccountModel = $this->convertToUserAccountModel($datas);
+        $generateUserAccountModel = $this->convertToUserAccountModel($datas);   
         $generateOrganizationDatabaseModel = $this->convertToOrganizationDatabaseModel($datas);
         $generateOrganizationDocumentModel = $this->convertToOrganizationDocumentModel($datas);
         $generateOrganizationWebAddressModel = $this->convertToOrganizationWebAddressModel($datas);
@@ -52,9 +54,9 @@ class OrganizationService
     public function convertToOrganizationModel($datas)
     {
         $model = new Organization();
+        $model->stage = "2";
         $model->authorization = "1";
         $model->origin = $datas->origin;
-        //$model->db_name = $datas->organizationName;
         //$model->status = "1";
         return $model;
     }
@@ -69,7 +71,7 @@ class OrganizationService
     public function convertToOrganizationDetailModel($datas)
     {
         $model = new OrganizationDetail();
-        $model->title_id = (isset($datas->title_id) ? $datas->title_id : "");
+        $model->title_id = (isset($datas->title_id) ? $datas->title_id : null);
         $model->org_name = $datas->organizationName;
         $model->org_alias = (isset($datas->org_alias) ? $datas->org_alias : null);
         $model->started_date = (isset($datas->started_date) ? $datas->started_date : null);
@@ -84,8 +86,6 @@ class OrganizationService
     {
         $model = new OrganizationEmail();
         $model->email = $datas->organizationEmail;
-        //$model->origin =  $datas->origin;
-        //$model->db_name = $datas->organizationName;
         $model->status = "1";
         return $model;
     }
@@ -147,5 +147,43 @@ class OrganizationService
         $setOrganization = UserOrganizationRelational::where(['organization_id' => $datas->orgId, 'uid' => $datas->uid])->update(['default_org' => 1]);
         return $this->commonService->sendResponse($datas, '');
     }
+public function tempOrganizationStore($datas)
+{
+    $validator = Validator::make($datas, [
+        'org_name' => 'required',
+        'org_email' => 'required|email',
+        'pin_code' => 'required|numeric',
+    ]);
+    if ($validator->fails()) {
+        return response(['errors' => $validator->errors()->all()], 422);
+    }else{
+        $datas=(object)$datas;
+        $convertTempOrg=$this->convertTempOrganization($datas);
+        $storeTempOrg=$this->organizationInterface->storeTempOrganization( $convertTempOrg);
+        return $this->commonService->sendResponse($storeTempOrg, '');
+    }
+}
+public function convertTempOrganization($datas)
+{
+    $model = new TempOrganization();
+    $model->org_name=$datas->org_name;
+    $model->org_email=$datas->org_email;
+    $model->org_website=$datas->org_website;   
+    $model->door_no=$datas->door_no;  
+    $model->building_name=$datas->building_name;
+    $model->street=$datas->street; 
+    $model->landmark=$datas->landmark;  
+    $model->pincode=$datas->pin_code;  
+    $model->district_id = $datas->district_id ?? null;
+    $model->state_id=$datas->state_id;  
+    $model->city_id=$datas->city_id;  
+    $model->area=$datas->area;  
+    $model->location=$datas->location;  
+    $model->tried_person_id=$datas->uid;
+    $model->gst_no=$datas->org_gst;
+    $model->pan_no=$datas->org_pan;
 
+    return $model;
+
+}
 }

@@ -7,5 +7,6 @@ interface OrganizationInterface
     public  function getDataBaseNameByOrgId($id);
     public function getPerviousDefaultOrganization($uid);
     public function changeDefaultOrganization($uid);
+    public function storeTempOrganization($model);
 
 }

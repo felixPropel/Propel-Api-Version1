@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -31,19 +32,20 @@ class UserService
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], 422);
         }
-
-        $user = User::where('primary_email', $datas->userName)->orWhere('primary_mobile', $datas->userName)->first();
-        $uid = $user->uid;
+        $verifyUser = $this->userInterface->verifyUserForMobile($datas);
+        $uid = $verifyUser->uid;
         $personDetail = $this->personInterface->getPersonPicAndPersonName($uid);
         $nickName = $personDetail->nick_name ?? null;
         $firstName = $personDetail->first_name ?? null;
         $personPic = $personDetail->PersonPic->profile_pic ?? null;
-        Log::info('UserService > loginUser function Return.' . json_encode($user));
-        if ($user) {
-            if (Hash::check($datas->password, $user->password)) {
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+        Log::info('UserService > loginUser function Return.' . json_encode($verifyUser));
+        if ($verifyUser) {
+            if (Hash::check($datas->password, $verifyUser->password)) {
+             $token = $verifyUser->createToken('Laravel Password Grant Client')->accessToken;
+                $personStatus = $this->personInterface->checkPersonExistence($uid);
+                $personType = $personStatus ? $personStatus->existence : null;
                 $defaultOrg = $this->OrganizationInterface->getPerviousDefaultOrganization($uid);
-                $response = ['token' => $token, 'uid' => $uid, 'defaultOrg' => $defaultOrg, 'nickName' => $nickName, 'firstName' => $firstName, 'personPic' => $personPic];
+                $response = ['personType' => $personType, 'token' => $token, 'uid' => $uid, 'defaultOrg' => $defaultOrg, 'nickName' => $nickName, 'firstName' => $firstName, 'personPic' => $personPic];
                 return $this->commonService->sendResponse($response, "");
             } else {
                 $response = ["message" => "Password mismatch", 'firstName' => $firstName, 'uid' => $uid];
@@ -124,6 +126,7 @@ class UserService
         $model->primary_email = $personModel->emailId;
         $model->primary_mobile = $personModel->mobileId;
         $model->password = Hash::make($datas->password);
+        $model->stage = 1;
         Log::info('UserService > convertToUserModel function Return.' . json_encode($model));
         return $model;
     }
@@ -135,7 +138,6 @@ class UserService
         $mobile = $this->personInterface->getPrimaryMobileNumberByUid($datas->uid);
         $email = $this->personInterface->getPersonEmailByUid($datas->uid);
         $getPersonName = $this->personInterface->getPersonDatasByUid($datas->uid);
-
         $createuser = $this->UserCreate($mobile->mobile_no, $email->email, $datas);
         $saveUser = $this->userInterface->savedUser($createuser);
         $result = ['personName' => $getPersonName->first_name, 'mobileNumber' => $mobile->mobile_no];
@@ -155,6 +157,7 @@ class UserService
         $model->primary_email = $email;
         $model->primary_mobile = $mobile;
         $model->password = Hash::make($datas->password);
+        $model->stage = 1;
         Log::info('UserService > UserCreate function Return.' . json_encode($model));
         return $model;
     }
