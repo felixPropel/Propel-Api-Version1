@@ -420,7 +420,7 @@ class PersonService
     {
         Log::info('PersonService > convertToPersonMobileModel function Inside.' . json_encode($datas));
         if ($datas->personUid) {
-            $model = $this->personInterface->getMobileNumberByUid($datas->personUid, $datas->mobileNumber);
+            $model = $this->personInterface->getPersonMobileNoByUid($datas->personUid, $datas->mobileNumber);
             $model->mobile_no = $datas->mobileNumber;
             $model->mobile_cachet_id = 1;
         } else {

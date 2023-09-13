@@ -491,4 +491,8 @@ class PersonRepository implements PersonInterface
         return   PersonMobile::where(['uid' => $model->personUid, 'mobile_no' => $model->mobileNo])->update(['mobile_cachet_id' => 1, 'mobileno_updated_on' => Carbon::now(), 'validation_updated_on' => Carbon::now(),'mobile_validation_id' =>1]);
 
     }
+    public function getPersonMobileNoByUid($uid,$mobile)
+    {
+        return   PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->first();
+    }
 }

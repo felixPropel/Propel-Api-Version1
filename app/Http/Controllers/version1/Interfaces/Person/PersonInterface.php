@@ -52,6 +52,7 @@ interface PersonInterface
    public function setStageInUser($uid);
    public function resendOtpForSecondaryMobileNo($uid,$mobile,$otp);
    public function setPirmaryMobileNo($model);
+   public function getPersonMobileNoByUid($uid,$mobile);
 
 
 }
