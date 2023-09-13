@@ -18,9 +18,13 @@ class CreateHrmDepartmentsTable extends Migration
             $table->string('department_name');
             $table->integer('parent_dept_id')->nullable();
             $table->string('description')->nullable();
-            $table->integer('active_state');
-            $table->timestamp('deleted_at')->nullable();
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('last_updated_by')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+            
         });
     }
 

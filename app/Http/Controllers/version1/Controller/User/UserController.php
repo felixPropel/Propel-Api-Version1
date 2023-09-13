@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-
-    public function __construct(UserService $service)
+    protected $UserService;
+        public function __construct(UserService $service)
     {
         $this->userService = $service;
     }

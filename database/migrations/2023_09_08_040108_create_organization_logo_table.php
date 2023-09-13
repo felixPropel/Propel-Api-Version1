@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOrganizationMobilesTable extends Migration
+class CreateOrganizationLogoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,15 @@ class CreateOrganizationMobilesTable extends Migration
      */
     public function up()
     {
-        Schema::create('organization_mobiles', function (Blueprint $table) {
+        Schema::create('organization_logo', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('org_id');
-            $table->integer('country_id');
-            $table->string('mobile_no');
-            $table->integer('validated_status')->default('0');
+            $table->string('org_logo');
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+
         });
     }
 
@@ -30,6 +32,6 @@ class CreateOrganizationMobilesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('organization_mobiles');
+        Schema::dropIfExists('organization_logo');
     }
 }

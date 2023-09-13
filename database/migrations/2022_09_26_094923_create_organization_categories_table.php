@@ -14,11 +14,14 @@ class CreateOrganizationCategoriesTable extends Migration
     public function up()
     {
         Schema::create('organization_categories', function (Blueprint $table) {
-            $table->increments('id');  
-            $table->string('organization_category');       
-            $table->string('name');
-            $table->integer('status')->nullable();
+            $table->increments('id');
+            $table->integer('org_id');
+            $table->integer('pims_org_category_id');
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+            
         });
     }
 

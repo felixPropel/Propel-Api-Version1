@@ -23,21 +23,20 @@ Route::post('emailOtpValidation', 'App\Http\Controllers\version1\Controller\Pers
 Route::post('personProfiles', 'App\Http\Controllers\version1\Controller\Person\PersonController@personProfiles')->name('personProfiles');
 Route::post('profileUpdate', 'App\Http\Controllers\version1\Controller\Person\PersonController@profileUpdate')->name('profileUpdate');
 Route::post('getDetailedAllPerson', 'App\Http\Controllers\version1\Controller\Person\PersonController@getDetailedAllPerson')->name('getDetailedAllPerson');
-Route::post('changePassword', 'App\Http\Controllers\version1\Controller\User\UserController@changePassword')->name('changePassword');
+Route::post('changePassword',  'App\Http\Controllers\version1\Controller\User\UserController@changePassword')->name('changePassword');
 //User Profile
 Route::post('userProfileDatas', 'App\Http\Controllers\version1\Controller\Person\PersonController@userProfileDatas')->name('userProfileDatas');
-Route::post('addOtherMobile', 'App\Http\Controllers\version1\Controller\Person\PersonController@addOtherMobileNumber')->name('addOtherMobile');
+Route::post('addSecondaryMobile', 'App\Http\Controllers\version1\Controller\Person\PersonController@addSecondaryMobile')->name('addSecondaryMobile');
 Route::post('resendOtpForMobile', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForMobile')->name('resendOtpForMobile');
-Route::post('otpValidationForMobile', 'App\Http\Controllers\version1\Controller\Person\PersonController@otpValidationForMobile')->name('otpValidationForMobile');
 Route::post('deleteForMobileNumberByUid', 'App\Http\Controllers\version1\Controller\Person\PersonController@deleteForMobileNumberByUid')->name('deleteForMobileNumberByUid');
-Route::post('mobileNumberChangeAsPrimary', 'App\Http\Controllers\version1\Controller\Person\PersonController@mobileNumberChangeAsPrimary')->name('mobileNumberChangeAsPrimary');
+Route::post('makeAsPrimaryMobileOtpValidate', 'App\Http\Controllers\version1\Controller\Person\PersonController@makeAsPrimaryMobileOtpValidate')->name('makeAsPrimaryMobileOtpValidate');
 Route::post('addOtherEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@addOtherEmail')->name('addOtherEmail');
 Route::post('resendOtpForEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForEmail')->name('resendOtpForEmail');
 Route::post('deleteForEmailByUid', 'App\Http\Controllers\version1\Controller\Person\PersonController@deleteForEmailByUid')->name('deleteForEmailByUid');
 Route::post('emailChangeAsPrimary', 'App\Http\Controllers\version1\Controller\Person\PersonController@emailChangeAsPrimary')->name('emailChangeAsPrimary');
-Route::post('resendOtpForTempMobileNo', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForTempMobileNo')->name('resendOtpForTempMobileNo');
-Route::post('OtpValidationForTempMobile', 'App\Http\Controllers\version1\Controller\Person\PersonController@OtpValidationForTempMobile')->name('OtpValidationForTempMobile');
+Route::post('resendOtpForSecondaryMobile', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForSecondaryMobile')->name('resendOtpForSecondaryMobile');
+Route::post('OtpValidateSecondaryMobileNo', 'App\Http\Controllers\version1\Controller\Person\PersonController@OtpValidateSecondaryMobileNo')->name('OtpValidateSecondaryMobileNo');
 Route::post('resendOtpForTempEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForTempEmail')->name('resendOtpForTempEmail');
 Route::post('OtpValidationForTempEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@OtpValidationForTempEmail')->name('OtpValidationForTempEmail');
 
-//user Profile End 
+//user Profile End

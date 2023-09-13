@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTempMobilesTable extends Migration
+class CreatePfmExistence extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,13 @@ class CreateTempMobilesTable extends Migration
      */
     public function up()
     {
-        Schema::create('temp_mobiles', function (Blueprint $table) {
+        Schema::create('pfm_existence', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('mobile_no');
-            $table->integer('otp_received');
-            $table->integer('stage');
+            $table->integer('existence');
+            $table->integer('active_status')->nullable();
+            $table->integer('deleted_flag')->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('last_updated_by')->nullable();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });
@@ -30,6 +32,6 @@ class CreateTempMobilesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('temp_mobiles');
+        Schema::dropIfExists('pfm_existence');
     }
 }

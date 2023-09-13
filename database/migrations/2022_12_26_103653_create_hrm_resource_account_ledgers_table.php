@@ -17,8 +17,10 @@ class CreateHrmResourceAccountLedgersTable extends Migration
             $table->increments('id');
             $table->integer('resource_id');
             $table->integer('ledger_id');
-            $table->timestamp('deleted_at')->nullable();
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 

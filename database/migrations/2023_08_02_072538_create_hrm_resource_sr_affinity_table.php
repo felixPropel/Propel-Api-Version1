@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTempEmailsTable extends Migration
+class CreateHrmResourceSrAffinityTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,17 @@ class CreateTempEmailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('temp_emails', function (Blueprint $table) {
+        Schema::create('hrm_resource_sr_affinity', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('email');
-            $table->integer('otp_received');
-            $table->integer('stage');
+            $table->integer('resource_sr_id');
+            $table->integer('activity_id');
+            $table->date('date');
+            $table->string('reason');
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
+           
         });
     }
 
@@ -30,6 +34,6 @@ class CreateTempEmailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('temp_emails');
+        Schema::dropIfExists('hrm_resource_sr_details');
     }
 }

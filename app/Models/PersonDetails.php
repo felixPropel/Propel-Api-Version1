@@ -12,12 +12,12 @@ class PersonDetails extends Model
 
     public function mobile()
     {
-        return $this->hasMany('App\Models\PersonMobile', 'uid', 'uid')->where('status', '!=', 0)->orderBy('status');
+        return $this->hasMany('App\Models\PersonMobile', 'uid', 'uid')->where('pfm_active_status_id', '!=', 0)->orderBy('pfm_active_status_id');
     }
 
     public function email()
     {
-        return $this->hasMany('App\Models\PersonEmail', 'uid', 'uid')->where('status', '!=', 0)->orderBy('status');
+        return $this->hasMany('App\Models\PersonEmail', 'uid', 'uid')->where('pfm_active_status_id', '!=', 0)->orderBy('pfm_active_status_id');
     }
 
 
@@ -33,7 +33,7 @@ class PersonDetails extends Model
 
     public function person_address_profile()
     {
-        return $this->hasMany('App\Models\PersonAddress', 'uid', 'uid')->where('status', '=', 1);
+        return $this->hasMany('App\Models\PersonAddress', 'uid', 'uid')->where('pfm_active_status_id', '=', 1);
     }
 
     public function user()
@@ -56,10 +56,10 @@ class PersonDetails extends Model
     }
     public function gender()
     {
-        return $this->hasOne('App\Models\BasicModels\Gender', 'id','gender_id');
+        return $this->hasOne('App\Models\BasicModels\Gender', 'id','pims_person_gender_id');
     }
     public function bloodGroup()
     {
-        return $this->hasOne('App\Models\BasicModels\BloodGroup', 'id','blood_group_id');
+        return $this->hasOne('App\Models\BasicModels\BloodGroup', 'id','pims_person_blood_group_id');
     }
 }

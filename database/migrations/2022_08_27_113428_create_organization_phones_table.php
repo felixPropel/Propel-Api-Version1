@@ -19,8 +19,11 @@ class CreateOrganizationPhonesTable extends Migration
             $table->integer('coutry_code')->nullable();
             $table->integer('std_code')->nullable();
             $table->integer('phone_no');
-            $table->integer('status')->nullable();
+            $table->integer('pfm_active_status_id')->nullable();    
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+          
         });
     }
 

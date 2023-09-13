@@ -16,6 +16,7 @@ use App\Models\TempEmail;
 use App\Models\TempMobile;
 use App\Models\TempPerson;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -130,7 +131,7 @@ class PersonRepository implements PersonInterface
                     $personCommonAddressModel[$i]->save();
                 }
                 for ($i = 0; $i < count($personAddressId); $i++) {
-                    $personAddressId[$i]->ParentComAddress()->associate($personCommonAddressModel[$i], 'property_address_id', 'id');
+                    $personAddressId[$i]->ParentComAddress()->associate($personCommonAddressModel[$i], 'com_property_address_id', 'id');
                     $personAddressId[$i]->ParentPerson()->associate($personModel, 'uid', 'uid');
                     $personAddressId[$i]->save();
                 }
@@ -152,19 +153,16 @@ class PersonRepository implements PersonInterface
 
     public function checkPersonEmailByUid($email, $uid)
     {
-        return PersonEmail::where(['uid' => $uid, 'email' => $email, 'email_cachet' => 1])->first();
+        return PersonEmail::where(['uid' => $uid, 'email' => $email, 'email_cachet_id' => 1])->first();
     }
-    public function getOtpByUid($uid, $mobile)
-    {
-        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->first();
-    }
+
     public function emailOtpValidation($uid)
     {
         return PersonEmail::where('uid', $uid)->first();
     }
     public function findEmailByPersonEmail($email)
     {
-        $model = PersonEmail::where('email', $email)->whereIn('email_cachet', [1, 2])->get();
+        $model = PersonEmail::where('email', $email)->whereIn('email_cachet_id', [1, 2])->get();
         if (count($model) == 0) {
             return null;
         } else {
@@ -173,7 +171,7 @@ class PersonRepository implements PersonInterface
     }
     public function getPersonEmailByUid($uid)
     {
-        return PersonEmail::where(['uid' => $uid, ['email_cachet', '=', 1]])->first();
+        return PersonEmail::where(['uid' => $uid, ['email_cachet_id', '=', 1]])->first();
     }
     public function getPersonDatasByUid($uid)
     {
@@ -193,7 +191,13 @@ class PersonRepository implements PersonInterface
     }
     public function getMobileNumberByUid($uid, $mobile)
     {
-        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile, ['deleted_at', '=', null]])->first();
+        $model = PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->update(['mobile_cachet_id' => 3, 'deleted_at' => Carbon::now()]);
+        $data = ($model)
+            ? ['Message' => 'MobileNumber is Deleted']
+            : ['Message' => 'MobileNumber Not Found'];
+        
+        return $data;
+        
     }
 
     public function getPersonPrimaryDataByUid($uid)
@@ -201,10 +205,10 @@ class PersonRepository implements PersonInterface
 
         $model = Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personLanguage', 'personAnniversaryDate')
             ->whereHas('mobile', function ($query) {
-                $query->where('mobile_cachet', 1);
+                $query->where('mobile_cachet_id', 1);
             })
             ->whereHas('email', function ($query) {
-                $query->where('email_cachet', 1);
+                $query->where('email_cachet_id', 1);
             })
             ->where('uid', $uid)
             ->first()->toArray();
@@ -264,8 +268,8 @@ class PersonRepository implements PersonInterface
             ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
             ->where('person_mobiles.mobile_no', $mobile)
             ->Where('person_emails.email', $email)
-            ->whereIn('person_mobiles.mobile_cachet', [1, 2])
-            ->whereIn('person_emails.email_cachet', [1, 2])
+            ->whereIn('person_mobiles.mobile_cachet_id', [1, 2])
+            ->whereIn('person_emails.email_cachet_id', [1, 2])
             ->first();
 
         Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Return . ' . json_encode($model));
@@ -275,14 +279,14 @@ class PersonRepository implements PersonInterface
     {
         $mobile = Person::with('mobile')
             ->whereHas('mobile', function ($query) use ($mobile) {
-                $query->whereIn('mobile_cachet', [1, 2])
+                $query->whereIn('mobile_cachet_id', [1, 2])
                     ->where('mobile_no', $mobile)
                     ->select('uid');
             })->first();
 
         $email = Person::with('email')
             ->whereHas('email', function ($query) use ($email) {
-                $query->whereIn('email_cachet', [1, 2])
+                $query->whereIn('email_cachet_id', [1, 2])
                     ->where('email', $email)
                     ->select('uid');
             })
@@ -312,22 +316,22 @@ class PersonRepository implements PersonInterface
     public function personAddressByuid($uid)
     {
         $models = PropertyAddress::select('*')
-            ->leftjoin('person_addresses', 'person_addresses.property_address_id', 'com_property_addresses.id')
+            ->leftjoin('person_addresses', 'person_addresses.com_property_address_id', 'com_property_addresses.id')
             ->where('person_addresses.uid', $uid)
             ->get();
         return $models;
     }
     public function personSecondMobileAndEmailByUid($uid)
     {
-        $mobile = PersonMobile::where(['uid' => $uid, ['mobile_cachet', '=', '2']])->get();
-        $email = PersonEmail::where(['uid' => $uid, ['email_cachet', '=', '2']])->get();
+        $mobile = PersonMobile::where(['uid' => $uid, ['mobile_cachet_id', '=', '2']])->get();
+        $email = PersonEmail::where(['uid' => $uid, ['email_cachet_id', '=', '2']])->get();
         $model['mobile'] = $mobile;
         $model['email'] = $email;
         return $model;
     }
-    public function checkPersonByMobile($mobile)
+    public function checkPersonByMobileNo($mobile)
     {
-        return PersonMobile::where(['mobile_no' => $mobile, ['mobile_cachet', '=', '1']])->first();
+        return PersonMobile::where(['mobile_no' => $mobile, ['mobile_cachet_id', '=', '1']])->first();
     }
     public function getAllDatasInUser($uid)
     {
@@ -339,35 +343,32 @@ class PersonRepository implements PersonInterface
     }
     public function checkPersonByEmail($email)
     {
-        return PersonEmail::where(['email' => $email, ['email_cachet', '=', '1']])->first();
+        return PersonEmail::where(['email' => $email, ['email_cachet_id', '=', '1']])->first();
     }
     public function getPrimaryMobileNumberByUid($uid)
     {
-        return PersonMobile::where(['uid' => $uid, ['mobile_cachet', '=', '1']])->first();
+        return PersonMobile::where(['uid' => $uid, ['mobile_cachet_id', '=', '1']])->first();
     }
-    public function getPerviousPrimaryMobileNumber($uid)
+    public function getPerviousPrimaryMobileNo($uid)
     {
-        $model = PersonMobile::where(['uid' => $uid, ['mobile_cachet', '=', '1']])->first();
-        if ($model) {
-            $model->mobile_cachet = 2;
-            $model->save();
-        } else {
-            $model = null;
-        }
-        return $model;
+        return PersonMobile::updateOrInsert(
+            ['uid' => $uid, 'mobile_cachet_id' => 1],
+            ['mobile_cachet_id' => 2]
+        );
+        
     }
     public function getPerviousPrimaryEmail($uid)
     {
-        $model = PersonEmail::where(['uid' => $uid, ['email_cachet', '=', '1']])->first();
+        $model = PersonEmail::where(['uid' => $uid, ['email_cachet_id', '=', '1']])->first();
         if ($model) {
-            $model->email_cachet = 2;
+            $model->email_cachet_id = 2;
             $model->save();
         } else {
             $model = null;
         }
         return $model;
     }
-    public function storeTempMobileNumber($model)
+    public function addSecondaryMobileNoForUser($model)
     {
         try {
             $result = DB::transaction(function () use ($model) {
@@ -386,37 +387,19 @@ class PersonRepository implements PersonInterface
             ];
         }
     }
-    public function getMobileOtpByTempId($id, $mobile)
+    public function getSecondaryMobileNoByUid($mobile,$uid)
     {
-        return TempMobile::where(['id' => $id, 'mobile_no' => $mobile])->first();
+        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->where('mobile_cachet_id', '<>', 1)->first();
     }
-    public function removeTempMobileById($id)
+    public function secondaryMobileNoValidationId($uid,$mobile)
     {
-        return TempMobile::where('id', $id)->delete();
+        return   PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->update(['mobile_validation_id' => 1,'validation_updated_on'=>Carbon::now()]);
     }
     public function removeTempEmailById($id)
     {
         return TempEmail::where('id', $id)->delete();
     }
-    public function addedOtherMobileNoInPerson($model)
-    {
-        try {
-            $result = DB::transaction(function () use ($model) {
-
-                $model->save();
-                return [
-                    'message' => "Success",
-                    'data' => $model,
-                ];
-            });
-            return $result;
-        } catch (\Exception $e) {
-            return [
-                'message' => "Failed",
-                'data' => $e,
-            ];
-        }
-    }
+   
     public function storeTempEmail($model)
     {
         try {
@@ -461,17 +444,17 @@ class PersonRepository implements PersonInterface
     }
     public function checkSecondaryMobileNumberByUid($mobile, $uid)
     {
-        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile, ['mobile_cachet', '=', '2']])->first();
+        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile, ['mobile_cachet_id', '=', '2']])->first();
     }
     public function checkSecondaryEmailByUid($email, $uid)
     {
-        return PersonEmail::where(['uid' => $uid, 'email' => $email, ['email_cachet', '=', '2']])->first();
+        return PersonEmail::where(['uid' => $uid, 'email' => $email, ['email_cachet_id', '=', '2']])->first();
 
     }
     public function checkPerivousAddressById($addressId, $uid)
     {
         $porpertyAddress = PropertyAddress::where('id', $addressId)->delete();
-        $personAddress = PersonAddress::where(['uid' => $uid, 'property_address_id' => $addressId])->delete();
+        $personAddress = PersonAddress::where(['uid' => $uid, 'com_property_address_id' => $addressId])->delete();
         return false;
     }
     public function getPrimaryMobileAndEmailbyUid($uid)
@@ -481,22 +464,31 @@ class PersonRepository implements PersonInterface
             ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
             ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
             ->Where('persons.uid', $uid)
-            ->whereIn('person_mobiles.mobile_cachet', [1])
-            ->whereIn('person_emails.email_cachet', [1])
+            ->whereIn('person_mobiles.mobile_cachet_id', [1])
+            ->whereIn('person_emails.email_cachet_id', [1])
             ->first();
 
     }
-    public function getPersonPicAndPersonName($uid)
+    public function getPersonPicAndPersonName($uid) 
     {
         return personDetails::with('PersonPic')->where('uid', $uid)->first();
     }
     public function checkPersonExistence($uid)
     {
-        return person::where(['uid' => $uid, 'existence' => 1])->first();
+        return person::where(['uid' => $uid, 'pfm_existence_id' => 1])->first();
 
     }
     public function setStageInUser($uid)
     {
         return User::where('uid', $uid)->update(['stage' => 2]);
+    }
+    public function resendOtpForSecondaryMobileNo($uid,$mobile,$otp)
+    {
+        return   PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->update(['otp_received' =>$otp]);
+    }
+    public function setPirmaryMobileNo($model)
+    {
+        return   PersonMobile::where(['uid' => $model->personUid, 'mobile_no' => $model->mobileNo])->update(['mobile_cachet_id' => 1, 'mobileno_updated_on' => Carbon::now(), 'validation_updated_on' => Carbon::now(),'mobile_validation_id' =>1]);
+
     }
 }

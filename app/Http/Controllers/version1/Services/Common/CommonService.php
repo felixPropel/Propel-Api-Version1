@@ -10,6 +10,8 @@ use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+
 
 class CommonService
 {
@@ -146,10 +148,13 @@ class CommonService
 
   public function getOrganizationDatabaseByOrgId($orgId)
   {
-    Log::info('CommonService > getOrganizationDatabaseByOrgId function Inside.');
+    $databaseName = config('database.connections.mysql.database');
     $result = $this->organizationInterface->getDataBaseNameByOrgId($orgId);
     Session::put('currentDatabase', $result->db_name);
-    Config::set('database.connections.mysql_external.database', $result->db_name);
+   $name=Config::set('database.connections.mysql_external.database', $result->db_name);
+   DB::purge('mysql'); 
+   DB::reconnect('mysql_external');
+
     Log::info('CommonService > getOrganizationDatabaseByOrgId function Return.' . json_encode($result));
     return $result;
   }

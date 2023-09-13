@@ -16,14 +16,12 @@ class CreateHrmResourceSrsTable extends Migration
         Schema::create('hrm_resource_srs', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('resource_id');
-            $table->integer('active_state');
-            $table->date('date_of_joining');
-            $table->date('break_date')->nullable();
-            $table->date('relived_date')->nullable();
-            $table->date('rejoin_date')->nullable();
-            $table->string('reason')->nullable();
-            $table->timestamp('deleted_at')->nullable();
+            $table->integer('hrm_resource_activity_status_id');
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+           
         });
     }
 

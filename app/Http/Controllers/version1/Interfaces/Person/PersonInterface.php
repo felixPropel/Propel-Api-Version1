@@ -4,13 +4,12 @@ namespace App\Http\Controllers\version1\Interfaces\Person;
 
 interface PersonInterface
 {
-    public function checkPersonByMobile($mobileNumber);
+    public function checkPersonByMobileNo($mobileNumber);
     public function storePerson($allModels);
     public function getPersonPrimaryDataByUid($uid);
     public function storeTempPerson($model);
     public function findTempPersonById($id);
     public function checkPersonEmailByUid($email,$uid);
-    public function getOtpByUid($uid,$mobile);//re
     public function emailOtpValidation($uid);//re
     public function getPersonEmailByUid($uid);//re
     public function getPersonDatasByUid($uid);
@@ -35,11 +34,10 @@ interface PersonInterface
    public function getAllDatasInUser($uid);
    public function getPersonProfileByUid($uid);
    public function checkPersonByEmail($email);
-   public function getPerviousPrimaryMobileNumber($uid);
-   public function storeTempMobileNumber($model);
-   public function getMobileOtpByTempId($id,$mobile);
-   public function removeTempMobileById($id);
-   public function addedOtherMobileNoInPerson($model);
+   public function getPerviousPrimaryMobileNo($uid);
+   public function addSecondaryMobileNoForUser($model);
+   public function getSecondaryMobileNoByUid($mobile,$uid);
+   public function secondaryMobileNoValidationId($id,$mobile);
    public function storeTempEmail($model);
    public function getEmailOtpByTempId($id,$email);
    public function removeTempEmailById($id);
@@ -52,6 +50,8 @@ interface PersonInterface
    public function getPersonPicAndPersonName($uid);
    public function checkPersonExistence($uid);
    public function setStageInUser($uid);
+   public function resendOtpForSecondaryMobileNo($uid,$mobile,$otp);
+   public function setPirmaryMobileNo($model);
 
 
 }

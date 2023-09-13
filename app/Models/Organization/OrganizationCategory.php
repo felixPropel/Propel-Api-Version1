@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class OrganizationCategory extends Model
 {
     use HasFactory;
+    public function ParentOrganization()
+    {
+        return $this->belongsTo(Organization::class, 'org_id', 'id');
+    }
 }

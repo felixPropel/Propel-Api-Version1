@@ -109,13 +109,7 @@ public function checkUserOrPerson(Request $request)
     Log::info('PersonController > checkUserOrPerson function Return.' . json_encode($response));
     return  $response;
 }
-public function otpValidationForMobile(Request $request)
-{
-    Log::info('PersonController > otpValidationForMobile function Inside.' . json_encode($request->all()));
-    $response=$this->personService->otpValidationForMobile($request->all());
-    Log::info('PersonController > otpValidationForMobile  function Return.' . json_encode($response));
-    return  $response;
-}
+
 public function generateEmailOtp(Request $request)
 {
     Log::info('PersonController > mobileOtpValidated function Inside.' . json_encode($request->all()));
@@ -147,6 +141,7 @@ public function personDatas(Request $request)
 }
 public function personUpdate(Request $request)
 {
+   
     Log::info('PersonController > personUpdate function Inside.' . json_encode($request->all()));
     $response = $this->personService->personUpdate($request->all());
     Log::info('PersonController > personUpdate function Return.' . json_encode($response));
@@ -186,11 +181,11 @@ public function profileUpdate(Request $request)
     Log::info('PersonController > profileUpdate function Return.' .json_encode($response));
     return  $response;
 }
-public function addOtherMobileNumber(Request $request)
+public function addSecondaryMobile(Request $request)
 {
-    Log::info('PersonController > addOtherMobileNumber function Inside.' . json_encode($request->all()));
-    $response=$this->personService->addOtherMobileNumber($request->all());
-    Log::info('PersonController > addOtherMobileNumber function Return.' .json_encode($response));
+    Log::info('PersonController > addSecondaryMobile function Inside.' . json_encode($request->all()));
+    $response=$this->personService->addSecondaryMobile($request->all());
+    Log::info('PersonController > addSecondaryMobile function Return.' .json_encode($response));
     return  $response;
 }
 public function resendOtpForMobile(Request $request)
@@ -228,11 +223,11 @@ public function deleteForEmailByUid(Request $request)
     Log::info('PersonController > deleteForEmailByUid function Return.' .json_encode($response));
     return  $response;
 }
-public function mobileNumberChangeAsPrimary(Request $request)
+public function makeAsPrimaryMobileOtpValidate(Request $request)
 {
-    Log::info('PersonController > mobileNumberChangeAsPrimary function Inside.' . json_encode($request->all()));
-    $response=$this->personService->mobileNumberChangeAsPrimary($request->all());
-    Log::info('PersonController > mobileNumberChangeAsPrimary function Return.' .json_encode($response));
+    Log::info('PersonController > makeAsPrimaryMobileOtpValidate function Inside.' . json_encode($request->all()));
+    $response=$this->personService->makeAsPrimaryMobileOtpValidate($request->all());
+    Log::info('PersonController > makeAsPrimaryMobileOtpValidate function Return.' .json_encode($response));
     return  $response;
 }
 
@@ -243,18 +238,18 @@ public function emailChangeAsPrimary(Request $request)
     Log::info('PersonController > emailChangeAsPrimary function Return.' .json_encode($response));
     return  $response;
 }
-public function resendOtpForTempMobileNo(Request $request)
+public function resendOtpForSecondaryMobile(Request $request)
 {
-    Log::info('PersonController > resendOtpForTempMobileNo function Inside.' . json_encode($request->all()));
-    $response=$this->personService->resendOtpForTempMobileNo($request->all());
-    Log::info('PersonController > resendOtpForTempMobileNo function Return.' .json_encode($response));
+    Log::info('PersonController > resendOtpForSecondaryMobile function Inside.' . json_encode($request->all()));
+    $response=$this->personService->resendOtpForSecondaryMobile($request->all());
+    Log::info('PersonController > resendOtpForSecondaryMobile function Return.' .json_encode($response));
     return  $response;
 }
-public function OtpValidationForTempMobile(Request $request)
+public function OtpValidateSecondaryMobileNo(Request $request)
 {
-    Log::info('PersonController > OtpValidationForTempMobile function Inside.' . json_encode($request->all()));
-    $response=$this->personService->OtpValidationForTempMobile($request->all());
-    Log::info('PersonController > OtpValidationForTempMobile function Return.' .json_encode($response));
+    Log::info('PersonController > OtpValidateSecondaryMobileNo function Inside.' . json_encode($request->all()));
+    $response=$this->personService->OtpValidateSecondaryMobileNo($request->all());
+    Log::info('PersonController > OtpValidateSecondaryMobileNo function Return.' .json_encode($response));
     return  $response;
 }
 public function resendOtpForTempEmail(Request $request)

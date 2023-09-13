@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOrganizationAdministratorsTable extends Migration
+class CreateOrganizationOwnershipsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,15 @@ class CreateOrganizationAdministratorsTable extends Migration
      */
     public function up()
     {
-        Schema::create('organization_administrators', function (Blueprint $table) {
+        Schema::create('organization_ownerships', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('org_id');
-            $table->integer('u_id');
-            $table->integer('administrator_type_id');
-            $table->integer('verification_status_id');
-            $table->integer('status')->nullable();
+            $table->integer('pims_org_ownership_id');
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+           
         });
     }
 
@@ -31,6 +32,6 @@ class CreateOrganizationAdministratorsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('organization_administrators');
+        Schema::dropIfExists('organization_ownerships');
     }
 }

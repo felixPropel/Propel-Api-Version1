@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHrmResourcesTable extends Migration
+class CreateOrganizationStructuresTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,14 @@ class CreateHrmResourcesTable extends Migration
      */
     public function up()
     {
-        Schema::create('hrm_resources', function (Blueprint $table) {
+        Schema::create('organization_structures', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('u_id');
-            $table->string('employee_code');
             $table->integer('org_id');
+            $table->integer('pims_org_structure_id');
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 
@@ -29,6 +31,6 @@ class CreateHrmResourcesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hrm_resources');
+        Schema::dropIfExists('organization_structures');
     }
 }

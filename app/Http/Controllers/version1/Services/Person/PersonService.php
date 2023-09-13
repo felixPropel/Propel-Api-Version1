@@ -20,12 +20,12 @@ use App\Models\PersonProfession;
 use App\Models\PersonProfilePic;
 use App\Models\PropertyAddress;
 use App\Models\TempEmail;
-use App\Models\TempMobile;
 use App\Models\TempPerson;
 use App\Models\WebLink;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class PersonService
@@ -48,8 +48,10 @@ class PersonService
         Log::info('PersonService > findMobileNumber function Return.' . json_encode($model));
         if ($model) {
             $userName = $model->personDetails->first_name;
+
             $userUid = $model->personDetails->uid;
-            $userSatge = $model->existUser->stage;
+            $userSatge = $model->existUser->pfm_stage_id;
+
             $result = ['type' => 1, 'stage' => $userSatge, 'userName' => $userName, 'userUid' => $userUid, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
         } else {
             $result = ['type' => 2, 'mobileNumber' => $datas->mobileNumber, 'status' => "checkingPerson"];
@@ -60,7 +62,7 @@ class PersonService
     {
         Log::info('PersonService > findCredential function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $checkPersonMobile = $this->personInterface->checkPersonByMobile($datas->mobileNumber);
+        $checkPersonMobile = $this->personInterface->checkPersonByMobileNo($datas->mobileNumber);
         if (!empty($checkPersonMobile)) {
             $checkPersonEmail = $this->personInterface->checkPersonEmailByUid($datas->email, $checkPersonMobile->uid);
         }
@@ -193,6 +195,10 @@ class PersonService
             return $personData;
         } else {
             if ($personData['message'] == "Success") {
+                if (!$datas->personUid) {
+                    $uid = $personData['data']->uid->toString();
+                    $createTableBasedUid = $this->createPersonTableByUid($uid);
+                }
                 return $this->commonService->sendResponse($personData['data'], $personData['message']);
             } else {
                 return $this->commonService->sendError($personData['data'], $personData['message']);
@@ -236,8 +242,8 @@ class PersonService
             $model = new PersonProfilePic();
             $model->uid = $datas->personUid;
             $model->profile_pic = $uniqueFilename;
-            $model->status = 1;
-            $model->profile_cachet = 1;
+            $model->pfm_active_status_id = 1;
+            $model->profile_cachet_id = 1;
             return $model;
         }
     }
@@ -313,9 +319,9 @@ class PersonService
             $model = new Person();
             $model->uid = Str::uuid();
         }
-        $model->stage = 1;
-        $model->origin = 1;
-        $model->existence = 1;
+        $model->pfm_stage_id = 1;
+        $model->pfm_origin_id = 1;
+        $model->pfm_existence_id = 1;
         Log::info('PersonService > personUid .' . json_encode($model));
         return $model;
     }
@@ -393,7 +399,7 @@ class PersonService
         } else {
             $model = new PersonDetails();
         }
-        $model->salutation_id = $datas->salutationId;
+        $model->pims_person_salutation_id = $datas->salutationId;
         $model->first_name = $datas->firstName;
         $model->middle_name = isset($datas->middleName) ? $datas->middleName : '';
         $model->last_name = isset($datas->lastName) ? $datas->lastName : '';
@@ -401,9 +407,10 @@ class PersonService
         // $date = Carbon::createFromFormat('d-m-Y', $datas->dob)->format('Y-m-d');
         $model->dob = '2000-08-18';
         $model->birth_place = isset($datas->birthCity) ? $datas->birthCity : '';
-        $model->marital_id = isset($datas->maritalStatus) ? $datas->maritalStatus : null;
-        $model->gender_id = isset($datas->genderId) ? $datas->genderId : '';
-        $model->blood_group_id = isset($datas->bloodGroup) ? $datas->bloodGroup : '';
+        $model->pims_person_marital_status_id = isset($datas->maritalStatus) ? $datas->maritalStatus : null;
+        $model->pims_person_gender_id = isset($datas->genderId) ? $datas->genderId : '';
+        $model->pims_person_blood_group_id = isset($datas->bloodGroup) ? $datas->bloodGroup : '';
+        $model->pfm_survial_id = 1;
 
         Log::info('PersonService > convertToPersonDetailModel function Return.' . json_encode($model));
 
@@ -415,11 +422,11 @@ class PersonService
         if ($datas->personUid) {
             $model = $this->personInterface->getMobileNumberByUid($datas->personUid, $datas->mobileNumber);
             $model->mobile_no = $datas->mobileNumber;
-            $model->mobile_cachet = 1;
+            $model->mobile_cachet_id = 1;
         } else {
             $model = new PersonMobile();
             $model->mobile_no = $datas->mobileNumber;
-            $model->mobile_cachet = 1;
+            $model->mobile_cachet_id = 1;
         }
 
         Log::info('PersonService > convertToPersonMobileModel function Return.' . json_encode($model));
@@ -431,11 +438,11 @@ class PersonService
         if ($datas->personUid) {
             $model = $this->personInterface->getPersonEmailByUid($datas->personUid);
             $model->email = $datas->email;
-            $model->email_cachet = 1;
+            $model->email_cachet_id = 1;
         } else {
             $model = new PersonEmail();
             $model->email = $datas->email;
-            $model->email_cachet = 1;
+            $model->email_cachet_id = 1;
         }
 
         Log::info('PersonService > convertToPersonEmailModel function Return.' . json_encode($model));
@@ -451,12 +458,12 @@ class PersonService
             if ($checkEmail) {
                 $checkEmail->uid = $datas->personUid;
                 $checkEmail->email = $datas->secondEmail[$i];
-                $checkEmail->email_cachet = 2;
+                $checkEmail->email_cachet_id = 2;
                 $checkEmail->save();
             } else {
                 $model[$i] = new PersonEmail();
                 $model[$i]->email = $datas->secondEmail[$i];
-                $model[$i]->email_cachet = 2;
+                $model[$i]->email_cachet_id = 2;
                 array_push($orgModel, $model[$i]);
             }
         }
@@ -472,12 +479,12 @@ class PersonService
             if ($checkMobile) {
                 $checkMobile->uid = $datas->personUid;
                 $checkMobile->mobile_no = $datas->secondNumber[$i];
-                $checkMobile->mobile_cachet = 2;
+                $checkMobile->mobile_cachet_id = 2;
                 $checkMobile->save();
             } else {
                 $model[$i] = new PersonMobile();
                 $model[$i]->mobile_no = $datas->secondNumber[$i];
-                $model[$i]->mobile_cachet = 2;
+                $model[$i]->mobile_cachet_id = 2;
                 array_push($orgModel, $model[$i]);
             }
         }
@@ -493,8 +500,8 @@ class PersonService
             if ($link[$i]) {
                 $model[$i] = new WebLink();
                 $model[$i]->web_add = $link[$i];
-                $model[$i]->web_cachet = 1;
-                $model[$i]->status = 1;
+                $model[$i]->web_cachet_id = 1;
+                $model[$i]->pfm_active_status_id = 1;
                 array_push($orgModel, $model[$i]);
             }
         }
@@ -517,9 +524,9 @@ class PersonService
             for ($i = 0; $i < count($datas->otherLanguage); $i++) {
                 if ($datas->otherLanguage[$i]) {
                     $result[$i] = new PersonLanguage();
-                    $result[$i]->language_id = $datas->otherLanguage[$i];
-                    $result[$i]->mother_tongue = $datas->motherLanguage;
-                    $result[$i]->status = 1;
+                    $result[$i]->pims_com_language_id = $datas->otherLanguage[$i];
+                    $result[$i]->is_mother_tongue = $datas->motherLanguage;
+                    $result[$i]->pfm_active_status_id = 1;
                     array_push($orgModel, $result[$i]);
                 }
             }
@@ -537,8 +544,8 @@ class PersonService
             for ($i = 0; $i < count($language); $i++) {
                 if ($language[$i]) {
                     $result[$i] = new PersonLanguage();
-                    $result[$i]->mother_tongue = $language[$i];
-                    $result[$i]->status = 1;
+                    $result[$i]->is_mother_tongue = $language[$i];
+                    $result[$i]->pfm_active_status_id = 1;
                     array_push($orgModel, $result[$i]);
                 }
             }
@@ -553,11 +560,11 @@ class PersonService
         for ($i = 0; $i < count($datas->idDocumentType); $i++) {
             if ($datas->idDocumentType[$i]) {
                 $model[$i] = new IdDocumentType();
-                $model[$i]->person_doc_types = $datas->idDocumentType[$i];
+                $model[$i]->pims_person_doc_type_id = $datas->idDocumentType[$i];
                 $model[$i]->Doc_no = $datas->documentNumber[$i];
                 $model[$i]->doc_validity = $datas->validTill[$i];
                 $model[$i]->attachment = $datas->attachments[$i];
-                $model[$i]->status = 1;
+                $model[$i]->pfm_active_status_id = 1;
                 array_push($orgModel, $model[$i]);
             }
         }
@@ -571,8 +578,7 @@ class PersonService
         for ($i = 0; $i < count($datas->Qualification); $i++) {
             if ($datas->Qualification[$i]) {
                 $model[$i] = new PersonEducation();
-                $model[$i]->qualification = $datas->Qualification[$i];
-                $model[$i]->education_place = $datas->university[$i];
+                $model[$i]->pims_person_qualification_id = $datas->Qualification[$i];
                 $model[$i]->year_of_pass = $datas->passedYear[$i];
                 $model[$i]->Mark = $datas->mark[$i];
                 array_push($orgModel, $model[$i]);
@@ -588,9 +594,9 @@ class PersonService
         for ($i = 0; $i < count($datas->ProfessionDepartment); $i++) {
             if ($datas->ProfessionDepartment[$i]) {
                 $model[$i] = new PersonProfession();
-                $model[$i]->department = $datas->ProfessionDepartment[$i];
-                $model[$i]->designation = $datas->Designation[$i];
-                $model[$i]->organization = $datas->organization[$i];
+                $model[$i]->department_id = $datas->ProfessionDepartment[$i];
+                $model[$i]->designation_id = $datas->Designation[$i];
+                $model[$i]->org_id = $datas->organization[$i];
                 // $model[$i]->doj=$datas->joinDate[$i];
                 //  $model[$i]->dor=$datas->reliveDate[$i];
                 $model[$i]->experience = $datas->experinceYear[$i];
@@ -607,17 +613,17 @@ class PersonService
         for ($i = 0; $i < count($datas->addressOf); $i++) {
             if ($datas->addressOf[$i]) {
                 $model[$i] = new PropertyAddress();
-                $model[$i]->address_type = $datas->addressOf[$i];
+                $model[$i]->pims_com_address_type_id = $datas->addressOf[$i];
                 $model[$i]->door_no = $datas->doorNo[$i];
                 $model[$i]->building_name = $datas->buildingName[$i];
                 $model[$i]->pin = $datas->pinCode[$i];
                 $model[$i]->area = $datas->area[$i];
                 $model[$i]->street = $datas->street[$i];
                 $model[$i]->land_mark = $datas->landMark[$i];
-                $model[$i]->district = $datas->district[$i];
-                $model[$i]->city_id = $datas->city[$i];
-                $model[$i]->state_id = $datas->state[$i];
-                $model[$i]->status = 1;
+                $model[$i]->pims_com_district_id = $datas->district[$i];
+                $model[$i]->pims_com_city_id = $datas->city[$i];
+                $model[$i]->pims_com_state_id = $datas->state[$i];
+                $model[$i]->pfm_active_status_id = 1;
                 array_push($orgModel, $model[$i]);
             }
         }
@@ -631,7 +637,7 @@ class PersonService
         for ($i = 0; $i < count($datas->addressOf); $i++) {
             $model[$i] = new PersonAddress();
             // $model[$i]->uid = $datas->personUid;
-            $model[$i]->address_cachet = 1;
+            $model[$i]->address_cachet_id = 1;
             array_push($orgModel, $model[$i]);
         }
         return $orgModel;
@@ -671,25 +677,7 @@ class PersonService
             return $model;
         }
     }
-    public function otpValidationForMobile($datas, $type = null)
-    {
-        Log::info('PersonService > otpValidationForMobile function Inside.' . json_encode($datas));
-        $datas = (object) $datas;
-        $model = $this->personInterface->getOtpByUid($datas->uid, $datas->mobile_no);
-        Log::info('PersonService > otpValidationForMobile  getOtpByUid function Return.' . json_encode($model));
-        if ($datas->otp == $model->otp_received) {
-            if ($type) {
-                $status = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['mobile_cachet' => 2, 'mobile_validation' => 1, 'validation_updated_on' => Carbon::now()]);
-                $result = ['personData' => $datas, 'status' => 'OtpValidateSuccess', 'type' => 1];
-            } else {
-                $result = ['personData' => $datas, 'status' => 'OtpValidateSuccess', 'type' => 1];
-            }
-
-        } else {
-            $result = ['personData' => "", 'status' => 'OtpValidatefailed', 'type' => 0];
-        }
-        return $result;
-    }
+   
     public function personDatas($datas)
     {
         Log::info('PersonService > personDatas function Inside.' . json_encode($datas));
@@ -701,6 +689,7 @@ class PersonService
     }
     public function personUpdate($datas)
     {
+
         Log::info('PersonService > personUpdate function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $personData = $this->personInterface->getPersonDatasByUid($datas->uid);
@@ -810,10 +799,7 @@ class PersonService
     {
         Log::info('PersonService > userProfileDatas function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $userProfiles = $this->personInterface->getAllDatasInUser($datas->uid);
-        $users = $userProfiles;
-
-        //   $entities = collect($userProfiles)->map(function ($users) {
+        $users = $this->personInterface->getAllDatasInUser($datas->uid);
         $personDetails = $users['personDetails'];
         $primaryMobile = $users['mobile'];
         $primaryEmail = $users['email'];
@@ -826,9 +812,6 @@ class PersonService
 
         $data = ['userDeatils' => $personDetails, 'primaryMobile' => $primaryMobile, 'primaryEmail' => $primaryEmail, 'profilePic' => $profilePic, 'userGender' => $personGender, 'userBloodGroup' => $personbloodGroup, 'primaryAddress' => $primaryAddress, 'UserEducation' => $personEducation, 'userProfession' => $personProfession];
 
-        //  return $data;
-        // });
-
         return $this->commonService->sendResponse($data, '');
     }
     public function sendingOtp()
@@ -836,26 +819,35 @@ class PersonService
         $otp = random_int(1000, 9999);
         return $otp;
     }
-    public function addOtherMobileNumber($datas)
+    public function addSecondaryMobile($datas)
     {
 
         $datas = (object) $datas;
-        Log::info('PersonService > addOtherMobileNumber function Inside.' . json_encode($datas->mobileNo));
-        $checkPrimaryMobile = $this->personInterface->checkPersonByMobile($datas->mobileNo);
+        Log::info('PersonService > addSecondaryMobile function Inside.' . json_encode($datas->mobileNo));
+        $checkPrimaryMobile = $this->personInterface->checkPersonByMobileNo($datas->mobileNo);
+
         $checkMobile = $this->personInterface->checkSecondaryMobileNumberByUid($datas->mobileNo, $datas->personUid);
-        if ($checkPrimaryMobile) {
-            $result = ['users' => 'This Number Is Already Exists in Other User ', 'type' => 0];
-        } else if ($checkMobile) {
-            $result = ['users' => 'This Number Is Already Exists in yours ', 'type' => 2];
+        if (empty($checkPrimaryMobile) && empty($checkMobile)) {
+            $convertMobileNo = $this->convertSecondaryMobileNo($datas->mobileNo, $datas->personUid);
+            $result = $this->personInterface->addSecondaryMobileNoForUser($convertMobileNo);
+
         } else {
-            $model = new TempMobile;
-            $model->mobile_no = $datas->mobileNo;
-            $model->otp_received = $this->sendingOtp();
-            $model->stage = 1;
-            $result = $this->personInterface->storeTempMobileNumber($model);
-            $result['type'] = 1;
+
+            $result = $checkPrimaryMobile
+            ? ['users' => 'This Number Is Already Exists in yours', 'type' => 2]
+            : ['users' => 'This Number Is Already Exists in Other User', 'type' => 1];
+
         }
         return $result;
+    }
+    public function convertSecondaryMobileNo($mobile, $uid)
+    {
+        $model = new PersonMobile();
+        $model->uid = $uid;
+        $model->mobile_no = $mobile;
+        $model->otp_received = $this->sendingOtp();
+        $model->mobile_cachet_id = 2;
+        return $model;
     }
     public function resendOtpForMobile($datas)
     {
@@ -872,14 +864,9 @@ class PersonService
     public function deleteForMobileNumberByUid($datas)
     {
         $datas = (object) $datas;
+        Log::info('PersonService > deleteForMobileNumberByUid function Inside.' . json_encode($datas));
         $model = $this->personInterface->getMobileNumberByUid($datas->uid, $datas->mobile_no);
-        if ($model) {
-            $mobile = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['mobile_cachet' => 3, 'deleted_at' => Carbon::now()]);
-            $data = ['Message' => ' MobileNumber is Deleted '];
-        } else {
-            $data = ['Message' => 'MobileNumber Not Found'];
-        }
-        return $this->commonService->sendResponse($data, '');
+        return $this->commonService->sendResponse($model, '');
     }
     public function addOtherEmail($datas)
     {
@@ -918,30 +905,27 @@ class PersonService
         $datas = (object) $datas;
         $model = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->uid);
         if ($model) {
-            $mobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_cachet' => 3, 'deleted_at' => Carbon::now()]);
+            $mobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_cachet_id' => 3, 'deleted_at' => Carbon::now()]);
             $data = ['Message' => ' Email is Deleted '];
         } else {
             $data = ['Message' => 'Email Not Found'];
         }
         return $this->commonService->sendResponse($data, '');
     }
-    public function mobileNumberChangeAsPrimary($datas)
+    public function makeAsPrimaryMobileOtpValidate($datas)
     {
+
+        $otpValidate = $this->OtpValidateSecondaryMobileNo($datas);
         $datas = (object) $datas;
-        $otpValidation = $this->otpValidationForMobile($datas, $type = 'SecondMobileNumber');
-        if ($otpValidation['type'] == 1) {
-            $perviousMobile = $this->personInterface->getPerviousPrimaryMobileNumber($datas->uid);
-            if ($perviousMobile) {
-                $updateMobile = PersonMobile::where(['uid' => $datas->uid, 'mobile_no' => $datas->mobile_no])->update(['mobile_cachet' => 1, 'mobileno_updated_on' => Carbon::now(), 'validation_updated_on' => Carbon::now()]);
-                $message = ['status' => 'primary changed Successfully', 'type' => 1];
-            } else {
-                $message = ['status' => 'primary Not in Tables', 'type' => 0];
-            }
-            $result = $message;
+        if ($otpValidate == 1) {
+            $perviousMobileNo = $this->personInterface->getPerviousPrimaryMobileNo($datas->personUid);
+            $setprimaryMobileNo = $this->personInterface->setPirmaryMobileNo($datas);
+            $message = ['status' => 'primary changed Successfully', 'type' => 1];
         } else {
-            $result = ['message' => 'OTP Validation Failed ', 'type' => 0];
+            $message = ['status' => 'OTP Validation Failed ', 'type' => 2];
         }
-        return $this->commonService->sendResponse($result, '');
+
+        return $this->commonService->sendResponse($message, '');
     }
     public function emailChangeAsPrimary($datas)
     {
@@ -950,7 +934,7 @@ class PersonService
         if ($otpValidation['type'] == 1) {
             $perviousMobile = $this->personInterface->getPerviousPrimaryEmail($datas->uid);
             if ($perviousMobile) {
-                $updateMobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_cachet' => 1, 'email_updated_on' => Carbon::now(), 'email_validation_updated_on' => Carbon::now()]);
+                $updateMobile = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_cachet_id' => 1, 'email_updated_on' => Carbon::now(), 'email_validation_updated_on' => Carbon::now()]);
                 $message = ['status' => 'primary Changed Successfully', 'type' => 1];
             } else {
                 $message = ['status' => 'primary Not in Tables', 'type' => 0];
@@ -961,32 +945,19 @@ class PersonService
         }
         return $this->commonService->sendResponse($result, '');
     }
-    public function resendOtpForTempMobileNo($datas)
+    public function resendOtpForSecondaryMobile($datas)
     {
         $datas = (object) $datas;
-        $tempMobile = $this->personInterface->getMobileOtpByTempId($datas->mobileTempId, $datas->number);
-        if ($tempMobile) {
-            $model = TempMobile::where(['id' => $datas->mobileTempId, 'mobile_no' => $datas->number])->update(['otp_received' => $this->sendingOtp()]);
-        }
-        return $this->commonService->sendResponse($model, '');
+        $otp = $this->sendingOtp();
+        $resendOtpSecondaryMobile = $this->personInterface->resendOtpForSecondaryMobileNo($datas->uid, $datas->number, $otp);
+        return $this->commonService->sendResponse($resendOtpSecondaryMobile, '');
     }
-    public function OtpValidationForTempMobile($datas)
+    public function OtpValidateSecondaryMobileNo($datas)
     {
         $datas = (object) $datas;
-        $tempMobile = $this->personInterface->getMobileOtpByTempId($datas->mobileTempId, $datas->number);
-        if ($tempMobile->otp_received == $datas->otp) {
-            $removeTempMobile = $this->personInterface->removeTempMobileById($datas->mobileTempId);
-            if ($removeTempMobile) {
-                $model = new PersonMobile;
-                $model->uid = $datas->personUid;
-                $model->mobile_no = $tempMobile->mobile_no;
-                $model->mobile_cachet = 2;
-                $model->mobile_validation = 1;
-                $model->validation_updated_on = Carbon::now();
-                $result = $this->personInterface->addedOtherMobileNoInPerson($model);
-            } else {
-                $result = ['message' => 'Failed', 'status' => 'TempMobile Data is Found'];
-            }
+        $checkMobile = $this->personInterface->getSecondaryMobileNoByUid($datas->mobileNo, $datas->personUid);
+        if ($checkMobile->otp_received == $datas->otp) {
+            $result = $this->personInterface->secondaryMobileNoValidationId($checkMobile->uid, $checkMobile->mobile_no);
         } else {
             $result = ['message' => 'Failed', 'status' => 'OTP validation Failed'];
         }
@@ -1002,7 +973,7 @@ class PersonService
                 $model = new PersonEmail;
                 $model->uid = $datas->personUid;
                 $model->email = $tempEmail->email;
-                $model->email_cachet = 2;
+                $model->email_cachet_id = 2;
                 $model->email_validation_status = 1;
                 $model->email_validation_updated_on = Carbon::now();
                 $result = $this->personInterface->addedEmailInPerson($model);
@@ -1022,5 +993,19 @@ class PersonService
             $model = TempEmail::where(['id' => $datas->emailTempId, 'email' => $datas->email])->update(['otp_received' => $this->sendingOtp()]);
         }
         return $this->commonService->sendResponse($model, '');
+    }
+    public function createPersonTableByUid($uid)
+    {
+        if ($uid) {
+            Schema::create($uid, function ($table) {
+                $table->id();
+                $table->string('org_id');
+                $table->integer('pfm_active_status_id')->nullable();
+                $table->integer('deleted_flag')->nullable();
+                $table->timestamps();
+                $table->timestamp('deleted_at')->nullable();
+            });
+        }
+
     }
 }
