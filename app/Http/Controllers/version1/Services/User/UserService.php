@@ -157,7 +157,7 @@ class UserService
         $model->primary_email = $email;
         $model->primary_mobile = $mobile;
         $model->password = Hash::make($datas->password);
-        $model->stage = 1;
+        $model->pfm_stage_id = 1;
         Log::info('UserService > UserCreate function Return.' . json_encode($model));
         return $model;
     }

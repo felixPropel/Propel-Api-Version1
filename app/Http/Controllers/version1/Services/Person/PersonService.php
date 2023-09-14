@@ -89,14 +89,14 @@ class PersonService
         if ($storeTempPerson['message'] == "Success") {
 
             $responseModel = $storeTempPerson['data'];
-            if ($responseModel->stage == 1) {
+            if ($responseModel->pfm_stage_id == 1) {
                 $salutationModel = $this->commonService->getSalutation();
                 $responseData = ['tempModel' => $storeTempPerson['data'], 'salutationModel' => $salutationModel];
-            } else if ($responseModel->stage == 2) {
+            } else if ($responseModel->pfm_stage_id == 2) {
                 $gender = $this->commonService->getAllGender();
                 $bloodGroup = $this->commonService->getAllBloodGroup();
                 $responseData = ['tempModel' => $responseModel, 'gender' => $gender, 'bloodGroup' => $bloodGroup];
-            } elseif ($responseModel->stage == 3) {
+            } elseif ($responseModel->pfm_stage_id == 3) {
                 $temp = ['tempId' => $tempId];
                 $storeTempPerson1 = $this->resendOtp($temp);
                 log::info('personservice > ' . json_encode($storeTempPerson1));
@@ -359,7 +359,7 @@ class PersonService
         $stage = isset($datas->stage) ? $datas->stage : "";
         if ($stage) {
             log::info('personService > stage' . json_encode($datas->stage));
-            $model->stage = $stage;
+            $model->pfm_stage_id = $stage;
         }
 
         if ($firstName) {
