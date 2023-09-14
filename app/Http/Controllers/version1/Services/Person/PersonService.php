@@ -706,7 +706,7 @@ class PersonService
         Log::info('PersonService > updatePerson function Inside.' . json_encode($personData));
         if ($datas->uid) {
             $personData->uid = $datas->uid;
-            $personData->salutation_id = $datas->salutation;
+            $personData->pims_person_salutation_id = $datas->salutation;
             $personData->first_name = $datas->firstName;
             $personData->middle_name = $datas->middleName;
             $personData->last_name = $datas->lastName;
@@ -731,8 +731,8 @@ class PersonService
         Log::info('PersonService > convertPerson function Inside.' . json_encode($person));
         $person->uid = $datas->uid;
         $person->dob = $datas->dob;
-        $person->gender_id = $datas->gender;
-        $person->blood_group_id = $datas->bloodGroup;
+        $person->pims_person_gender_id = $datas->gender;
+        $person->pims_person_blood_group_id = $datas->bloodGroup;
         Log::info('PersonService > convertPerson function Return.' . json_encode($person));
         return $person;
     }
@@ -760,11 +760,11 @@ class PersonService
         $model = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->uid);
         Log::info('PersonService > emailOtpValidation function Return.' . json_encode($model));
         if ($model->otp_received == $datas->otp) {
-            $email = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_validation_status' => 1, 'email_validation_updated_on' => Carbon::now()]);
+            $email = PersonEmail::where(['uid' => $datas->uid, 'email' => $datas->email])->update(['email_validation_id' => 1, 'validation_updated_on' => Carbon::now()]);
             $setSatge = $this->personInterface->setStageInUser($uid);
             $result = ['status' => 'Otp Verified', 'type' => 1, 'uid' => $uid];
         } else {
-            $result = ['status' => 'Otp Verified Failed', 'type' => 0, 'uid' => $uid];
+            $result = ['status' => 'Otp Verified Failed', 'type' => 2, 'uid' => $uid];
         }
         return $result;
     }
@@ -924,6 +924,7 @@ class PersonService
 
         return $this->commonService->sendResponse($message, '');
     }
+    
     public function makeAsPrimaryEmailOtpValidate($datas)
     {
         $otpValidate = $this->OtpValidateForSecondaryEmail($datas);
@@ -950,6 +951,18 @@ class PersonService
     {
         $datas = (object) $datas;
         $checkMobile = $this->personInterface->getSecondaryMobileNoByUid($datas->mobileNo, $datas->personUid);
+        if ($checkMobile->otp_received == $datas->otp) {
+            $result = $this->personInterface->secondaryMobileNoValidationId($checkMobile->uid, $checkMobile->mobile_no);
+        } else {
+            $result = ['message' => 'Failed', 'status' => 'OTP validation Failed'];
+        }
+        return $result;
+    }
+    public function otpValidationForMobile($datas)
+    {
+      
+        $datas = (object) $datas;
+        $checkMobile = $this->personInterface->getMobileNoByUid($datas->mobileNo, $datas->personUid);
         if ($checkMobile->otp_received == $datas->otp) {
             $result = $this->personInterface->secondaryMobileNoValidationId($checkMobile->uid, $checkMobile->mobile_no);
         } else {

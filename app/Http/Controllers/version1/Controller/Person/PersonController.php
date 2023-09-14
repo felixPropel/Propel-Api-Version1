@@ -253,6 +253,13 @@ public function OtpValidateSecondaryMobileNo(Request $request)
     Log::info('PersonController > OtpValidateSecondaryMobileNo function Return.' .json_encode($response));
     return  $response;
 }
+public function otpValidationForMobile(Request $request)
+{
+    Log::info('PersonController > otpValidationForMobile function Inside.' . json_encode($request->all()));
+    $response=$this->personService->otpValidationForMobile($request->all());
+    Log::info('PersonController > otpValidationForMobile function Return.' .json_encode($response));
+    return  $response;
+}
 public function resendOtpForSecondaryEmail(Request $request)
 {
     Log::info('PersonController > resendOtpForSecondaryEmail function Inside.' . json_encode($request->all()));

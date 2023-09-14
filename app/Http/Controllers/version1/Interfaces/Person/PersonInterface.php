@@ -59,6 +59,7 @@ interface PersonInterface
    public function getPersonMobileNoByUid($uid,$mobile);
    public function getPerviousPrimaryEmail($uid);
    public function deletedPersonEmailByUid($email,$uid);
+   public function getMobileNoByUid($mobile,$uid);
 
 
 }

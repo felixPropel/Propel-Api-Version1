@@ -39,5 +39,6 @@ Route::post('resendOtpForSecondaryMobile', 'App\Http\Controllers\version1\Contro
 Route::post('OtpValidateSecondaryMobileNo', 'App\Http\Controllers\version1\Controller\Person\PersonController@OtpValidateSecondaryMobileNo')->name('OtpValidateSecondaryMobileNo');
 Route::post('resendOtpForSecondaryEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@resendOtpForSecondaryEmail')->name('resendOtpForSecondaryEmail');
 Route::post('OtpValidateForSecondaryEmail', 'App\Http\Controllers\version1\Controller\Person\PersonController@OtpValidateForSecondaryEmail')->name('OtpValidateForSecondaryEmail');
+Route::post('otpValidationForMobile', 'App\Http\Controllers\version1\Controller\Person\PersonController@otpValidationForMobile')->name('otpValidationForMobile');
 
 //user Profile End

@@ -413,7 +413,11 @@ class PersonRepository implements PersonInterface
     }
     public function getSecondaryMobileNoByUid($mobile,$uid)
     {
-        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->whereNotIn('email_cachet_id', [1, 3])->first();
+        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->whereNotIn('mobile_cachet_id', [1, 3])->first();
+    }
+    public function getMobileNoByUid($mobile,$uid)
+    {
+        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile,'mobile_cachet_id'=>1])->first();
     }
     public function getSecondaryEmailByUid($email,$uid)
     {
@@ -516,7 +520,7 @@ class PersonRepository implements PersonInterface
     }
     public function setStageInUser($uid)
     {
-        return User::where('uid', $uid)->update(['stage' => 2]);
+        return User::where('uid', $uid)->update(['pfm_stage_id' => 2]);
     }
     public function resendOtpForSecondaryMobileNo($uid,$mobile,$otp)
     {
