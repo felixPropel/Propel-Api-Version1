@@ -125,6 +125,7 @@ public function emailOtpValidation(Request $request)
     Log::info('PersonController > emailOtpValidation function Return.' . json_encode($response));
     return  $response;
 }
+
 public function changePassword(Request $request)
 {
     Log::info('PersonController > changePassword function Inside.' . json_encode($request->all()));
@@ -202,11 +203,11 @@ public function deleteForMobileNumberByUid(Request $request)
     Log::info('PersonController > deleteForMobileNumberByUid function Return.' .json_encode($response));
     return  $response;
 }
-public function addOtherEmail(Request $request)
+public function addSecondaryEmail(Request $request)
 {
-    Log::info('PersonController > addOtherEmail function Inside.' . json_encode($request->all()));
-    $response=$this->personService->addOtherEmail($request->all());
-    Log::info('PersonController > addOtherEmail function Return.' .json_encode($response));
+    Log::info('PersonController > addSecondaryEmail function Inside.' . json_encode($request->all()));
+    $response=$this->personService->addSecondaryEmail($request->all());
+    Log::info('PersonController > addSecondaryEmail function Return.' .json_encode($response));
     return  $response;
 }
 public function resendOtpForEmail(Request $request)
@@ -231,11 +232,11 @@ public function makeAsPrimaryMobileOtpValidate(Request $request)
     return  $response;
 }
 
-public function emailChangeAsPrimary(Request $request)
+public function makeAsPrimaryEmailOtpValidate(Request $request)
 {
-    Log::info('PersonController > emailChangeAsPrimary function Inside.' . json_encode($request->all()));
-    $response=$this->personService->emailChangeAsPrimary($request->all());
-    Log::info('PersonController > emailChangeAsPrimary function Return.' .json_encode($response));
+    Log::info('PersonController > makeAsPrimaryEmailOtpValidate function Inside.' . json_encode($request->all()));
+    $response=$this->personService->makeAsPrimaryEmailOtpValidate($request->all());
+    Log::info('PersonController > makeAsPrimaryEmailOtpValidate function Return.' .json_encode($response));
     return  $response;
 }
 public function resendOtpForSecondaryMobile(Request $request)
@@ -252,18 +253,18 @@ public function OtpValidateSecondaryMobileNo(Request $request)
     Log::info('PersonController > OtpValidateSecondaryMobileNo function Return.' .json_encode($response));
     return  $response;
 }
-public function resendOtpForTempEmail(Request $request)
+public function resendOtpForSecondaryEmail(Request $request)
 {
-    Log::info('PersonController > resendOtpForTempEmail function Inside.' . json_encode($request->all()));
-    $response=$this->personService->resendOtpForTempEmail($request->all());
-    Log::info('PersonController > resendOtpForTempEmail function Return.' .json_encode($response));
+    Log::info('PersonController > resendOtpForSecondaryEmail function Inside.' . json_encode($request->all()));
+    $response=$this->personService->resendOtpForSecondaryEmail($request->all());
+    Log::info('PersonController > resendOtpForSecondaryEmail function Return.' .json_encode($response));
     return  $response;
 }
-public function OtpValidationForTempEmail(Request $request)
+public function OtpValidateForSecondaryEmail(Request $request)
 {
-    Log::info('PersonController > OtpValidationForTempEmail function Inside.' . json_encode($request->all()));
-    $response=$this->personService->OtpValidationForTempEmail($request->all());
-    Log::info('PersonController > OtpValidationForTempEmail function Return.' .json_encode($response));
+    Log::info('PersonController > OtpValidateForSecondaryEmail function Inside.' . json_encode($request->all()));
+    $response=$this->personService->OtpValidateForSecondaryEmail($request->all());
+    Log::info('PersonController > OtpValidateForSecondaryEmail function Return.' .json_encode($response));
     return  $response;
 }
     /**

@@ -199,7 +199,16 @@ class PersonRepository implements PersonInterface
         return $data;
         
     }
-
+    public function deletedPersonEmailByUid($email, $uid)
+    {
+        $model = PersonEmail::where(['uid' => $uid, 'email' => $email])->update(['email_cachet_id' => 3, 'deleted_at' => Carbon::now()]);
+        $data = ($model)
+            ? ['Message' => 'Email is Deleted']
+            : ['Message' => 'Email Not Found'];
+        
+        return $data;
+        
+    }
     public function getPersonPrimaryDataByUid($uid)
     {
 
@@ -359,14 +368,10 @@ class PersonRepository implements PersonInterface
     }
     public function getPerviousPrimaryEmail($uid)
     {
-        $model = PersonEmail::where(['uid' => $uid, ['email_cachet_id', '=', '1']])->first();
-        if ($model) {
-            $model->email_cachet_id = 2;
-            $model->save();
-        } else {
-            $model = null;
-        }
-        return $model;
+        return PersonEmail::updateOrInsert(
+            ['uid' => $uid, 'email_cachet_id' => 1],
+            ['email_cachet_id' => 2]
+        );
     }
     public function addSecondaryMobileNoForUser($model)
     {
@@ -387,13 +392,44 @@ class PersonRepository implements PersonInterface
             ];
         }
     }
+    public function addSecondaryEmailForUser($model)
+    {
+        try {
+            $result = DB::transaction(function () use ($model) {
+
+                $model->save();
+                return [
+                    'message' => "Success",
+                    'data' => $model,
+                ];
+            });
+            return $result;
+        } catch (\Exception $e) {
+            return [
+                'message' => "Failed",
+                'data' => $e,
+            ];
+        }
+    }
     public function getSecondaryMobileNoByUid($mobile,$uid)
     {
-        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->where('mobile_cachet_id', '<>', 1)->first();
+        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->whereNotIn('email_cachet_id', [1, 3])->first();
     }
+    public function getSecondaryEmailByUid($email,$uid)
+    {
+        return PersonEmail::where('uid', $uid)
+        ->where('email', $email)
+        ->whereNotIn('email_cachet_id', [1, 3])
+        ->first();
+        }
     public function secondaryMobileNoValidationId($uid,$mobile)
     {
         return   PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->update(['mobile_validation_id' => 1,'validation_updated_on'=>Carbon::now()]);
+    }
+
+    public function secondaryEmailValidationId($uid,$email)
+    {
+        return   PersonEmail::where(['uid' => $uid, 'email' => $email])->update(['email_validation_id' => 1,'validation_updated_on'=>Carbon::now()]);
     }
     public function removeTempEmailById($id)
     {
@@ -419,9 +455,9 @@ class PersonRepository implements PersonInterface
             ];
         }
     }
-    public function getEmailOtpByTempId($id, $email)
+    public function resendOtpForSecondaryEmail($uid, $email,$otp)
     {
-        return TempEmail::where(['id' => $id, 'email' => $email])->first();
+        return   PersonEmail::where(['uid' => $uid, 'email' => $email])->update(['otp_received' =>$otp]);
     }
     public function addedEmailInPerson($model)
     {
@@ -489,6 +525,11 @@ class PersonRepository implements PersonInterface
     public function setPirmaryMobileNo($model)
     {
         return   PersonMobile::where(['uid' => $model->personUid, 'mobile_no' => $model->mobileNo])->update(['mobile_cachet_id' => 1, 'mobileno_updated_on' => Carbon::now(), 'validation_updated_on' => Carbon::now(),'mobile_validation_id' =>1]);
+
+    }
+    public function setPirmaryEmail($model)
+    {
+        return   PersonEmail::where(['uid' => $model->personUid, 'email' => $model->email])->update(['email_cachet_id' => 1, 'email_updated_on' => Carbon::now(), 'validation_updated_on' => Carbon::now(),'email_validation_id' =>1]);
 
     }
     public function getPersonMobileNoByUid($uid,$mobile)

@@ -36,10 +36,13 @@ interface PersonInterface
    public function checkPersonByEmail($email);
    public function getPerviousPrimaryMobileNo($uid);
    public function addSecondaryMobileNoForUser($model);
+   public function addSecondaryEmailForUser($model);
    public function getSecondaryMobileNoByUid($mobile,$uid);
+   public function getSecondaryEmailByUid($email,$uid);
    public function secondaryMobileNoValidationId($id,$mobile);
+   public function secondaryEmailValidationId($id,$email);
    public function storeTempEmail($model);
-   public function getEmailOtpByTempId($id,$email);
+   public function resendOtpForSecondaryEmail($uid,$email,$otp);
    public function removeTempEmailById($id);
    public function addedEmailInPerson($model);
    public function checkSecondaryMobileNumberByUid($mobile,$uid);
@@ -52,7 +55,10 @@ interface PersonInterface
    public function setStageInUser($uid);
    public function resendOtpForSecondaryMobileNo($uid,$mobile,$otp);
    public function setPirmaryMobileNo($model);
+   public function setPirmaryEmail($model);
    public function getPersonMobileNoByUid($uid,$mobile);
+   public function getPerviousPrimaryEmail($uid);
+   public function deletedPersonEmailByUid($email,$uid);
 
 
 }
