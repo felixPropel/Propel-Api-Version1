@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\version1\Repositories\Organization;
 
 use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
-use App\Models\Organization\OrganizationDatabase;
-use App\Models\Organization\UserOrganizationRelational;
-use App\Models\Organization\OrganizationStructure;
-use App\Models\Organization\OrganizationOwnership;
+use App\Models\Organization\OrganizationAddress;
 use App\Models\Organization\OrganizationCategory;
+use App\Models\Organization\OrganizationDatabase;
 use App\Models\Organization\OrganizationDocument;
+use App\Models\Organization\OrganizationOwnership;
+use App\Models\Organization\OrganizationStructure;
+use App\Models\Organization\UserOrganizationRelational;
 use App\Models\TempOrganization;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
 class OrganizationRepository implements OrganizationInterface
@@ -23,10 +23,10 @@ class OrganizationRepository implements OrganizationInterface
             ->where('uid', $uid)
             ->get();
     }
-    public function saveOrganization($orgModel, $orgDetailModel, $orgEmailModel, $orgWebLinkModel, $orgAddressModel, $orgDBModel)
+    public function saveOrganization($orgModel, $orgDetailModel, $orgEmailModel, $orgWebLinkModel, $propertyAddressModel, $orgDBModel)
     {
         try {
-            $result = DB::transaction(function () use ($orgModel, $orgDetailModel, $orgEmailModel, $orgWebLinkModel, $orgAddressModel, $orgDBModel) {
+            $result = DB::transaction(function () use ($orgModel, $orgDetailModel, $orgEmailModel, $orgWebLinkModel, $propertyAddressModel, $orgDBModel) {
 
                 $orgModel->save();
                 $orgDetailModel->ParentOrganization()->associate($orgModel, 'org_id', 'id');
@@ -36,13 +36,39 @@ class OrganizationRepository implements OrganizationInterface
                 $orgDetailModel->save();
                 $orgEmailModel->save();
                 $orgWebLinkModel->save();
-                $orgAddressModel->save();
                 $orgDBModel->save();
-               
+                if ($propertyAddressModel) {
+                    $propertyAddressModel->save();
+                    $orgAddress = new OrganizationAddress();
+                    $orgAddress->org_id = $orgModel->id;
+                    $orgAddress->com_property_address_id = $propertyAddressModel->id;
+                    $orgAddress->save();
+                }
+                return   $orgDBModel;
+                
+            });
+            return $result;
+        } catch (\Exception $e) {
+            return [
+                'message' => "failed",
+                'data' => $e,
+            ];
+        }
+    }
+    public function dynamicOrganizationData($orgDocId, $orgOwnershipId, $orgCategoryId, $orgStructureId)
+    {
+
+        try {
+            $result = DB::transaction(function () use ($orgDocId, $orgOwnershipId, $orgCategoryId, $orgStructureId) {
+
+                $orgDocId->save();
+                $orgOwnershipId->save();
+                $orgCategoryId->save();
+                $orgStructureId->save();
 
                 return [
                     'message' => "Success",
-                    'data' => $orgDBModel,
+                    'data' => $orgDocId->org_id,
                 ];
             });
             return $result;
@@ -53,31 +79,6 @@ class OrganizationRepository implements OrganizationInterface
             ];
         }
     }
-         public function dynamicOrganizationData($orgDocId,$orgOwnershipId,$orgCategoryId,$orgStructureId)
-         {
-           
-            try {
-                $result = DB::transaction(function () use ($orgDocId, $orgOwnershipId, $orgCategoryId, $orgStructureId) {
-    
-                    $orgDocId->save();
-                    $orgOwnershipId->save();
-                    $orgCategoryId->save();
-                    $orgStructureId->save();
-              
-                    
-                    return [
-                        'message' => "Success",
-                        'data' => $orgDocId->org_id,
-                    ];
-                });
-                return $result;
-            } catch (\Exception $e) {
-                return [
-                    'message' => "failed",
-                    'data' => $e,
-                ];
-            }
-         }
 
     public function getDataBaseNameByOrgId($id)
     {
@@ -123,29 +124,30 @@ class OrganizationRepository implements OrganizationInterface
     public function pimsOrganizationStructure()
     {
         return OrganizationStructure::whereNull('deleted_flag')
-        ->whereNull('deleted_at')
-        ->get();
-     
+            ->whereNull('deleted_at')
+            ->get();
+
     }
     public function pimsOrganizationCategory()
     {
         return OrganizationCategory::whereNull('deleted_flag')
-        ->whereNull('deleted_at')
-        ->get();
-      
+            ->whereNull('deleted_at')
+            ->get();
+
     }
     public function pimsOrganizationOwnerShip()
     {
         return OrganizationOwnership::whereNull('deleted_flag')
-        ->whereNull('deleted_at')
-        ->get();
-      
+            ->whereNull('deleted_at')
+            ->get();
+
     }
     public function pimsOrganizationDocumentType()
     {
         return OrganizationDocument::whereNull('deleted_flag')
-        ->whereNull('deleted_at')
-        ->get();
-      
+            ->whereNull('deleted_at')
+            ->get();
+
     }
+
 }
