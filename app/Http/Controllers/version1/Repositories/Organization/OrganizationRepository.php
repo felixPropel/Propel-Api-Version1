@@ -11,6 +11,7 @@ use App\Models\Organization\OrganizationOwnership;
 use App\Models\Organization\OrganizationStructure;
 use App\Models\Organization\UserOrganizationRelational;
 use App\Models\TempOrganization;
+use App\Models\PropertyAddress;
 use Illuminate\Support\Facades\DB;
 
 class OrganizationRepository implements OrganizationInterface
@@ -40,8 +41,8 @@ class OrganizationRepository implements OrganizationInterface
                 if ($propertyAddressModel) {
                     $propertyAddressModel->save();
                     $orgAddress = new OrganizationAddress();
-                    $orgAddress->org_id = $orgModel->id;
-                    $orgAddress->com_property_address_id = $propertyAddressModel->id;
+                    $orgAddress->ParentOrganization()->associate($orgModel, 'org_id', 'id');
+                    $orgAddress->ParentComAddress()->associate($propertyAddressModel, 'com_propertry_address_id', 'id');
                     $orgAddress->save();
                 }
                 return   $orgDBModel;
