@@ -5,6 +5,10 @@ namespace App\Http\Controllers\version1\Repositories\Organization;
 use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
 use App\Models\Organization\OrganizationDatabase;
 use App\Models\Organization\UserOrganizationRelational;
+use App\Models\Organization\OrganizationStructure;
+use App\Models\Organization\OrganizationOwnership;
+use App\Models\Organization\OrganizationCategory;
+use App\Models\Organization\OrganizationDocument;
 use App\Models\TempOrganization;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -115,5 +119,33 @@ class OrganizationRepository implements OrganizationInterface
     public function getTempOrganizationDataByTempId($id)
     {
         return TempOrganization::where('id', $id)->whereNull('deleted_at')->first();
+    }
+    public function pimsOrganizationStructure()
+    {
+        return OrganizationStructure::whereNull('deleted_flag')
+        ->whereNull('deleted_at')
+        ->get();
+     
+    }
+    public function pimsOrganizationCategory()
+    {
+        return OrganizationCategory::whereNull('deleted_flag')
+        ->whereNull('deleted_at')
+        ->get();
+      
+    }
+    public function pimsOrganizationOwnerShip()
+    {
+        return OrganizationOwnership::whereNull('deleted_flag')
+        ->whereNull('deleted_at')
+        ->get();
+      
+    }
+    public function pimsOrganizationDocumentType()
+    {
+        return OrganizationDocument::whereNull('deleted_flag')
+        ->whereNull('deleted_at')
+        ->get();
+      
     }
 }

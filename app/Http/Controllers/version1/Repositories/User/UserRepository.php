@@ -9,13 +9,16 @@ use Illuminate\Support\Facades\DB;
 
 class UserRepository implements UserInterface
 {
-    public function existUserByMobileNo($mobileNo)
+
+    public function findUserByMobileNo($mobileNo)
     {
-       return Person::with('existUser','personDetails')
-            ->whereHas('existUser', fn($query) => $query->where('primary_mobile', $mobileNo))
-            ->first();
+      
+       return User::with('personDetails')->where('primary_mobile', $mobileNo)->first();
+  
 
     }
+
+   
     public function findUserDataByEmail($email)
     {
         return User::where('primary_email', $email)->first();
@@ -52,7 +55,9 @@ class UserRepository implements UserInterface
     }
     public function verifyUserForMobile($datas)
     {
-        return  User::where('primary_email', $datas->userName)->orWhere('primary_mobile', $datas->userName)->first();
+        return  User::where('primary_email', $datas->userName)
+        ->orWhere('primary_mobile', $datas->userName)
+        ->first();
 
     }
 }

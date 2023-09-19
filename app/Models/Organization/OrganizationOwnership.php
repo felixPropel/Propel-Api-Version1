@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class OrganizationOwnership extends Model
 {
     use HasFactory;
+    protected $table = 'pims_org_ownerships';
+
     public function ParentOrganization()
     {
         return $this->belongsTo(Organization::class, 'org_id', 'id');

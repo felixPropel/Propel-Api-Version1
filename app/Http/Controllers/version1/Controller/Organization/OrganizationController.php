@@ -20,11 +20,11 @@ class OrganizationController extends Controller
         Log::info('OrganizationController > store function Return.' . json_encode($response));
         return $response;
     }
-    public function getAllStates()  
+    public function organizationMasterDatas()  
     {
-        Log::info('OrganizationController > getAllStates function Inside.');
-        $response = $this->commonService->getAllStates();
-        Log::info('OrganizationController > getAllStates function Return.' . json_encode($response));
+        Log::info('OrganizationController > organizationMasterDatas function Inside.');
+        $response = $this->service->organizationMasterDatas();
+        Log::info('OrganizationController > organizationMasterDatas function Return.' . json_encode($response));
         return $response;
     }
     public function getCityByStateId(Request $request)
@@ -57,7 +57,7 @@ class OrganizationController extends Controller
     }
     public function tempOrganizationStore(Request $request)
     {
-      
+     
         Log::info('OrganizationController > tempOrganizationStore function Inside.' . json_encode($request->all()));
         $response = $this->service->tempOrganizationStore($request->all());
         Log::info('OrganizationController > tempOrganizationStore  function Return.' . json_encode($response));

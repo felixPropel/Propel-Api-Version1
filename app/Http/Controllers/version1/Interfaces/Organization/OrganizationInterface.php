@@ -10,5 +10,12 @@ interface OrganizationInterface
     public function storeTempOrganization($model);
     public function getTempOrganizationDataByTempId($id);
     public function dynamicOrganizationData($orgDocId,$orgOwnershipId,$orgCategoryId,$orgStructureId);
+    public function pimsOrganizationStructure();
+    public function pimsOrganizationCategory();
+    public function pimsOrganizationOwnerShip();
+    public function pimsOrganizationDocumentType();
+
+
+
 
 }

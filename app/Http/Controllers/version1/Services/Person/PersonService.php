@@ -42,18 +42,26 @@ class PersonService
 
         Log::info('PersonService > findMobileNumber function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $model = $this->userInterface->existUserByMobileNo($datas->mobileNumber);
+        $model = $this->userInterface->findUserByMobileNo($datas->mobileNumber);
 
         Log::info('PersonService > findMobileNumber function Return.' . json_encode($model));
         if ($model) {
+            // dd($model);
             $userName = $model->personDetails->first_name;
-
             $userUid = $model->personDetails->uid;
-            $userSatge = $model->existUser->pfm_stage_id;
+            $userSatge = $model->pfm_stage_id;
 
-            $result = ['type' => 1, 'stage' => $userSatge, 'userName' => $userName, 'userUid' => $userUid, 'mobileNumber' => $datas->mobileNumber, 'status' => "UserOnly"];
+            $result = [
+                'type' => 1,
+                'stage' => $userSatge,
+                'userName' => $userName,
+                'userUid' => $userUid,
+                'mobileNumber' => $datas->mobileNumber,
+                'status' => "UserOnly"];
         } else {
-            $result = ['type' => 2, 'mobileNumber' => $datas->mobileNumber, 'status' => "checkingPerson"];
+            $result = ['type' => 2,
+                'mobileNumber' => $datas->mobileNumber,
+                'status' => "checkingPerson"];
         }
         return $this->commonService->sendResponse($result, "");
     }
@@ -924,7 +932,7 @@ class PersonService
 
         return $this->commonService->sendResponse($message, '');
     }
-    
+
     public function makeAsPrimaryEmailOtpValidate($datas)
     {
         $otpValidate = $this->OtpValidateForSecondaryEmail($datas);
@@ -960,7 +968,7 @@ class PersonService
     }
     public function otpValidationForMobile($datas)
     {
-      
+
         $datas = (object) $datas;
         $checkMobile = $this->personInterface->getMobileNoByUid($datas->mobileNo, $datas->personUid);
         if ($checkMobile->otp_received == $datas->otp) {

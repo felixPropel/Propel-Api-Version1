@@ -7,19 +7,20 @@ use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Models\Organization\Organization;
 use App\Models\Organization\OrganizationCategory;
 use App\Models\Organization\OrganizationDatabase;
-use App\Models\Organization\OrganizationStructure;
 use App\Models\Organization\OrganizationDetail;
 use App\Models\Organization\OrganizationDocument;
 use App\Models\Organization\OrganizationEmail;
 use App\Models\Organization\OrganizationOwnership;
+use App\Models\Organization\OrganizationStructure;
 use App\Models\Organization\OrganizationWebAddress;
 use App\Models\Organization\UserOrganizationRelational;
 use App\Models\PropertyAddress;
 use App\Models\TempOrganization;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class OrganizationService
 {
@@ -37,9 +38,11 @@ class OrganizationService
     }
     public function store($tempOrgId)
     {
-       
+
         Log::info('OrganizationService > store function Inside.' . json_encode($tempOrgId));
         $tempOrgData = $this->organizationInterface->getTempOrganizationDataByTempId($tempOrgId);
+        $decodedData = json_decode($tempOrgData->organization_doc_type, true);
+
         if ($tempOrgData) {
             $datas = (object) $tempOrgData;
             $generateOrganizationModel = $this->convertToOrganizationModel($datas);
@@ -48,16 +51,16 @@ class OrganizationService
             $generateOrganizationWebAddressModel = $this->convertToOrganizationWebAddressModel($datas);
             $generateOrganizationAddressModel = $this->convertToOrganizationAddressModel($datas);
             $generateOrganizationDatabaseModel = $this->convertToOrganizationDatabaseModel($datas);
-            $orgModel=$this->organizationInterface->saveOrganization($generateOrganizationModel,$generateOrganizationDetailModel,$generateOrganizationEmailModel,$generateOrganizationWebAddressModel,$generateOrganizationAddressModel,$generateOrganizationDatabaseModel);
+            $orgModel = $this->organizationInterface->saveOrganization($generateOrganizationModel, $generateOrganizationDetailModel, $generateOrganizationEmailModel, $generateOrganizationWebAddressModel, $generateOrganizationAddressModel, $generateOrganizationDatabaseModel);
 
             $orgId = $orgModel['data']->id;
-            $org_name=$orgModel['data']->db_name;
-            $CreateDynamicDb=$this->createDynamicDatabase($org_name);
+            $org_name = $orgModel['data']->db_name;
+            $CreateDynamicDb = $this->createDynamicDatabase($org_name);
             $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-            $generateOrganizationDocumentModel = $this->convertToOrganizationDocumentModel($datas,$orgId);
-            $generateOrganizationOwnerShipIdModel = $this->convertOrganizationOwnerShipModel($datas,$orgId); 
-            $generateOrganizationCategoryIdModel = $this->convertOrganizationCategoryModel($datas,$orgId);  
-            $generateOrganizationStructureIdModel = $this->convertOrganizationStructureModel($datas,$orgId);           
+            $generateOrganizationDocumentModel = $this->convertToOrganizationDocumentModel($datas, $orgId);
+            $generateOrganizationOwnerShipIdModel = $this->convertOrganizationOwnerShipModel($datas, $orgId);
+            $generateOrganizationCategoryIdModel = $this->convertOrganizationCategoryModel($datas, $orgId);
+            $generateOrganizationStructureIdModel = $this->convertOrganizationStructureModel($datas, $orgId);
             $model = $this->organizationInterface->dynamicOrganizationData($generateOrganizationDocumentModel, $generateOrganizationOwnerShipIdModel, $generateOrganizationCategoryIdModel, $generateOrganizationStructureIdModel);
             // $generateUserAccountModel = $this->convertToUserAccountModel($datas);
             if ($model['message'] == "Success") {
@@ -70,19 +73,19 @@ class OrganizationService
 
         }
     }
-public function  createDynamicDatabase($db_name)
-{
-    $preDatabase = Config::get('database.connections.mysql.database'); 
-    DB::statement("CREATE DATABASE IF NOT EXISTS $db_name");
-     $new = Config::set('database.connections.mysql.database', $db_name);
-    DB::purge('mysql');
-    DB::reconnect('mysql');
-    \Artisan::call('migrate');
-    $current=Config::set('database.connections.mysql.database', $preDatabase);
-    DB::purge('mysql');
-    DB::reconnect('mysql');
-     return true;
-}
+    public function createDynamicDatabase($db_name)
+    {
+        $preDatabase = Config::get('database.connections.mysql.database');
+        DB::statement("CREATE DATABASE IF NOT EXISTS $db_name");
+        $new = Config::set('database.connections.mysql.database', $db_name);
+        DB::purge('mysql');
+        DB::reconnect('mysql');
+        \Artisan::call('migrate');
+        $current = Config::set('database.connections.mysql.database', $preDatabase);
+        DB::purge('mysql');
+        DB::reconnect('mysql');
+        return true;
+    }
     public function convertToOrganizationModel($datas)
     {
         $model = new Organization();
@@ -134,10 +137,10 @@ public function  createDynamicDatabase($db_name)
 
         return $this->commonService->sendResponse($model, '');
     }
-    public function convertToOrganizationDocumentModel($datas,$orgId)
+    public function convertToOrganizationDocumentModel($datas, $orgId)
     {
         $model = new OrganizationDocument();
-        $model->org_id=$orgId;
+        $model->org_id = $orgId;
         $model->org_doc_type_id = (isset($datas->doc_type_id) ? $datas->doc_type_id : null);
         $model->doc_no = null;
         $model->doc_validity = null;
@@ -182,6 +185,9 @@ public function  createDynamicDatabase($db_name)
     public function tempOrganizationStore($datas)
     {
         $validator = Validator::make($datas, [
+            'org_structure_id' => 'required',
+            'org_category_id' => 'required',
+            'org_ownership_id' => 'required',
             'org_name' => 'required',
             'org_email' => 'required|email',
             'pin_code' => 'required|numeric',
@@ -195,50 +201,90 @@ public function  createDynamicDatabase($db_name)
             return $this->commonService->sendResponse($storeTempOrg, '');
         }
     }
-    public function convertOrganizationOwnerShipModel($datas,$orgId)
+    public function convertOrganizationOwnerShipModel($datas, $orgId)
     {
         $model = new OrganizationOwnership();
-        $model->org_id=$orgId;
+        $model->org_id = $orgId;
         $model->org_ownership_id = (isset($datas->org_ownership_id) ? $datas->org_ownership_id : null);
         return $model;
     }
-    public function convertOrganizationCategoryModel($datas,$orgId)
+    public function convertOrganizationCategoryModel($datas, $orgId)
     {
         $model = new OrganizationCategory();
-        $model->org_id=$orgId;
+        $model->org_id = $orgId;
         $model->org_category_id = (isset($datas->org_category_id) ? $datas->org_category_id : null);
         return $model;
     }
-    public function convertOrganizationStructureModel($datas,$orgId)
+    public function convertOrganizationStructureModel($datas, $orgId)
     {
         $model = new OrganizationStructure();
-        $model->org_id=$orgId;
+        $model->org_id = $orgId;
         $model->org_structure_id = (isset($datas->org_structure_id) ? $datas->org_structure_id : null);
         return $model;
     }
     public function convertTempOrganization($datas)
     {
+        $orgDetail = [];
+        $orgName = ($datas->org_name) ? $datas->org_name : '';
+        $orgEmail = ($datas->org_email) ? $datas->org_email : '';
+        $orgwebsite = ($datas->org_website) ? $datas->org_website : '';
+        $orgStructureId = ($datas->org_structure_id) ? $datas->org_structure_id : '';
+        $orgCategoryId = ($datas->org_category_id) ? $datas->org_category_id : '';
+        $orgOwnershipId = ($datas->org_ownership_id) ? $datas->org_ownership_id : '';
+        $orgDetail = ['orgName' => $orgName, 'orgEmail' => $orgEmail, 'orgwebsite' => $orgwebsite,
+            'orgStructureId' => $orgStructureId, 'orgCategoryId' => $orgCategoryId, 'orgOwnershipId' => $orgOwnershipId];
+        $orgAddress = [];
+        $doorNo = ($datas->door_no) ? $datas->door_no : '';
+        $buildingName = ($datas->building_name) ? $datas->building_name : '';
+        $street = ($datas->street) ? $datas->street : '';
+        $landMark = ($datas->landmark) ? $datas->landmark : '';
+        $pinCode = ($datas->pin_code) ? $datas->pin_code : '';
+        $districtId = ($datas->district_id) ? $datas->district_id : '';
+        $stateId = ($datas->state_id) ? $datas->state_id : '';
+        $CityId = ($datas->city_id) ? $datas->city_id : '';
+        $area = ($datas->area) ? $datas->area : '';
+        $location = ($datas->location) ? $datas->location : '';
+        $orgAddress = ['doorNo' => $doorNo, 'buildingName' => $buildingName, 'street' => $street, 'landMark' => $landMark, 'pinCode' => $pinCode, 'districtId' => $districtId, 'stateId' => $stateId, 'CityId' => $CityId, 'area' => $area, 'location' => $location];
+        $orgDocModels = [];
+        if (isset($datas->org_doc_type_id)) {
+
+            for ($i = 0; $i < count($datas->org_doc_type_id); $i++) {
+                if ($datas->org_doc_type_id[$i]) {
+
+                    $doctypeId = $datas->org_doc_type_id[$i]; 
+                    $docNo = $datas->org_doc_no[$i] ?? '';
+                    $docValid = $datas->org_doc_valid[$i] ?? '';
+                    if (isset($datas->org_doc_file[$i]) && $datas->org_doc_file[$i]) {
+                         $uniqueFileName[$i] = date('YmdHis') . '_' . uniqid() . '.jpg';
+                        $savePath[$i] = storage_path('app/public/OrganizationDocument/' . $uniqueFileName[$i]);
+                        File::put($savePath[$i], $datas->org_doc_file[$i]);
+
+                    }
+                    $orgDocModel = ['doctypeId' => $doctypeId, 'docNo' => $docNo, 'docValid' => $docValid, 'docFilePath' => isset($uniqueFileName[$i]) ? $uniqueFileName[$i] : ''];
+
+                    array_push($orgDocModels, $orgDocModel);
+
+                }
+            }
+        }
+
         $model = new TempOrganization();
-        $model->org_name = $datas->org_name;
-        $model->org_email = $datas->org_email;
-        $model->org_website = $datas->org_website;
-        $model->door_no = $datas->door_no;
-        $model->building_name = $datas->building_name;
-        $model->street = $datas->street;
-        $model->landmark = $datas->landmark;
-        $model->pincode = $datas->pin_code;
-        $model->district_id = $datas->district_id ?? null;
-        $model->state_id = $datas->state_id;
-        $model->city_id = $datas->city_id;
-        $model->area = $datas->area;
-        $model->location = $datas->location;
-        $model->tried_person_id = $datas->uid;
-        $model->gst_no = $datas->org_gst;
-        $model->gst_available_status = $datas->org_gst ?? '1';
-        $model->authority_status = 1;
-        $model->pan_no = $datas->org_pan;
-
+        $model->authorized_person_id = $datas->uid;
+        $model->organization_detail = json_encode($orgDetail);
+        $model->organization_address = json_encode($orgAddress);
+        if ($orgDocModels) {
+            $model->organization_doc_type = json_encode($orgDocModels);
+        }
         return $model;
-
+    }
+    public function organizationMasterDatas()
+    {
+        $state = $this->commonService->getAllStates();
+        $orgStructure = $this->organizationInterface->pimsOrganizationStructure();
+        $orgCategory = $this->organizationInterface->pimsOrganizationCategory();
+        $orgOwnerShip = $this->organizationInterface->pimsOrganizationOwnerShip();
+        $orgDocType = $this->organizationInterface->pimsOrganizationDocumentType();
+        $result = ['state' => $state, 'orgStructure' => $orgStructure, 'orgCategory' => $orgCategory, 'orgOwnerShip' => $orgOwnerShip, 'orgDocType' => $orgDocType];
+        return $this->commonService->sendResponse($result, '');
     }
 }
