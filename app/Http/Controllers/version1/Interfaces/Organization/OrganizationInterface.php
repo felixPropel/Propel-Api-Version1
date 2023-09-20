@@ -14,6 +14,7 @@ interface OrganizationInterface
     public function pimsOrganizationCategory();
     public function pimsOrganizationOwnerShip();
     public function pimsOrganizationDocumentType();
+    public function getAllTempOrganizations();
    
 
 

@@ -7,3 +7,4 @@ Route::post('getCityByStateId', 'App\Http\Controllers\version1\Controller\Organi
 Route::post('getOrganizationAccountByUid', 'App\Http\Controllers\version1\Controller\Organization\OrganizationController@getOrganizationAccountByUid')->name('getOrganizationAccountByUid');
 Route::post('getDataBaseNameByid', 'App\Http\Controllers\version1\Controller\Organization\OrganizationController@getDataBaseNameByid')->name('getDataBaseNameByid');
 Route::post('setDefaultOrganization', 'App\Http\Controllers\version1\Controller\Organization\OrganizationController@setDefaultOrganization')->name('setDefaultOrganization');
+Route::get('organizationIndex', 'App\Http\Controllers\version1\Controller\Organization\OrganizationController@organizationIndex')->name('organizationIndex');

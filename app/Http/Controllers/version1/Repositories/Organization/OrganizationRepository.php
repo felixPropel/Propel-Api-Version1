@@ -11,7 +11,6 @@ use App\Models\Organization\OrganizationOwnership;
 use App\Models\Organization\OrganizationStructure;
 use App\Models\Organization\UserOrganizationRelational;
 use App\Models\TempOrganization;
-use App\Models\PropertyAddress;
 use Illuminate\Support\Facades\DB;
 
 class OrganizationRepository implements OrganizationInterface
@@ -45,8 +44,8 @@ class OrganizationRepository implements OrganizationInterface
                     $orgAddress->ParentComAddress()->associate($propertyAddressModel, 'com_propertry_address_id', 'id');
                     $orgAddress->save();
                 }
-                return   $orgDBModel;
-                
+                return $orgDBModel;
+
             });
             return $result;
         } catch (\Exception $e) {
@@ -150,5 +149,9 @@ class OrganizationRepository implements OrganizationInterface
             ->get();
 
     }
-
+    public function getAllTempOrganizations()
+    {
+        return TempOrganization::whereNull('deleted_flag') ->whereNull('deleted_at')
+        ->get();
+    }
 }

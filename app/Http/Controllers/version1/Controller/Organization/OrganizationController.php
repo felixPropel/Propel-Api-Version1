@@ -22,9 +22,15 @@ class OrganizationController extends Controller
     }
     public function organizationMasterDatas()  
     {
-        Log::info('OrganizationController > organizationMasterDatas function Inside.');
         $response = $this->service->organizationMasterDatas();
         Log::info('OrganizationController > organizationMasterDatas function Return.' . json_encode($response));
+        return $response;
+    }
+    public function organizationIndex()  
+    {
+    
+        $response = $this->service->organizationIndex();
+        Log::info('OrganizationController > organizationIndex function Return.' . json_encode($response));
         return $response;
     }
     public function getCityByStateId(Request $request)

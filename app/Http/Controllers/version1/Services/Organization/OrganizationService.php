@@ -190,19 +190,19 @@ class OrganizationService
     }
     public function tempOrganizationStore($datas)
     {
+
         $validator = Validator::make($datas, [
-            'org_structure_id' => 'required',
-            'org_category_id' => 'required',
-            'org_ownership_id' => 'required',
-            'org_name' => 'required',
-            'org_email' => 'required|email',
-            'pin_code' => 'required|numeric',
+            'orgStructureId' => 'required',
+            'orgCategoryId' => 'required',
+            'orgOwnershipId' => 'required',
+            'orgName' => 'required',
+            'orgEmail' => 'required|email',
+            'pinCode' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], 422);
         } else {
             $datas = (object) $datas;
-            $userUid = $this->organizationInterface->getUserUid($userId);
             $convertTempOrg = $this->convertTempOrganization($datas);
             $storeTempOrg = $this->organizationInterface->storeTempOrganization($convertTempOrg);
             return $this->commonService->sendResponse($storeTempOrg, '');
@@ -235,40 +235,41 @@ class OrganizationService
     public function convertTempOrganization($datas)
     {
         $uid = auth()->user()->uid;
+
         $orgDetail = [];
-        $orgName = ($datas->org_name) ? $datas->org_name : '';
-        $orgEmail = ($datas->org_email) ? $datas->org_email : '';
-        $orgwebsite = ($datas->org_website) ? $datas->org_website : '';
-        $orgStructureId = ($datas->org_structure_id) ? $datas->org_structure_id : '';
-        $orgCategoryId = ($datas->org_category_id) ? $datas->org_category_id : '';
-        $orgOwnershipId = ($datas->org_ownership_id) ? $datas->org_ownership_id : '';
+        $orgName = ($datas->orgName) ? $datas->orgName : '';
+        $orgEmail = ($datas->orgEmail) ? $datas->orgEmail : '';
+        $orgwebsite = isset($datas->orgWebsite) ? $datas->orgWebsite : '';
+        $orgStructureId = isset($datas->orgStructureId) ? $datas->orgStructureId : '';
+        $orgCategoryId = isset($datas->orgCategoryId) ? $datas->orgCategoryId : '';
+        $orgOwnershipId = isset($datas->orgOwnershipId) ? $datas->orgOwnershipId : '';
         $orgDetail = ['orgName' => $orgName, 'orgEmail' => $orgEmail, 'orgwebsite' => $orgwebsite,
             'orgStructureId' => $orgStructureId, 'orgCategoryId' => $orgCategoryId, 'orgOwnershipId' => $orgOwnershipId];
         $orgAddress = [];
-        $doorNo = ($datas->door_no) ? $datas->door_no : '';
-        $buildingName = ($datas->building_name) ? $datas->building_name : '';
-        $street = ($datas->street) ? $datas->street : '';
-        $landMark = ($datas->landmark) ? $datas->landmark : '';
-        $pinCode = ($datas->pin_code) ? $datas->pin_code : '';
-        $districtId = ($datas->district_id) ? $datas->district_id : '';
-        $stateId = ($datas->state_id) ? $datas->state_id : '';
-        $CityId = ($datas->city_id) ? $datas->city_id : '';
-        $area = ($datas->area) ? $datas->area : '';
-        $location = ($datas->location) ? $datas->location : '';
+        $doorNo = isset($datas->doorNo) ? $datas->doorNo : '';
+        $buildingName = isset($datas->buildingName) ? $datas->buildingName : '';
+        $street = isset($datas->street) ? $datas->street : '';
+        $landMark = isset($datas->landMark) ? $datas->landMark : '';
+        $pinCode = isset($datas->pinCode) ? $datas->pinCode : '';
+        $districtId = isset($datas->districtId) ? $datas->districtId : '';
+        $stateId = isset($datas->stateId) ? $datas->stateId : '';
+        $CityId = isset($datas->cityId) ? $datas->cityId : '';
+        $area = isset($datas->area) ? $datas->area : '';
+        $location = isset($datas->location) ? $datas->location : '';
         $orgAddress = ['doorNo' => $doorNo, 'buildingName' => $buildingName, 'street' => $street, 'landMark' => $landMark, 'pinCode' => $pinCode, 'districtId' => $districtId, 'stateId' => $stateId, 'CityId' => $CityId, 'area' => $area, 'location' => $location];
         $orgDocModels = [];
-        if (isset($datas->org_doc_type_id)) {
+        if (isset($datas->documentNo)) {
 
-            for ($i = 0; $i < count($datas->org_doc_type_id); $i++) {
-                if ($datas->org_doc_type_id[$i]) {
+            for ($i = 0; $i < count($datas->documentNo); $i++) {
+                if ($datas->documentNo[$i]) {
 
-                    $doctypeId = $datas->org_doc_type_id[$i];
-                    $docNo = $datas->org_doc_no[$i] ?? '';
-                    $docValid = $datas->org_doc_valid[$i] ?? '';
-                    if (isset($datas->org_doc_file[$i]) && $datas->org_doc_file[$i]) {
+                    $doctypeId = $datas->orgDocTypeId[$i];
+                    $docNo = $datas->documentNo[$i] ?? '';
+                    $docValid = $datas->validDate[$i] ?? '';
+                    if (isset($datas->fileAttachment[$i]) && $datas->fileAttachment[$i]) {
                         $uniqueFileName[$i] = date('YmdHis') . '_' . uniqid() . '.jpg';
                         $savePath[$i] = storage_path('app/public/OrganizationDocument/' . $uniqueFileName[$i]);
-                        File::put($savePath[$i], $datas->org_doc_file[$i]);
+                        File::put($savePath[$i], $datas->fileAttachment[$i]);
 
                     }
                     $orgDocModel = ['doctypeId' => $doctypeId, 'docNo' => $docNo, 'docValid' => $docValid, 'docFilePath' => isset($uniqueFileName[$i]) ? $uniqueFileName[$i] : ''];
@@ -297,5 +298,14 @@ class OrganizationService
         $orgDocType = $this->organizationInterface->pimsOrganizationDocumentType();
         $result = ['state' => $state, 'orgStructure' => $orgStructure, 'orgCategory' => $orgCategory, 'orgOwnerShip' => $orgOwnerShip, 'orgDocType' => $orgDocType];
         return $this->commonService->sendResponse($result, '');
+    }
+    public function organizationIndex()
+    {
+        $tempOrg = $this->organizationInterface->getAllTempOrganizations();
+        $newCollection = $tempOrg->map(function ($tempOrgItem) {
+            $orgDetails = json_decode($tempOrgItem->organization_detail, true);
+            return $orgDetails['orgName'];
+        });
+        return $this->commonService->sendResponse($newCollection, '');
     }
 }
