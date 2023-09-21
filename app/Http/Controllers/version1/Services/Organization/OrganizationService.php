@@ -237,25 +237,25 @@ class OrganizationService
         $uid = auth()->user()->uid;
 
         $orgDetail = [];
-        $orgName = ($datas->orgName) ? $datas->orgName : '';
-        $orgEmail = ($datas->orgEmail) ? $datas->orgEmail : '';
-        $orgwebsite = isset($datas->orgWebsite) ? $datas->orgWebsite : '';
-        $orgStructureId = isset($datas->orgStructureId) ? $datas->orgStructureId : '';
-        $orgCategoryId = isset($datas->orgCategoryId) ? $datas->orgCategoryId : '';
-        $orgOwnershipId = isset($datas->orgOwnershipId) ? $datas->orgOwnershipId : '';
+        $orgName = ($datas->orgName) ? $datas->orgName : null;
+        $orgEmail = ($datas->orgEmail) ? $datas->orgEmail : null;
+        $orgwebsite = isset($datas->orgWebsite) ? $datas->orgWebsite :null;
+        $orgStructureId = isset($datas->orgStructureId) ? $datas->orgStructureId : null;
+        $orgCategoryId = isset($datas->orgCategoryId) ? $datas->orgCategoryId : null;
+        $orgOwnershipId = isset($datas->orgOwnershipId) ? $datas->orgOwnershipId : null;
         $orgDetail = ['orgName' => $orgName, 'orgEmail' => $orgEmail, 'orgwebsite' => $orgwebsite,
             'orgStructureId' => $orgStructureId, 'orgCategoryId' => $orgCategoryId, 'orgOwnershipId' => $orgOwnershipId];
         $orgAddress = [];
-        $doorNo = isset($datas->doorNo) ? $datas->doorNo : '';
-        $buildingName = isset($datas->buildingName) ? $datas->buildingName : '';
-        $street = isset($datas->street) ? $datas->street : '';
-        $landMark = isset($datas->landMark) ? $datas->landMark : '';
-        $pinCode = isset($datas->pinCode) ? $datas->pinCode : '';
-        $districtId = isset($datas->districtId) ? $datas->districtId : '';
-        $stateId = isset($datas->stateId) ? $datas->stateId : '';
-        $CityId = isset($datas->cityId) ? $datas->cityId : '';
-        $area = isset($datas->area) ? $datas->area : '';
-        $location = isset($datas->location) ? $datas->location : '';
+        $doorNo = isset($datas->doorNo) ? $datas->doorNo : null;
+        $buildingName = isset($datas->buildingName) ? $datas->buildingName :null;
+        $street = isset($datas->street) ? $datas->street : null;
+        $landMark = isset($datas->landMark) ? $datas->landMark :null;
+        $pinCode = isset($datas->pinCode) ? $datas->pinCode : null;
+        $districtId = isset($datas->districtId) ? $datas->districtId : null;
+        $stateId = isset($datas->stateId) ? $datas->stateId : null;
+        $CityId = isset($datas->cityId) ? $datas->cityId : null;
+        $area = isset($datas->area) ? $datas->area : null;
+        $location = isset($datas->location) ? $datas->location :null;
         $orgAddress = ['doorNo' => $doorNo, 'buildingName' => $buildingName, 'street' => $street, 'landMark' => $landMark, 'pinCode' => $pinCode, 'districtId' => $districtId, 'stateId' => $stateId, 'CityId' => $CityId, 'area' => $area, 'location' => $location];
         $orgDocModels = [];
         if (isset($datas->documentNo)) {
@@ -264,8 +264,8 @@ class OrganizationService
                 if ($datas->documentNo[$i]) {
 
                     $doctypeId = $datas->orgDocTypeId[$i];
-                    $docNo = $datas->documentNo[$i] ?? '';
-                    $docValid = $datas->validDate[$i] ?? '';
+                    $docNo = $datas->documentNo[$i] ?? null;
+                    $docValid = $datas->validDate[$i] ?? null ;
                     if (isset($datas->fileAttachment[$i]) && $datas->fileAttachment[$i]) {
                         $uniqueFileName[$i] = date('YmdHis') . '_' . uniqid() . '.jpg';
                         $savePath[$i] = storage_path('app/public/OrganizationDocument/' . $uniqueFileName[$i]);
@@ -301,7 +301,8 @@ class OrganizationService
     }
     public function organizationIndex()
     {
-        $tempOrg = $this->organizationInterface->getAllTempOrganizations();
+        $uid=auth()->user()->uid;
+        $tempOrg = $this->organizationInterface->getAllTempOrganizations($uid);
         $newCollection = $tempOrg->map(function ($tempOrgItem) {
             $orgDetails = json_decode($tempOrgItem->organization_detail, true);
             return $orgDetails['orgName'];

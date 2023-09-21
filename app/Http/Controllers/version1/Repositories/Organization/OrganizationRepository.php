@@ -149,9 +149,9 @@ class OrganizationRepository implements OrganizationInterface
             ->get();
 
     }
-    public function getAllTempOrganizations()
+    public function getAllTempOrganizations($uid)
     {
-        return TempOrganization::whereNull('deleted_flag') ->whereNull('deleted_at')
+        return TempOrganization::where('authorized_person_id',$uid)->whereNull('deleted_flag') ->whereNull('deleted_at')
         ->get();
     }
 }

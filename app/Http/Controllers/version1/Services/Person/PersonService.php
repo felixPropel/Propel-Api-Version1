@@ -126,6 +126,7 @@ class PersonService
         $datas = (object) $datas;
 
         $personModel = $this->convertToPersonModel($datas);
+
         $personDetailModel = $this->convertToPersonDetailModel($datas);
         $personEmailModel = $this->convertToPersonEmailModel($datas);
         $personMobileModel = $this->convertToPersonMobileModel($datas);
@@ -292,23 +293,25 @@ class PersonService
 
         Log::info('PersonService > personOtpValidation function Inside.' . json_encode($datas));
         $datas = (object) $datas;
+       
         $tempPersonModel = $this->personInterface->findTempPersonById($datas->tempId);
 
         Log::info('PersonService > personOtpValidation function Return.' . json_encode($tempPersonModel));
         if ($tempPersonModel) {
             if ($datas->otp == $tempPersonModel->otp) {
                 $personalDatas = json_decode($tempPersonModel->personal_data, true);
-                $mobileNumber = isset($tempPersonModel['mobile_no']) ? $tempPersonModel['mobile_no'] : "";
-                $email = isset($tempPersonModel['email']) ? $tempPersonModel['email'] : "";
-                $salutation = isset($personalDatas['salutation']) ? $personalDatas['salutation'] : "";
-                $firstName = isset($personalDatas['firstName']) ? $personalDatas['firstName'] : "";
-                $middleName = isset($personalDatas['middleName']) ? $personalDatas['middleName'] : "";
-                $lastName = isset($personalDatas['lastName']) ? $personalDatas['lastName'] : "";
-                $nickName = isset($personalDatas['nickName']) ? $personalDatas['nickName'] : "";
-                $gender = isset($personalDatas['gender']) ? $personalDatas['gender'] : "";
-                $bloodGroup = isset($personalDatas['bg']) ? $personalDatas['bg'] : "";
-                $dob = isset($personalDatas['dob']) ? $personalDatas['dob'] : "";
+                $mobileNumber = isset($tempPersonModel['mobile_no']) ? $tempPersonModel['mobile_no'] : null;
+                $email = isset($tempPersonModel['email']) ? $tempPersonModel['email'] : null;
+                $salutation = isset($personalDatas['salutation']) ? $personalDatas['salutation'] : null;
+                $firstName = isset($personalDatas['firstName']) ? $personalDatas['firstName'] : null;
+                $middleName = isset($personalDatas['middleName']) ? $personalDatas['middleName'] : null;
+                $lastName = isset($personalDatas['lastName']) ? $personalDatas['lastName'] : null;
+                $nickName = isset($personalDatas['nickName']) ? $personalDatas['nickName'] : null;
+                $gender = isset($personalDatas['gender']) ? $personalDatas['gender'] : null;
+                $bloodGroup = isset($personalDatas['bg']) ? $personalDatas['bg'] : null;
+                $dob = isset($personalDatas['dob']) ? $personalDatas['dob'] : null;
                 $personDatas = ['mobileNumber' => $mobileNumber, 'email' => $email, 'salutationId' => $salutation, 'firstName' => $firstName, 'middleName' => $middleName, 'lastName' => $lastName, 'nickName' => $nickName, 'genderId' => $gender, 'bloodGroup' => $bloodGroup, 'dob' => $dob];
+              
                 $personModel = $this->storePerson($personDatas);
                 $tempPersonModel->delete();
                 return $personModel;
@@ -406,19 +409,19 @@ class PersonService
         } else {
             $model = new PersonDetails();
         }
-        $model->pims_person_salutation_id = $datas->salutationId;
+    
+        $model->pims_person_salutation_id = isset($datas->salutationId)? $datas->salutationId : null;
         $model->first_name = $datas->firstName;
-        $model->middle_name = isset($datas->middleName) ? $datas->middleName : '';
-        $model->last_name = isset($datas->lastName) ? $datas->lastName : '';
-        $model->nick_name = isset($datas->nickName) ? $datas->nickName : '';
+        $model->middle_name = isset($datas->middleName) ? $datas->middleName : null;
+        $model->last_name = isset($datas->lastName) ? $datas->lastName : null;
+        $model->nick_name = isset($datas->nickName) ? $datas->nickName : null;
         // $date = Carbon::createFromFormat('d-m-Y', $datas->dob)->format('Y-m-d');
         $model->dob = '2000-08-18';
-        $model->birth_place = isset($datas->birthCity) ? $datas->birthCity : '';
+        $model->birth_place = isset($datas->birthCity) ? $datas->birthCity : null;
         $model->pims_person_marital_status_id = isset($datas->maritalStatus) ? $datas->maritalStatus : null;
-        $model->pims_person_gender_id = isset($datas->genderId) ? $datas->genderId : '';
-        $model->pims_person_blood_group_id = isset($datas->bloodGroup) ? $datas->bloodGroup : '';
+        $model->pims_person_gender_id = isset($datas->genderId) ? $datas->genderId : null;
+        $model->pims_person_blood_group_id = isset($datas->bloodGroup) ? $datas->bloodGroup : null;
         $model->pfm_survial_id = 1;
-
         Log::info('PersonService > convertToPersonDetailModel function Return.' . json_encode($model));
 
         return $model;
