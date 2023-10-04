@@ -10,7 +10,8 @@ class HrmDesignation extends Model
     public function __construct()
     {
         parent::__construct();
-        $this->connection ='mysql_external';
+        $this->connection ='mysql';
+        // $this->connection ='mysql_external';
     }
     public function department()
     {

@@ -15,7 +15,7 @@ class CreatePfmActiveStatus extends Migration
     {
         Schema::create('pfm_active_status', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('active_type');
+            $table->string('active_type');
             $table->integer('active_status')->nullable();
             $table->integer('deleted_flag')->nullable();
             $table->string('created_by')->nullable();

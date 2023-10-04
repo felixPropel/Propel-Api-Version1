@@ -15,7 +15,7 @@ class CreatePfmCachet extends Migration
     {
         Schema::create('pfm_cachet', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('cachet');
+            $table->string('cachet');
             $table->integer('active_status')->nullable();
             $table->integer('deleted_flag')->nullable();
             $table->string('created_by')->nullable();

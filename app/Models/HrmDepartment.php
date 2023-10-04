@@ -12,7 +12,7 @@ class HrmDepartment extends Model
     public function __construct()
     {
         parent::__construct();
-        $this->connection ='mysql_external';
+        $this->connection ='mysql';
     }
     public function hrmParentDept()
     {

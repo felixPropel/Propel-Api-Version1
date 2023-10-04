@@ -15,7 +15,7 @@ class CreatePfmPersonStage extends Migration
     {
         Schema::create('pfm_person_stage', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('person_stage');
+            $table->string('person_stage');
             $table->integer('active_status')->nullable();
             $table->integer('deleted_flag')->nullable();
             $table->string('created_by')->nullable();

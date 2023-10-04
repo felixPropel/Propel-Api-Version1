@@ -15,7 +15,7 @@ class CreatePfmOrigin extends Migration
     {
         Schema::create('pfm_origin', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('origin');
+            $table->string('origin');
             $table->integer('active_status')->nullable();
             $table->integer('deleted_flag')->nullable();
             $table->string('created_by')->nullable();

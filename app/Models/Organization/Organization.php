@@ -9,4 +9,9 @@ class Organization extends Model
 {
     use HasFactory;
     protected $table = 'organizations';
+    public function OrganizationDetail()
+    {
+        return $this->hasOne(OrganizationDetail::class, 'org_id', 'id');
+    }
+  
 }

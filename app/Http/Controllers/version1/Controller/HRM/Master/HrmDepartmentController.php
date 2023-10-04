@@ -35,8 +35,8 @@ class HrmDepartmentController extends Controller
 
     public function index($orgId)
     {
-
-        Log::info('HrmDepartmentController>Index Function>Inside.');
+       
+        Log::info('HrmDepartmentController>Index Function>Inside.' .json_encode($orgId));
         $response = $this->service->findAll($orgId);
         Log::info('HrmDepartmentController>Index Function>Return' . json_encode($response));
         return $response;

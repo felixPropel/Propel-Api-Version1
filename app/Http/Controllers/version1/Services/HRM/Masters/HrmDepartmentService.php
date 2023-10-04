@@ -22,9 +22,10 @@ class HrmDepartmentService
     }
     public function findAll($orgId)
     {
+      
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-
         $models = $this->interface->findAll();
+    
 
         return $this->commonService->sendResponse($models, '');
     }
@@ -60,18 +61,22 @@ class HrmDepartmentService
 
     public function convertToModel($data)
     {
-
         $data = (object) $data;
         $id = $data->id;
         if ($id) {
             $model = $this->interface->findById($id);
+            $model->last_updated_by=auth()->user()->uid;
+
+
         } else {
             $model = new HrmDepartment();
+            $model->created_by=auth()->user()->uid;
+
         }
-        $model->department_name = $data->name;
+        $model->department_name = $data->department;
         $model->parent_dept_id = isset($data->parent_dept_id) ? $data->parent_dept_id : null;
         $model->description = $data->description;
-        $model->active_state =isset($data->status) ? 1 : 0;
+        $model->pfm_active_status_id =isset($data->activeStatus) ? $data->activeStatus : null;
 
         return $model;
     }

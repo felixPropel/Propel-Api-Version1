@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class OrganizationCategory extends Model
 {
     use HasFactory;
-    protected $table = 'pims_org_categories';
+    protected $table = 'organization_categories';
 
     public function ParentOrganization()
     {

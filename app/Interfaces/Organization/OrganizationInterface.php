@@ -22,4 +22,5 @@ interface OrganizationInterface
     public function saveOrganizationActivityModel($data);
     public function saveOrganizationSubsetModel($data);
     // public function saveToOrganizationAddreessModel($data);
+   public function getOrganizationName();
 }

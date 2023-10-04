@@ -15,7 +15,7 @@ class CreatePfmDeponeStatus extends Migration
     {
         Schema::create('pfm_depone_status', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('depone_status');
+            $table->string('depone_status');
             $table->integer('active_status')->nullable();
             $table->integer('deleted_flag')->nullable();
             $table->string('created_by')->nullable();

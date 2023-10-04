@@ -30,8 +30,7 @@ class HrmHumanResourceTypeService
     }
     public function store($data, $orgId)
     {
-        Log::info('HrmHumanResourceTypeService > Store function Inside.' . json_encode($data));
-        Log::info('HrmHumanResourceTypeService > Store function Inside.' . json_encode($orgId));
+        Log::info('HrmHumanResourceTypeService > Store function Inside.' . json_encode($data,$orgId));
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $model = $this->convertToModel($data);
         $response = $this->interface->store($model);
@@ -45,19 +44,22 @@ class HrmHumanResourceTypeService
         $id = $data->id;
         if ($id) {
             $model = $this->interface->findById($id);
+            $model->last_updated_by=auth()->user()->uid;
+
         } else {
             $model = new HrmResourceType();
+            $model->created_by=auth()->user()->uid;
+
         }
-        $model->name = $data->name;
+        $model->resource_type = $data->hrType;
         $model->description = $data->description;
-        $model->active_state = isset($data->active_state) ? 1 : 0;
+        $model->pfm_active_status_id =isset($data->activeStatus) ? $data->activeStatus : null;
         Log::info('HrmHumanResourceTypeService > convertToModel function Return.' . json_encode($model));
         return $model;
     }
     public function findById($orgId, $id)
     {
-        Log::info('HrmHumanResourceTypeService > findById function Inside.' . json_encode($orgId));
-        Log::info('HrmHumanResourceTypeService > findById function Inside.' . json_encode($id));
+        Log::info('HrmHumanResourceTypeService > findById function Inside.' . json_encode($orgId,$id));
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $response = $this->interface->findById($id);
         Log::info('HrmHumanResourceTypeService > findById function Return.' . json_encode($response));

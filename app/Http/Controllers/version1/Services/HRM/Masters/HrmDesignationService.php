@@ -57,14 +57,16 @@ class HrmDesignationService
         $id=$data->id;
         if ($id) {
             $model = $this->interface->findById($id);
+            $model->last_updated_by=auth()->user()->uid;
         } else {
             $model = new HrmDesignation();
+            $model->created_by=auth()->user()->uid;
         }
         $model->designation_name = $data->designation;
         $model->no_of_posting =$data->no_of_posting;
         $model->dept_id =$data->department;
         $model->description = $data->description;
-        $model->active_state=isset($data->status)? 1 : 0;
+        $model->pfm_active_status_id =isset($data->activeStatus) ? $data->activeStatus : null;
         return $model;
     }
     public function findById($orgId,$id)

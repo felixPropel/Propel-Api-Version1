@@ -9,6 +9,11 @@ use App\Models\Organization\OrganizationDatabase;
 use App\Models\Organization\OrganizationDocument;
 use App\Models\Organization\OrganizationOwnership;
 use App\Models\Organization\OrganizationStructure;
+use App\Models\Organization\Organization;
+use App\Models\PIMSOrganization\Structure;
+use App\Models\PIMSOrganization\Category;
+use App\Models\PIMSOrganization\OwnerShip;
+use App\Models\PIMSOrganization\DocumentType;
 use App\Models\Organization\UserOrganizationRelational;
 use App\Models\TempOrganization;
 use Illuminate\Support\Facades\DB;
@@ -57,18 +62,20 @@ class OrganizationRepository implements OrganizationInterface
     }
     public function dynamicOrganizationData($orgDocId, $orgOwnershipId, $orgCategoryId, $orgStructureId)
     {
-
         try {
             $result = DB::transaction(function () use ($orgDocId, $orgOwnershipId, $orgCategoryId, $orgStructureId) {
-
-                $orgDocId->save();
+                if ($orgDocId) {  
+                for ($i = 0; $i < count($orgDocId); $i++) {
+                    $orgDocId[$i]->save();
+                }
+                }
                 $orgOwnershipId->save();
                 $orgCategoryId->save();
                 $orgStructureId->save();
 
                 return [
                     'message' => "Success",
-                    'data' => $orgDocId->org_id,
+                    'data' => $orgOwnershipId->org_id,
                 ];
             });
             return $result;
@@ -84,6 +91,15 @@ class OrganizationRepository implements OrganizationInterface
     {
         return OrganizationDatabase::where('org_id', $id)->first();
     }
+    public function getOrganizationName()
+    {
+        return Organization::with('OrganizationDetail')
+        ->where('pfm_stage_id', 1)
+        ->whereNull('deleted_flag')
+        ->whereNull('deleted_at')->get();
+        
+    }
+    
     public function getPerviousDefaultOrganization($uid)
     {
         return UserOrganizationRelational::select('organization_details.org_name', 'user_organization_relationals.organization_id')
@@ -123,35 +139,35 @@ class OrganizationRepository implements OrganizationInterface
     }
     public function pimsOrganizationStructure()
     {
-        return OrganizationStructure::whereNull('deleted_flag')
+        return Structure::whereNull('deleted_flag')
             ->whereNull('deleted_at')
             ->get();
 
     }
     public function pimsOrganizationCategory()
     {
-        return OrganizationCategory::whereNull('deleted_flag')
+        return Category::whereNull('deleted_flag')
             ->whereNull('deleted_at')
             ->get();
 
     }
     public function pimsOrganizationOwnerShip()
     {
-        return OrganizationOwnership::whereNull('deleted_flag')
+        return OwnerShip::whereNull('deleted_flag')
             ->whereNull('deleted_at')
             ->get();
 
     }
     public function pimsOrganizationDocumentType()
     {
-        return OrganizationDocument::whereNull('deleted_flag')
+        return DocumentType::whereNull('deleted_flag')
             ->whereNull('deleted_at')
             ->get();
 
     }
     public function getAllTempOrganizations($uid)
     {
-        return TempOrganization::where('authorized_person_id',$uid)->whereNull('deleted_flag') ->whereNull('deleted_at')
-        ->get();
+        return TempOrganization::where('authorized_person_id', $uid)->whereNull('deleted_flag')->whereNull('deleted_at')
+            ->get();
     }
 }

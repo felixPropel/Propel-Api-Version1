@@ -15,7 +15,7 @@ class CreatePfmSurvival extends Migration
     {
         Schema::create('pfm_survival', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('survival');
+            $table->string('survival');
             $table->integer('active_status')->nullable();
             $table->integer('deleted_flag')->nullable();
             $table->string('created_by')->nullable();

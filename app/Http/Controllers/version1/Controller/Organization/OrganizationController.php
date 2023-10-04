@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\version1\Services\Organization\OrganizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 use App\Http\Controllers\version1\Services\Common\commonService;
 class OrganizationController extends Controller
 {
@@ -21,7 +22,7 @@ class OrganizationController extends Controller
         return $response;
     }
     public function organizationMasterDatas()  
-    {
+    {       
         $response = $this->service->organizationMasterDatas();
         Log::info('OrganizationController > organizationMasterDatas function Return.' . json_encode($response));
         return $response;

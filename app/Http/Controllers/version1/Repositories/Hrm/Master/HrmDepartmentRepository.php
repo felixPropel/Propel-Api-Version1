@@ -6,6 +6,7 @@ use App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmDepartmentInterface;
 
 use App\Models\HrmDepartment;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 //use Your Model
 
@@ -18,7 +19,7 @@ class HrmDepartmentRepository implements HrmDepartmentInterface
     public function findAll()
     {
 
-        return HrmDepartment::with('hrmParentDept')->whereNull('deleted_at')->get();
+        return HrmDepartment::with('hrmParentDept')->whereNull('deleted_flag')->whereNull('deleted_at')->get();
     }
     public function store($model)
     {
@@ -45,8 +46,8 @@ class HrmDepartmentRepository implements HrmDepartmentInterface
     }
     public function findById($id)
     {
-        $data = HrmDepartment::with('hrmParentDept')->where('id', $id)->first();
-        return $data;
+        return HrmDepartment::with('hrmParentDept')->where('id', $id)->whereNull('deleted_flag')->whereNull('deleted_at')->first();
+         
     }
     public function getParentDeptExceptThisId($id)
     {

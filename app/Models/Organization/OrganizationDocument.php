@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrganizationDocument extends Model
 {
-    protected $table = 'pims_org_document_types';
+    protected $table = 'organization_documents';
     use HasFactory;
     public function ParentOrganization()
     {
