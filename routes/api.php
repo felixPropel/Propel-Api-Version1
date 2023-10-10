@@ -13,6 +13,7 @@ use App\Http\Controllers\HomeController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('pocCategory', 'App\Http\Controllers\version1\Controller\POC\CategoryController@category')->name('pocCategory');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
@@ -84,6 +85,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     include_once('v1/person.php');
     include_once('v1/user.php');
     include_once('v1/common.php');
+    
  
 });
 
@@ -94,7 +96,10 @@ Route::middleware('auth:api')
         Route::post('/get_user_data', 'App\Http\Controllers\version1\Controller\User\UserController@get_user_data')->name('get_user_data');
         Route::post('/logout', 'App\Http\Controllers\Auth\ApiAuthController@logout')->name('logout.api');
 
+
         include_once('v1/organization.php');        
         include_once('v1/HRM/Masters/hrmMasterApi.php');
         include_once('v1/HRM/Transaction/hrmTransactionApi.php');
+
     });
+

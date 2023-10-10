@@ -35,6 +35,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('App\Http\Controllers\version1\Interfaces\Hrm\Master\HrmHumanResourceTypeInterface','App\Http\Controllers\version1\Repositories\Hrm\Master\HrmHumanResourceTypeRepository');
 
         $this->app->bind('App\Http\Controllers\version1\Interfaces\Hrm\Transaction\HrmResourceInterface','App\Http\Controllers\version1\Repositories\Hrm\Transaction\HrmResourceRepository');
+
+        $this->app->bind('App\Http\Controllers\version1\Interfaces\POC\CategoryInterface','App\Http\Controllers\version1\Repositories\POC\CategoryRepository');
+
     }
 
     /**
