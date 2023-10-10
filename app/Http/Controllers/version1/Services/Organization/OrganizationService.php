@@ -287,7 +287,7 @@ class OrganizationService
         $CityId = isset($datas->cityId) ? $datas->cityId : null;
         $area = isset($datas->area) ? $datas->area : null;
         $location = isset($datas->location) ? $datas->location :null;
-        $orgAddress = ['door_no' => $doorNo, 'building_name' => $buildingName, 'street' => $street, 'landmark' => $landMark, 'pincode' => $pinCode, 'district_id' => $districtId, 'state_id' => $stateId, 'city_id' => $CityId, 'area' => $area, 'location' => $location];
+        $orgAddress = ['doorNo' => $doorNo, 'buildingName' => $buildingName, 'street' => $street, 'landMark' => $landMark, 'pinCode' => $pinCode, 'districtId' => $districtId, 'stateId' => $stateId, 'CityId' => $CityId, 'area' => $area, 'location' => $location];
         $orgDocModels = [];
         if (isset($datas->documentNo)) {
 
