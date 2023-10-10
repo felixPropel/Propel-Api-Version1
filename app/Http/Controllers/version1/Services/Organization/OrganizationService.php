@@ -333,12 +333,14 @@ class OrganizationService
     public function organizationIndex()
     {
         $uid=auth()->user()->uid;
-        $orgName=$this->organizationInterface->getOrganizationName();
+       
+        $orgName=$this->organizationInterface->getOrganizationName($uid);
         $mainOrganization = $orgName->map(function ($OrgItem) {
             $OrgId=$OrgItem->id;
             $orgName =$OrgItem->OrganizationDetail->org_name;
             return ['OrgName'=> $orgName,'OrgId'=>$OrgId];
         });
+  
         $tempOrg = $this->organizationInterface->getAllTempOrganizations($uid);
         $tempOrganization = $tempOrg->map(function ($tempOrgItem) {
             $tempOrgId=$tempOrgItem->id;

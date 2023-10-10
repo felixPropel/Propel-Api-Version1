@@ -146,17 +146,18 @@ class CommonService
     return $datas;
   }
 
-  public function getOrganizationDatabaseByOrgId($orgId)
-  {
+  // public function getOrganizationDatabaseByOrgId($orgId)
+  // {
  
-    $databaseName = config('database.connections.mysql.database');
+  //   //$databaseName = config('database.connections.mysql.database');
+
     
-    $result = $this->organizationInterface->getDataBaseNameByOrgId($orgId);
-   Session::put('currentDatabase', $result->db_name);
-   $new = Config::set('database.connections.mysql.database', $result->db_name);
-   DB::purge('mysql');
-   DB::reconnect('mysql');
-    Log::info('CommonService > getOrganizationDatabaseByOrgId function Return.' . json_encode($result));
-    return $result;
-  }
+  //   $result = $this->organizationInterface->getDataBaseNameByOrgId($orgId);
+  //  Session::put('currentDatabase', $result->db_name);
+  //  Config::set('database.connections.mysql_external.database', $result->db_name);
+  //  DB::purge('mysql');
+  //  DB::reconnect('mysql');
+  //   Log::info('CommonService > getOrganizationDatabaseByOrgId function Return.' . json_encode($result));
+  //   return $result;
+  // }
 }

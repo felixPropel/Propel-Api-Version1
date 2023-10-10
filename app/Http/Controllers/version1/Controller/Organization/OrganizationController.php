@@ -13,14 +13,14 @@ class OrganizationController extends Controller
         $this->service = $service;
         $this->commonService = $commonService;
     }
-    public function store(Request $request)
-    {
-        Log::info('OrganizationController > store function Inside.' . json_encode($request->all()));
-        $response = $this->service->store($request->all());
-        // $dbResponse = $this->service->organizationDb($request->organizationName);
-        Log::info('OrganizationController > store function Return.' . json_encode($response));
-        return $response;
-    }
+    // public function store(Request $request)
+    // {
+    //     Log::info('OrganizationController > store function Inside.' . json_encode($request->all()));
+    //     $response = $this->service->store($request->all());
+    //     // $dbResponse = $this->service->organizationDb($request->organizationName);
+    //     Log::info('OrganizationController > store function Return.' . json_encode($response));
+    //     return $response;
+    // }
     public function organizationMasterDatas()  
     {       
         $response = $this->service->organizationMasterDatas();

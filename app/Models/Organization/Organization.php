@@ -13,5 +13,9 @@ class Organization extends Model
     {
         return $this->hasOne(OrganizationDetail::class, 'org_id', 'id');
     }
+    public function userRelational()
+    {
+        return $this->hasOne(UserOrganizationRelational::class, 'organization_id', 'id');
+    }
   
 }
