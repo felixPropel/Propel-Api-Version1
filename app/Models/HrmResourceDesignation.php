@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HrmResourceTypeDesignation extends Model
+class HrmResourceDesignation extends Model
 {
     use HasFactory;
-    public function __construct()
-    {
+    protected $connection;
+    
+    public function __construct(){
         parent::__construct();
-        $this->connection ='mysql_external';
-        
+        $this->connection = "mysql_external";
     }
     public function ParentHrmResource()
     {
@@ -22,6 +22,11 @@ class HrmResourceTypeDesignation extends Model
     {
         return $this->belongsTo(HrmDesignation::class, 'designation_id', 'id');
     }
+    public function department()
+    {
+        return $this->belongsTo(HrmDepartment::class, 'dept_id', 'id');
+    }
+    
     
     
 }

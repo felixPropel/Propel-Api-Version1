@@ -46,12 +46,12 @@ class HrmDesignationRepository implements HrmDesignationInterface
     }
     public function findById($id)
     {
-        $data = HrmDesignation::where('id', $id)->first();
-        return $data;
+        return  HrmDesignation::where('id', $id)->first();
+        
     }
     public function findByDeptId($deptId)
     {
-        $data = HrmDesignation::where('dept_id', $deptId)->get();
-        return $data;
+        return HrmDesignation::where('dept_id', $deptId)->get();
+        
     }
 }

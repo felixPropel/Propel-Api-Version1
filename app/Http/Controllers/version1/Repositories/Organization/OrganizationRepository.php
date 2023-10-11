@@ -5,6 +5,7 @@ namespace App\Http\Controllers\version1\Repositories\Organization;
 use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
 use App\Models\Organization\Organization;
 use App\Models\Organization\UserOrganizationRelational;
+use App\Models\Organization\OrganizationDatabase;
 use App\Models\PIMSOrganization\Category;
 use App\Models\PIMSOrganization\DocumentType;
 use App\Models\PIMSOrganization\OwnerShip;
@@ -83,10 +84,10 @@ class OrganizationRepository implements OrganizationInterface
     //     }
     // }
 
-    // public function getDataBaseNameByOrgId($id)
-    // {
-    //     return OrganizationDatabase::where('org_id', $id)->first();
-    // }
+    public function getDataBaseNameByOrgId($id)
+    {
+        return OrganizationDatabase::where('org_id', $id)->first();
+    }
     public function getOrganizationName($uid)
     {
         

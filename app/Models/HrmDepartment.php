@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HrmDepartment extends Model
 {
-    public function __construct()
-    {
+    protected $connection;
+    
+    public function __construct(){
         parent::__construct();
-        $this->connection ='mysql';
+        $this->connection = "mysql_external";
     }
     public function hrmParentDept()
     {

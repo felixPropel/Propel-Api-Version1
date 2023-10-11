@@ -7,14 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class HrmDesignation extends Model
 {
-    public function __construct()
-    {
+    protected $connection;
+    
+    public function __construct(){
         parent::__construct();
-        $this->connection ='mysql';
-        // $this->connection ='mysql_external';
+        $this->connection = "mysql_external";
     }
     public function department()
     {
-        return $this->belongsTo(HrmDepartment::class,'dept_id','id');
+        return $this->hasOne(HrmDepartment::class,'id','dept_id');
+    }
+    public function ParentHrmDesignation()
+    {
+        return $this->hasOne(HrmResourceDesignation::class,'designation_id','id');
     }
 }

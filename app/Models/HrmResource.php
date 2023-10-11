@@ -8,18 +8,27 @@ use Illuminate\Database\Eloquent\Model;
 class HrmResource extends Model
 {
     use HasFactory;
-    public function __construct()
-    {
+    protected $connection;
+    
+    public function __construct(){
         parent::__construct();
-        $this->connection = 'mysql_external';
+        $this->connection = "mysql_external";
     }
     public function Person()
     {
         return $this->hasOne(Person::class, 'uid', 'uid');
     }
-    public function designation()
+    public function resourceDesignation()
     {
-        return $this->hasOne(HrmResourceTypeDesignation::class, 'resource_id', 'id');
+        return $this->hasOne(HrmResourceDesignation::class, 'resource_id', 'id');
     }
-    
+    public function resourceType()
+    {
+        return $this->hasOne(HrmResourceTypeDetail::class, 'resource_id', 'id');
+    }
+    public function resourceSr()
+    {
+        return $this->hasOne(HrmResourceSr::class, 'resource_id', 'id');
+    }
+
 }

@@ -8,12 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class HrmResourceType extends Model
 {
     use HasFactory;
-    public function __construct()
-    {
+    protected $connection;
+    
+    public function __construct(){
         parent::__construct();
-        $this->connection ='mysql';
-        // $this->connection ='mysql_external';
-        
+        $this->connection = "mysql_external";
     }
     
 }

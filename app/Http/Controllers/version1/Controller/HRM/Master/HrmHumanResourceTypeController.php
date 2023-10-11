@@ -45,8 +45,7 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function store(Request $request, $orgId)
     {
-        Log::info('HrmHumanResourceTypeController > Store function Inside.' . json_encode($orgId));
-        Log::info('HrmHumanResourceTypeController > Store function Inside.' . json_encode($request->all()));
+        Log::info('HrmHumanResourceTypeController > Store function Inside.' . json_encode($orgId,$request->all()));
         $response = $this->service->store($request->all(), $orgId);
         Log::info('HrmHumanResourceTypeController > Store function Return.' . json_encode($response));
         return $response;
@@ -74,8 +73,7 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function edit($orgId, $id)
     {
-        Log::info('HrmHumanResourceTypeController > edit function Inside.' . json_encode($orgId));
-        Log::info('HrmHumanResourceTypeController > edit function Inside.' . json_encode($id));
+        Log::info('HrmHumanResourceTypeController > edit function Inside.' . json_encode($orgId,$id));
         $response = $this->service->findById($orgId, $id);
         Log::info('HrmHumanResourceTypeController > edit function Return.' . json_encode($response));
 
@@ -91,8 +89,7 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Log::info(' Human Resource Type update function Inside.' . json_encode($request->all()));
-        Log::info('Update function Inside request id.' . json_encode($id));
+        Log::info(' Human Resource Type update function Inside.' . json_encode($request->all(),$id));
         $response = $this->service->store($request->all(), $id);
         Log::info('Update function Inside response.' . json_encode($response));
         return $response;
@@ -106,8 +103,7 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function destroy($orgId,$id)
     {
-        Log::info('HrmHumanResourceTypeController > destroy function Inside.' . json_encode($orgId));
-        Log::info('HrmHumanResourceTypeController > destroy function Inside.' . json_encode($id));
+        Log::info('HrmHumanResourceTypeController > destroy function Inside.' . json_encode($orgId,$id));
         $response = $this->service->destroyById($orgId,$id);
         Log::info('HrmHumanResourceTypeController > destroy function Return.' . json_encode($response));
         return $response;

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Session;
  */
 class HrmDepartmentService
 {
-    protected $interface;
+    protected $interface,$commonService;
     public function __construct(HrmDepartmentInterface $interface, CommonService $commonService)
     {
         $this->interface = $interface;
@@ -25,8 +25,6 @@ class HrmDepartmentService
       
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
         $models = $this->interface->findAll();
-    
-
         return $this->commonService->sendResponse($models, '');
     }
     public function create($orgId)
@@ -38,11 +36,9 @@ class HrmDepartmentService
 
     public function store($data, $orgId)
     {
-
+       
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-
         $model = $this->convertToModel($data);
-
         $response = $this->interface->store($model);
 
         return $this->commonService->sendResponse($response, '');
@@ -62,12 +58,10 @@ class HrmDepartmentService
     public function convertToModel($data)
     {
         $data = (object) $data;
-        $id = $data->id;
+        $id=$data->id;
         if ($id) {
             $model = $this->interface->findById($id);
             $model->last_updated_by=auth()->user()->uid;
-
-
         } else {
             $model = new HrmDepartment();
             $model->created_by=auth()->user()->uid;

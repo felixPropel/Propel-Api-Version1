@@ -8,16 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class HrmResourceTypeDetail extends Model
 {
     use HasFactory;
-    public function __construct()
-    {
-        parent::__construct();
-        $this->connection ='mysql_external';
-        
-    }
+    protected $connection;
     
+    public function __construct(){
+        parent::__construct();
+        $this->connection = "mysql_external";
+    }
+
     public function ParentHrmResource()
     {
         return $this->belongsTo(HrmResource::class, 'resource_id', 'id');
     }
-    
+    public function ParentHrmResourceType()
+    {
+        return $this->belongsTo(HrmResourceType::class, 'resource_type_id', 'id');
+    }
 }
