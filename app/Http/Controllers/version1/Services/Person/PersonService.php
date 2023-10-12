@@ -169,9 +169,11 @@ class PersonService
         if ((isset($datas->addressOf) && $datas->addressOf !== null)) {
             $addressId = isset($datas->propertyAddressId) ? $datas->propertyAddressId : null;
             Log::info('PersonService > addressId function Inside.' . json_encode($addressId));
+            if($addressId){
             for ($i = 0; $i < count($datas->propertyAddressId); $i++) {
                 $perviousAddress = $this->personInterface->checkPerivousAddressById($datas->propertyAddressId[$i], $datas->personUid);
             }
+        }
             $personCommonAddressModel = $this->convertToPersonCommonAddress($datas);
             $personAddressId = $this->convertToPersonAddressId($datas);
             Log::info('PersonService > personAddressId function Return.' . json_encode($personAddressId));
