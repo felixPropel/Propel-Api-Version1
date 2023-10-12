@@ -45,7 +45,7 @@ class HrmHumanResourceTypeController extends Controller
      */
     public function store(Request $request, $orgId)
     {
-        Log::info('HrmHumanResourceTypeController > Store function Inside.' . json_encode($orgId,$request->all()));
+        Log::info('HrmHumanResourceTypeController > Store function Inside.' .$orgId."req datas". json_encode($request->all()));
         $response = $this->service->store($request->all(), $orgId);
         Log::info('HrmHumanResourceTypeController > Store function Return.' . json_encode($response));
         return $response;
