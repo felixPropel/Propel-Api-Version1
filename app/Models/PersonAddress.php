@@ -12,7 +12,7 @@ class PersonAddress extends Model
 
     public function ParentComAddress()
     {
-        return $this->belongsTo(PropertyAddress::class, 'property_address_id','id');
+        return $this->belongsTo(PropertyAddress::class, 'com_property_address_id','id');
     }
     public function ParentPerson()
     {
