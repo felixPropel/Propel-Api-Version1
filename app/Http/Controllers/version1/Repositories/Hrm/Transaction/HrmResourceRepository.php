@@ -5,6 +5,8 @@ namespace App\Http\Controllers\version1\Repositories\Hrm\Transaction;
 use App\Http\Controllers\version1\Interfaces\Hrm\Transaction\HrmResourceInterface;
 use App\Models\HrmDepartment;
 use App\Models\HrmResource;
+use App\Models\HrmResourceActivityStatus;
+use App\Models\HrmResourceSr;
 use Illuminate\Support\Facades\DB;
 
 //use Your Model
@@ -21,8 +23,12 @@ class HrmResourceRepository implements HrmResourceInterface
 
     public function findAll()
     {
+        return HrmResource::with([
+            'Person.personDetails',
+            'resourceDesignation.ParentHrmDesignation.department',
+            'resourceSr',
+        ])->whereNull('deleted_at')->get();
 
-        return HrmResource::with('Person.personDetails','designation.ParentHrmDesignation','designation.ParentHrmDesignation.department')->whereNull('deleted_at')->get();
     }
     public function store($model)
     {
@@ -32,18 +38,17 @@ class HrmResourceRepository implements HrmResourceInterface
                 $model->save();
                 return [
                     'message' => "Success",
-                    'data' => $model
+                    'data' => $model,
                 ];
             });
 
             return $result;
         } catch (\Exception $e) {
 
-
             return [
 
                 'message' => "failed",
-                'data' => $e
+                'data' => $e,
             ];
         }
     }
@@ -67,27 +72,27 @@ class HrmResourceRepository implements HrmResourceInterface
         try {
 
             $result = DB::transaction(function () use ($allModels) {
-               
 
                 $resourceModel = $allModels['resourceModel'];
                 $resourceTypeDetailModel = $allModels['resourceTypeDetailModel'];
                 $resourceDesignModel = $allModels['resourceDesignModel'];
-                $resourceWorkingModel = $allModels['resourceWorkingModel'];
+                $resourceServiceModel = $allModels['resourceServiceModel'];
+                $resourceServiceDetailsModel = $allModels['ResourceServiceDetailsModel'];
                 $userAccountModel = $allModels['userAccountModel'];
 
                 $resourceModel->save();
 
-                $resourceTypeDetailModel->ParentHrmResource()->associate($resourceModel,  'resource_id','id');
-                $resourceDesignModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
-                $resourceWorkingModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
+                $resourceTypeDetailModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
+                 $resourceDesignModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
+                $resourceServiceModel->ParentHrmResource()->associate($resourceModel, 'resource_id', 'id');
                 $userAccountModel->ParentPerson()->associate($resourceModel, 'uid', 'uid');
-
-
                 $resourceTypeDetailModel->save();
-                $resourceDesignModel->save();
-                $resourceWorkingModel->save();
+                 $resourceDesignModel->save();
+                $resourceServiceModel->save();
                 $userAccountModel->save();
-                
+                $resourceServiceDetailsModel->ParentHrmResourceService()->associate($resourceServiceModel, 'resource_sr_id', 'id');
+                $resourceServiceDetailsModel->save();
+
                 return [
                     'message' => "Success",
                     'data' => $resourceModel
@@ -98,7 +103,7 @@ class HrmResourceRepository implements HrmResourceInterface
             return $result;
         } catch (\Exception $e) {
 
-
+            
             return [
 
                 'message' => "failed",
@@ -106,4 +111,4 @@ class HrmResourceRepository implements HrmResourceInterface
             ];
         }
     }
-}
+    }

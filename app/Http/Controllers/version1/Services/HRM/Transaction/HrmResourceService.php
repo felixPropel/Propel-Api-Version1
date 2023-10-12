@@ -12,14 +12,15 @@ use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Http\Controllers\version1\Services\Person\PersonService;
 use App\Models\HrmResource;
-use App\Models\HrmResourceReliveDetail;
-use App\Models\HrmResourceSr;
-use App\Models\HrmResourceTypeDesignation;
-use App\Models\HrmResourceTypeDetail;
+use App\Models\HrmResourceDesignation;
+use App\Models\HrmResourceSr; 
+use App\Models\HrmResourceSrAffinity;
+use App\Models\HrmResourceTypeAffinity;
 use App\Models\Organization\UserOrganizationRelational;
 use App\Models\PersonEmail;
 use App\Models\PersonMobile;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Class HrmResourceService.
@@ -46,37 +47,30 @@ class HrmResourceService
     {
 
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-        $models = $this->hrmResourceInterface->findAll();
+        $resources = $this->hrmResourceInterface->findAll();
+     
 
-        $entities = collect($models)->map(function ($model) {
-            $designation = "";
-            $department = "";
-            $name = "";
-            $status = "";
+        $resourceDetails = $resources->map(function ($resource) {
 
-            if ($model['person']) {
-                $personModel = $model['person'];
-                if ($personModel['personDetails']) {
-                    $personDetailModel = $personModel['personDetails'];
-                    $name = $personDetailModel['first_name'] . " " . $personDetailModel['middle_name'] . " " . $personDetailModel['last_name'];
-                }
-            }
-            if ($model['designation']) {
-                $designModel = $model['designation'];
-                if ($designModel['ParentHrmDesignation']) {
-                    $descMasterModel = $designModel['ParentHrmDesignation'];
-                    $designation = $descMasterModel['designation_name'];
-                    if ($descMasterModel['department']) {
-                        $resourceDeptModel = $descMasterModel['department'];
-                        $department = $resourceDeptModel["department_name"];
-                    }
-                }
-            }
-            $params = ['designation' => $designation, 'department' => $department, 'resourceName' => $name, 'id' => $model->id];
-            return $params;
+            $personUid = $resource->uid;
+            $resourceId = $resource->id;
+            $personDetails = $resource->Person->personDetails;
+            $personName = "{$personDetails->first_name} {$personDetails->last_name} {$personDetails->nick_name}";
+            $department = $resource->resourceDesignation->ParentHrmDesignation->department->department_name;
+            $designation = $resource->resourceDesignation->ParentHrmDesignation->designation_name;
+            $resourceStatus = isset($resource->resourceSr->active_status_id) ? $resource->resourceSr->active_status_id : null;
+            
+
+            return [
+                'designation' => $designation,
+                'department' => $department,
+                'resourceName' => $personName,
+                'resourceId' => $resourceId,
+                'uid' => $personUid,
+                'resourceStatus' => $resourceStatus,
+            ];
         });
-
-        return $this->commonService->sendResponse($entities, '');
+        return $this->commonService->sendResponse($resourceDetails, '');
     }
     public function findResourceWithCredentials($datas, $orgId)
     {
@@ -120,7 +114,7 @@ class HrmResourceService
             }
         } else {
             $getAllPersonByMobileAndEmail = $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
-            if ($getAllPersonByMobileAndEmail) {
+            if ($getAllPersonByMobileAndEmail['mobile'] !== null || $getAllPersonByMobileAndEmail['email'] !== null) {
                 $resData = ['type' => 1, 'PersonDatas' => $getAllPersonByMobileAndEmail];
             } else {
                 $resData = ['type' => 2, 'status' => 'freshResource', 'mobile' => $mobile, 'email' => $email];
@@ -157,27 +151,24 @@ class HrmResourceService
     {
 
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-        $datas = (object) $datas;
+                $datas = (object) $datas;
         $cModel = $this->convertToResourceReliveModel($datas);
         $model = "";
 
     }
-
-    public function convertToResourceReliveModel($datas)
+    public function convertResourceServiceDetails($datas, $id)
     {
-
-        $model = new HrmResourceReliveDetail();
-        $model->reource_id = $datas->resourceId;
-        $model->relive_type_id = $datas->reliveType;
-        $model->relive_date = $datas->reliveDate;
-        $model->reason = $datas->reason;
+        $model = new HrmResourceSrAffinity();
+        $model->resource_sr_id = $id;
+        $model->activity_id = isset($datas->reliveTypeId) ? $datas->reliveTypeId : 1;
+        $model->date = date('Y-m-d', strtotime($datas->date));
+        $model->reason = isset($datas->reason) ? $datas->reason : null;
         return $model;
     }
     public function save($datas, $orgId)
     {
-
         $dbConnection = $this->commonService->getOrganizationDatabaseByOrgId($orgId);
-
+      
         $orgdatas = (object) $datas;
         $personModelresponse = $this->personService->storePerson($datas, 'resource');
 
@@ -189,21 +180,34 @@ class HrmResourceService
             Log::info('HrmResourceService > saveUid.' . json_encode($uid));
 
             $convertToResourceModel = $this->convertToResourceModel($orgdatas, $uid);
-            //  $resourceModel = $this->hrmResourceInterface->saveResourceModel($convertToResourceModel);
+            Log::info('HrmResourceService > convertToResourceModel.' . json_encode($convertToResourceModel));
+
+            //$resourceModel = $this->hrmResourceInterface->saveResourceModel($convertToResourceModel);
             $convertToResourceTypeDetailModel = $this->convertToResourceTypeDetailModel($orgdatas);
-            $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas);
-            $convertToResourceWorking = $this->convertToResourceWorking($orgdatas);
+                        $convertToResourceDesignationModel = $this->convertToResourceDesignationModel($orgdatas);
+            Log::info('HrmResourceService > convertToResourceDesignationModel.' . json_encode($convertToResourceDesignationModel));
+
+            $convertToResourceService = $this->convertToResourceService($orgdatas);
+            Log::info('HrmResourceService > convertToResourceService.' . json_encode($convertToResourceService));
+
+            $convertToResourceServiceDetails = $this->convertToResourceServiceDetails($orgdatas);
+            Log::info('HrmResourceService > convertToResourceServiceDetails.' . json_encode($convertToResourceServiceDetails));
+
             $convertToUserAccountModel = $this->convertToUserAccountModel($orgId);
+            Log::info('HrmResourceService > convertToUserAccountModel.' . json_encode($convertToUserAccountModel));
+ 
 
             $allModels = [
                 'resourceModel' => $convertToResourceModel,
-                'resourceTypeDetailModel' => $convertToResourceTypeDetailModel,
-                'resourceDesignModel' => $convertToResourceDesignationModel,
-                'resourceWorkingModel' => $convertToResourceWorking,
+                 'resourceTypeDetailModel' => $convertToResourceTypeDetailModel,
+                 'resourceDesignModel' => $convertToResourceDesignationModel,
+                'resourceServiceModel' => $convertToResourceService,
+                'ResourceServiceDetailsModel' => $convertToResourceServiceDetails,
                 'userAccountModel' => $convertToUserAccountModel,
             ];
 
             $saveResourceModel = $this->hrmResourceInterface->saveResource($allModels);
+           
 
             log::info('saveResource ' . json_encode($saveResourceModel));
             return $this->commonService->sendResponse($saveResourceModel, '');
@@ -213,7 +217,7 @@ class HrmResourceService
     {
         $model = HrmResource::where('uid', isset($datas->personUid))->first();
         if ($model) {
-            $model->uid = $datas->personUid;
+            $model->uid = $uid;
         } else {
             $model = new HrmResource();
             $model->uid = $uid;
@@ -225,7 +229,7 @@ class HrmResourceService
     public function convertToResourceTypeDetailModel($datas)
     {
         //dd($datas);
-        $model = new HrmResourceTypeDetail();
+        $model = new HrmResourceTypeAffinity();
         $model->resource_type_id = $datas->resourceTypeId;
         return $model;
     }
@@ -233,16 +237,23 @@ class HrmResourceService
     public function convertToResourceDesignationModel($datas)
     {
         //dd($datas);
-        $model = new HrmResourceTypeDesignation();
+        $model = new HrmResourceDesignation();
         $model->designation_id = $datas->designationId;
         return $model;
     }
-
-    public function convertToResourceWorking($datas)
+    public function convertToResourceService($datas)
     {
         $model = new HrmResourceSr();
-        $model->active_state = 1;
-        $model->date_of_joining = date('Y-m-d');
+        $model->hrm_resource_activity_status_id = 1;
+        log::info('hrmResourceService   HrmResourceSr ' . json_encode($model->date_of_joining));
+        return $model;
+    }
+    public function convertToResourceServiceDetails($datas)
+    {
+        $model = new HrmResourceSrAffinity();
+        $model->activity_id = 1;
+        $model->date = date('Y-m-d', strtotime($datas->resourceJoinDate));
+        $model->reason = isset($datas->reason) ? $datas->reason : null;
         log::info('hrmResourceService   HrmResourceSr ' . json_encode($model->date_of_joining));
         return $model;
     }
@@ -391,4 +402,4 @@ class HrmResourceService
         ];
         return $this->commonService->sendResponse($result, '');
     }
-}
+    }

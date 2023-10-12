@@ -24,7 +24,7 @@ class HrmResource extends Model
     }
     public function resourceType()
     {
-        return $this->hasOne(HrmResourceTypeDetail::class, 'resource_id', 'id');
+        return $this->hasOne(HrmResourceTypeAffinity::class, 'resource_id', 'id');
     }
     public function resourceSr()
     {

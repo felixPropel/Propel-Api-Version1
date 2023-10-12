@@ -20,11 +20,11 @@ class HrmResourceDesignation extends Model
     }
     public function ParentHrmDesignation()
     {
-        return $this->belongsTo(HrmDesignation::class, 'designation_id', 'id');
+        return $this->hasOne(HrmDesignation::class, 'id', 'designation_id');
     }
     public function department()
     {
-        return $this->belongsTo(HrmDepartment::class, 'dept_id', 'id');
+        return $this->hasOne(HrmDepartment::class, 'dept_id', 'id');
     }
     
     

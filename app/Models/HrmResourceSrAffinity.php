@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HrmResourceSr extends Model
+class HrmResourceSrAffinity extends Model
 {
     use HasFactory;
     protected $connection;
@@ -14,12 +14,8 @@ class HrmResourceSr extends Model
         parent::__construct();
         $this->connection = "mysql_external";
     }
-    public function ParentHrmResource()
+    public function ParentHrmResourceService()
     {
-        return $this->belongsTo(HrmResource::class, 'resource_id', 'id');
-    }
-    public function resourceServiceDetail()
-    {
-        return $this->hasOne(HrmResourceSrAffinity::class, 'resource_sr_id', 'id');
+        return $this->belongsTo(HrmResourceSr::class, 'resource_sr_id', 'id');
     }
 }
