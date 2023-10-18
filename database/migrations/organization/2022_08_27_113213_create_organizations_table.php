@@ -15,10 +15,15 @@ class CreateOrganizationsTable extends Migration
     {
         Schema::create('organizations', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('authorization_status');
-            $table->string('db_name');
-            $table->integer('status')->nullable();
+            $table->integer('pfm_stage_id');
+            $table->integer('pfm_origin_id');
+            $table->integer('pfm_existence_id')->nullable();
+            $table->integer('pfm_authorization_id')->nullable();
+            $table->string('reason')->nullable();
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 

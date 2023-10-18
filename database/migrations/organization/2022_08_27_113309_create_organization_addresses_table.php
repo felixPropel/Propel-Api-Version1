@@ -16,18 +16,13 @@ class CreateOrganizationAddressesTable extends Migration
         Schema::create('organization_addresses', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('org_id');
-            $table->integer('address_type_id')->nullable();
-            $table->string('door_no', 50)->nullable();
-            $table->string('building_name', 50)->nullable();
-            $table->string('street', 50)->nullable();
-            $table->string('area', 50)->nullable();
-            $table->integer('district_id')->nullable();
-            $table->string('city', 50)->nullable();
-            $table->string('pincode', 50)->nullable();
-            $table->string('landmark', 50)->nullable();
-            $table->string('location', 100)->nullable();
-            $table->integer('status_id')->nullable();
+            $table->integer('com_property_address_id');
+            $table->integer('address_cachet_id')->nullable();
+            $table->date('address_update_on')->nullable();
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable(); 
         });
     }
 

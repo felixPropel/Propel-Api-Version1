@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePfmOrigin extends Migration
+class CreatePimsComCountryTimeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,15 @@ class CreatePfmOrigin extends Migration
      */
     public function up()
     {
-        Schema::create('pfm_origin', function (Blueprint $table) {
+        Schema::create('pims_com_country_time', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('origin');
+            $table->integer('country_id');
+            $table->string('time_zone');
+            $table->string('gmt_difference')->nullable();
+            $table->string('is_daylight')->nullable();
+            $table->string('daylight')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->string('description')->nullable();
             $table->integer('pfm_active_status_id')->nullable();
             $table->integer('deleted_flag')->nullable();
@@ -33,6 +39,6 @@ class CreatePfmOrigin extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pfm_origin');
+        Schema::dropIfExists('pims_com_country_time');
     }
 }

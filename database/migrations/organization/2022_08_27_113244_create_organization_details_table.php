@@ -17,15 +17,18 @@ class CreateOrganizationDetailsTable extends Migration
             $table->increments('id');
             $table->integer('org_id');
             $table->integer('title_id')->nullable();
-            $table->string('org_name', 50);
-            $table->string('alias', 50)->nullable();
+            $table->string('org_name', 250);
+            $table->string('org_alias', 250)->nullable();
             $table->date('started_date')->nullable();
             $table->year('year_of_yestablishment')->nullable();
-            $table->integer('org_category_id')->nullable();
-            $table->integer('org_ownership_id')->nullable();
-            $table->integer('org_register_status')->nullable();
-            $table->integer('status')->nullable();
+            $table->string('is_registered_org')->nullable();
+            $table->string('gst_no')->nullable();
+            $table->string('date_of_reg')->nullable();
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+        
         });
     }
 

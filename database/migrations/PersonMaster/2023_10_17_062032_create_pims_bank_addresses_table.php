@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOrganizationWebAddressesTable extends Migration
+class CreatePimsBankAddressesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateOrganizationWebAddressesTable extends Migration
      */
     public function up()
     {
-        Schema::create('organization_web_addresses', function (Blueprint $table) {
+        Schema::create('pims_bank_addresses', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('org_id');
-            $table->string('web_address');
-            $table->integer('web_address_cachet_id')->nullable();
+            $table->integer('bank_id');
+            $table->string('address_id');
             $table->integer('pfm_active_status_id')->nullable();
             $table->integer('deleted_flag')->nullable();
             $table->timestamps();
@@ -32,6 +31,6 @@ class CreateOrganizationWebAddressesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('organization_web_addresses');
+        Schema::dropIfExists('pims_bank_addresses');
     }
 }

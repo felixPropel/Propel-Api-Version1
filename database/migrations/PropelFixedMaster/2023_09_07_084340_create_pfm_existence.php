@@ -16,7 +16,8 @@ class CreatePfmExistence extends Migration
         Schema::create('pfm_existence', function (Blueprint $table) {
             $table->increments('id');
             $table->string('existence');
-            $table->integer('active_status')->nullable();
+            $table->string('description')->nullable();
+            $table->integer('pfm_active_status_id')->nullable();
             $table->integer('deleted_flag')->nullable();
             $table->string('created_by')->nullable();
             $table->string('last_updated_by')->nullable();

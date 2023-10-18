@@ -17,9 +17,12 @@ class CreateOrganizationEmailsTable extends Migration
             $table->increments('id');
             $table->integer('org_id');
             $table->string('email');
-            $table->integer('verification_status_id');
-            $table->integer('status')->nullable();
+            $table->integer('email_cachet_id')->nullable();
+            $table->integer('email_validation_id')->nullable();
+            $table->integer('pfm_active_status_id')->nullable();
+            $table->integer('deleted_flag')->nullable();
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 
