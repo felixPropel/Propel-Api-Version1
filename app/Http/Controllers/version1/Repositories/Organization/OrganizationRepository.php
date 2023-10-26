@@ -134,10 +134,10 @@ class OrganizationRepository implements OrganizationInterface
             ];
         }
     }
-    // public function getTempOrganizationDataByTempId($id)
-    // {
-    //     return TempOrganization::where('id', $id)->whereNull('deleted_at')->first();
-    // }
+    public function getTempOrganizationDataByTempId($tempOrgId)
+    {
+        return TempOrganization::where('id', $tempOrgId)->whereNull('deleted_at')->first();
+    }
     public function pimsOrganizationStructure()
     {
         return Structure::whereNull('deleted_flag')

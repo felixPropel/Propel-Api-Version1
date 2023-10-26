@@ -8,7 +8,6 @@ interface OrganizationInterface
     public function getPerviousDefaultOrganization($uid);
     public function changeDefaultOrganization($uid);
     public function storeTempOrganization($model);
-    // public function getTempOrganizationDataByTempId($id);
     // public function dynamicOrganizationData($orgDocId,$orgOwnershipId,$orgCategoryId,$orgStructureId);
     public function pimsOrganizationStructure();
     public function pimsOrganizationCategory();
@@ -16,6 +15,7 @@ interface OrganizationInterface
     public function pimsOrganizationDocumentType();
     public function getAllTempOrganizations($uid);
     public function getOrganizationName($uid);
+    public function getTempOrganizationDataByTempId($tempOrgId);
    
 
 
