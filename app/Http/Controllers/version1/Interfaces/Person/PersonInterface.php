@@ -60,6 +60,9 @@ interface PersonInterface
    public function getPerviousPrimaryEmail($uid);
    public function deletedPersonEmailByUid($email,$uid);
    public function getMobileNoByUid($mobile,$uid);
+   public function getPersonDataByMobileNo($mobile);
+   public function getPersonDataByEmail($email);
+
 
 
 }

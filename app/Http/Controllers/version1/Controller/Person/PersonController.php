@@ -8,6 +8,7 @@ use App\Http\Controllers\version1\Services\Person\PersonService;
 use App\Http\Controllers\version1\Services\User\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class PersonController extends Controller
 {
@@ -49,6 +50,8 @@ class PersonController extends Controller
     }
     public function getSalutation(Request $request)
     {
+      
+
         Log::info('PersonController > getSalutation function Inside.');
         $response = $this->commonService->getSalutation();
         Log::info('PersonController > getSalutation function Return.' . json_encode($response));
@@ -83,6 +86,7 @@ class PersonController extends Controller
     }
     public function getDetailedAllPerson(Request $request)
     {
+       
         Log::info('PersonController > getDetailedAllPerson function Inside.' . json_encode($request->all()));
         $response = $this->personService->getDetailedAllPerson($request->all());
         Log::info('PersonController > getDetailedAllPerson function Return.' . json_encode($response));

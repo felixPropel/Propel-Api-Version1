@@ -73,12 +73,14 @@ class PersonService
         if (!empty($checkPersonMobile)) {
             $checkPersonEmail = $this->personInterface->checkPersonEmailByUid($datas->email, $checkPersonMobile->uid);
         }
-        $personAllDetails = $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email, $datas->mobileNumber);
+        $personMobile = $this->personInterface->getPersonDataByMobileNo($datas->mobileNumber);
+        $personEmail = $this->personInterface->getPersonDataByEmail($datas->email);
 
         if ($checkPersonMobile && $checkPersonEmail) {
             $result = ['type' => 1, 'personData' => $datas, 'uid' => $checkPersonMobile->uid, 'status' => 'ExactPerson'];
-        } else if ($personAllDetails['mobile'] !== null || $personAllDetails['email'] !== null) {
-            $result = ['type' => 2, 'personData' => $personAllDetails, 'status' => 'mappedPerson'];
+        } else if ($personMobile !== null || $personEmail!== null) {
+            $personData=['personMobile'=>$personMobile->mobile,'personEmail'=>$personEmail->email];
+            $result = ['type' => 2, 'personData' => $personData, 'status' => 'mappedPerson'];
         } else {
             $result = ['type' => 3, 'status' => 'freshUser'];
         }
@@ -803,8 +805,10 @@ class PersonService
 
         Log::info('PersonService > getDetailedAllPerson function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $personAllDetails = $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($datas->email, $datas->mobileNumber);
-        return $this->commonService->sendResponse($personAllDetails, '');
+        $personMobile = $this->personInterface->getPersonDataByMobileNo($datas->mobileNumber);
+        $personEmail = $this->personInterface->getPersonDataByEmail($datas->email);
+        $personData=['personMobile'=>$personMobile->mobile,'personEmail'=>$personEmail->email];
+        return $this->commonService->sendResponse($personData, '');
 
     }
     public function userProfileDatas($datas)

@@ -19,4 +19,8 @@ class UserOrganizationRelational extends Model
     {
         return $this->belongsTo(Person::class, 'uid', 'uid');
     }
+    public function organizationDetail()
+    {
+        return $this->hasOne(OrganizationDetail::class, 'org_id', 'organization_id');
+    }
 }

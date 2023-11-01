@@ -18,14 +18,13 @@ class HrmResourceController extends Controller
 
     public function index($orgId)
     {
-        Log::info('findResourceWithCredentials-> index Inside.' . json_encode($orgId));
+        Log::info('HrmResourceController-> index Inside.' . json_encode($orgId));
         $response = $this->service->findAll($orgId);
         return $response;
         Log::info('HrmResourceController>Store Return.' . json_encode($response));
     }
     public function findResourceWithCredentials(Request $request, $orgId)
     {
-
         Log::info('findResourceWithCredentials-> Store Inside.' . json_encode($request->all()));
         $response = $this->service->findResourceWithCredentials($request->all(), $orgId);
         return $response;
@@ -44,7 +43,7 @@ class HrmResourceController extends Controller
     public function getResourceMasterData($orgId)
     {
 
-        Log::info('findResourceWithCredentials-> getPersonMasterData Inside OrgId .' . json_encode($orgId));
+        Log::info('HrmResourceController-> getPersonMasterData Inside OrgId .' . json_encode($orgId));
         $response = $this->service->getResourceMasterData($orgId);
         return $response;
         Log::info('HrmResourceController>Store Return.' . json_encode($response));
@@ -60,7 +59,7 @@ class HrmResourceController extends Controller
 
     public function resourceRelive(Request $request,$orgId)
     {
-    Log::info('findResourceWithCredentials-> resourceRelive Inside OrgId .' . json_encode($orgId));
+    Log::info('HrmResourceController-> resourceRelive Inside OrgId .' . json_encode($orgId));
     $response = $this->service->resourceRelive($request->all(),$orgId);
     return $response;
     Log::info('HrmResourceController>Store Return.' . json_encode($response));

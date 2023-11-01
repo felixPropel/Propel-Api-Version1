@@ -270,22 +270,46 @@ class PersonRepository implements PersonInterface
     }
     public function findExactPersonWithEmailAndMobile($email, $mobile)
     {
-        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Inside.' . json_encode($email));
-
-        $model = Person::select('*')
-            ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
-            ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
-            ->where('person_mobiles.mobile_no', $mobile)
-            ->Where('person_emails.email', $email)
-            ->whereIn('person_mobiles.mobile_cachet_id', [1, 2])
-            ->whereIn('person_emails.email_cachet_id', [1, 2])
-            ->first();
-
-        Log::info('PersonRepository>findExactPersonWithEmailAndMobile Function>Return . ' . json_encode($model));
-        return $model;
+        return Person::with(['mobile', 'email'])
+        ->whereHas('mobile', function ($query) use ($mobile) {
+            $query->where('mobile_no', $mobile)
+                  ->whereIn('mobile_cachet_id', [1, 2]);
+        })
+        ->whereHas('email', function ($query) use ($email) {
+            $query->where('email', $email)
+                  ->whereIn('email_cachet_id', [1, 2]);
+        })
+        ->first();
+    }
+    public function getPersonDataByMobileNo($mobile)
+    {
+        return Person::with('mobile', 'existUser')
+        ->whereHas('mobile', function ($query) use ($mobile) {
+            $query->whereIn('mobile_cachet_id', [1, 2])
+                ->where('mobile_no', $mobile);
+        })
+        ->whereHas('existUser', function ($query) use ($mobile) {
+            $query->where('primary_mobile', '!=', $mobile);
+        })
+        ->first();
+    
+    }
+    public function getPersonDataByEmail($email)
+    {
+        return Person::with('email', 'existUser')
+        ->whereHas('email', function ($query) use ($email) {
+            $query->whereIn('email_cachet_id', [1, 2])
+                ->where('email', $email);
+        })
+        ->whereHas('existUser', function ($query) use ($email) {
+            $query->where('primary_email', '!=', $email);
+        })
+        ->first();
+    
     }
     public function getDetailedAllPersonDataWithEmailAndMobile($email, $mobile)
     {
+      
         $mobile = Person::with('mobile')
             ->whereHas('mobile', function ($query) use ($mobile) {
                 $query->whereIn('mobile_cachet_id', [1, 2])
@@ -302,6 +326,7 @@ class PersonRepository implements PersonInterface
             ->first();
         $mobileUid = $mobile?->uid;
         $emailUid = $email?->uid;
+       
         return [
             'mobile' => $mobileUid && !User::where('uid', $mobileUid)->exists() ? $this->personDataMapped($mobileUid) : null,
             'email' => $emailUid && !User::where('uid', $emailUid)->exists() ? $this->personDataMapped($emailUid) : null,
@@ -324,11 +349,10 @@ class PersonRepository implements PersonInterface
     }
     public function personAddressByuid($uid)
     {
-        $models = PropertyAddress::select('*')
-            ->leftjoin('person_addresses', 'person_addresses.com_property_address_id', 'com_property_addresses.id')
-            ->where('person_addresses.uid', $uid)
+        return  PropertyAddress::with('ParentAddress')
+            ->where('uid', $uid)
             ->get();
-        return $models;
+        
     }
     public function personSecondMobileAndEmailByUid($uid)
     {
@@ -495,18 +519,19 @@ class PersonRepository implements PersonInterface
     {
         $porpertyAddress = PropertyAddress::where('id', $addressId)->delete();
         $personAddress = PersonAddress::where(['uid' => $uid, 'com_property_address_id' => $addressId])->delete();
-        return false;
+        return true;
     }
     public function getPrimaryMobileAndEmailbyUid($uid)
     {
-        return Person::select('person_mobiles.mobile_no as mobileId', 'person_emails.email as emailId', 'persons.uid as personUid', 'person_details.first_name as personName')
-            ->leftjoin('person_mobiles', 'person_mobiles.uid', 'persons.uid')
-            ->leftjoin('person_emails', 'person_emails.uid', 'persons.uid')
-            ->leftjoin('person_details', 'person_details.uid', 'persons.uid')
-            ->Where('persons.uid', $uid)
-            ->whereIn('person_mobiles.mobile_cachet_id', [1])
-            ->whereIn('person_emails.email_cachet_id', [1])
-            ->first();
+     return  Person::with(['mobile', 'email'])
+        ->where('uid', $uid)
+        ->whereHas('mobile', function ($query) {
+            $query->whereIn('mobile_cachet_id', [1]);
+        })
+        ->whereHas('email', function ($query) {
+            $query->whereIn('email_cachet_id', [1]);
+        })
+        ->first();
 
     }
     public function getPersonPicAndPersonName($uid) 

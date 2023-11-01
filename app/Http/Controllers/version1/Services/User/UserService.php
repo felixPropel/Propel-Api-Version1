@@ -8,6 +8,7 @@ use App\Http\Controllers\version1\Interfaces\User\UserInterface;
 use App\Http\Controllers\version1\Services\Common\CommonService;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -23,7 +24,7 @@ class UserService
     }
     public function loginUser($objdatas)
     {
-        Log::info('UserService > loginUser function Inside.' . json_encode($objdatas));
+              Log::info('UserService > loginUser function Inside.' . json_encode($objdatas));
         $datas = (object) $objdatas;
         $validator = Validator::make($objdatas, [
             'userName' => 'required|string|max:255',
@@ -33,15 +34,15 @@ class UserService
             return response(['errors' => $validator->errors()->all()], 422);
         }
         $verifyUser = $this->userInterface->verifyUserForMobile($datas);
-        $uid = $verifyUser->uid;
+                $uid = $verifyUser->uid;
         $personDetail = $this->personInterface->getPersonPicAndPersonName($uid);
         $nickName = $personDetail->nick_name ?? null;
         $firstName = $personDetail->first_name ?? null;
-        $personPic = $personDetail->PersonPic->profile_pic ?? null;
+        $personPic = $personDetail->PersonPic->profile_pic ?? null; 
         Log::info('UserService > loginUser function Return.' . json_encode($verifyUser));
         if ($verifyUser) {
             if (Hash::check($datas->password, $verifyUser->password)) {
-             $token = $verifyUser->createToken('Laravel Password Grant Client')->accessToken;
+                             $token = $verifyUser->createToken('Laravel Password Grant Client')->accessToken;
                 $personStatus = $this->personInterface->checkPersonExistence($uid);
                 $personType = $personStatus ? $personStatus->existence : null;
                 $defaultOrg = $this->OrganizationInterface->getPerviousDefaultOrganization($uid);
@@ -58,10 +59,20 @@ class UserService
     }
     public function storeUser($data)
     {
-        Log::info('UserService > storeUser function Inside.' . json_encode($data));
+               Log::info('UserService > storeUser function Inside.' . json_encode($data));
+        $validator = Validator::make($data, [
+            'password' => 'required|string|max:255',
+            'passwordConfirmation' => 'required|string|same:password',
+        ]);
+        
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+        
         $datas = (object) $data;
-        $personModel = $this->personInterface->getPrimaryMobileAndEmailbyUid($datas->uId);
-        $model = $this->convertToUserModel($personModel, $datas);
+        $personModel = $this->personInterface->getPrimaryMobileAndEmailbyUid($datas->uid);
+        $personData=['mobile'=>$personModel->mobile->mobile_no,'email'=>$personModel->email->email];
+        $model = $this->convertToUserModel($personData, $datas);
         $storeUser = $this->userInterface->storeUser($model);
         Log::info('UserService > storeUser function Return.' . json_encode($storeUser));
 
@@ -116,17 +127,17 @@ class UserService
         }
 
     }
-    public function convertToUserModel($personModel, $datas)
+    public function convertToUserModel($personData, $datas)
     {
         Log::info('UserService > convertToUserModel function Inside.' . json_encode($datas));
-        Log::info('UserService > convertToUserModel function Inside.' . json_encode($personModel));
-        $personModel = (object) $personModel;
+        Log::info('UserService > convertToUserModel function Inside.' . json_encode($personData));
+        $personData = (object) $personData;
         $model = new User();
-        $model->uid = $personModel->personUid;
-        $model->primary_email = $personModel->emailId;
-        $model->primary_mobile = $personModel->mobileId;
+        $model->uid = $datas->uid;
+        $model->primary_email = $personData->email;
+        $model->primary_mobile = $personData->mobile;
         $model->password = Hash::make($datas->password);
-        $model->stage = 1;
+        $model->pfm_stage_id = 1;
         Log::info('UserService > convertToUserModel function Return.' . json_encode($model));
         return $model;
     }

@@ -29,12 +29,18 @@ class OrganizationService
         $this->organizationInterface = $organizationInterface;
         $this->commonService = $commonService;
     }
-    public function getOrganizationAccountByUid($datas)
+    public function getOrganizationAccountByUid($uid)
     {
-        Log::info('OrganizationService > getOrganizationAccountByUid function Inside.' . json_encode($datas));
-        $datas = (object) $datas;
-        $OrganizationAccountModel = $this->organizationInterface->getOrganizationAccountByUid($datas->uid);
-        return $this->commonService->sendResponse($OrganizationAccountModel, "");
+        Log::info('OrganizationService > getOrganizationAccountByUid function Inside.' . json_encode($uid));
+        $OrganizationAccountModel = $this->organizationInterface->getOrganizationAccountByUid($uid);
+        $transformed = $OrganizationAccountModel->map(function ($item) {
+            $orgId=$item->organization_id;
+            $defaultOrgStatus=$item->default_org;
+            $pfmActiveStatus=$item->pfm_active_status_id;
+            $orgName = $item->organizationDetail->org_name;
+            return ['orgId'=>$orgId,'org_name'=>$orgName,'pfm_stage_id'=>$pfmActiveStatus,'default_org'=>$defaultOrgStatus];
+        });
+        return $this->commonService->sendResponse($transformed, "");
     }
     public function store($tempOrgId)
     {

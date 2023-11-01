@@ -79,6 +79,7 @@ class HrmResourceService
         $mobile = $datas->mobileNo;
         $email = $datas->email;
         $checkPerson = $this->personInterface->findExactPersonWithEmailAndMobile($email, $mobile);
+      
 
         /*Some Important Types credential Type Start */
         /* 1.get All Person */
@@ -91,6 +92,7 @@ class HrmResourceService
 
         /*Some Important Types credential Type End */
         if ($checkPerson) {
+          
             $uid = $checkPerson->uid;
             $checkUserWithUid = $this->personInterface->checkUserByuid($uid);
             if ($checkUserWithUid) {
@@ -113,9 +115,11 @@ class HrmResourceService
                 return $this->commonService->sendResponse($resData, '');
             }
         } else {
-            $getAllPersonByMobileAndEmail = $this->personInterface->getDetailedAllPersonDataWithEmailAndMobile($email, $mobile);
-            if ($getAllPersonByMobileAndEmail['mobile'] !== null || $getAllPersonByMobileAndEmail['email'] !== null) {
-                $resData = ['type' => 1, 'PersonDatas' => $getAllPersonByMobileAndEmail];
+            $personMobile = $this->personInterface->getPersonDataByMobileNo($mobile);
+            $personEmail = $this->personInterface->getPersonDataByEmail($email);
+            if ($personMobile  !== null || $personEmail !== null) {
+                $personData=['personMobile'=>$personMobile->mobile,'personEmail'=>$personEmail->email];
+                $resData = ['type' => 1, 'PersonDatas' => $personData];
             } else {
                 $resData = ['type' => 2, 'status' => 'freshResource', 'mobile' => $mobile, 'email' => $email];
             }

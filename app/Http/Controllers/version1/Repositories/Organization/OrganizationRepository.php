@@ -4,8 +4,8 @@ namespace App\Http\Controllers\version1\Repositories\Organization;
 
 use App\Http\Controllers\version1\Interfaces\Organization\OrganizationInterface;
 use App\Models\Organization\Organization;
-use App\Models\Organization\UserOrganizationRelational;
 use App\Models\Organization\OrganizationDatabase;
+use App\Models\Organization\UserOrganizationRelational;
 use App\Models\PIMSOrganization\Category;
 use App\Models\PIMSOrganization\DocumentType;
 use App\Models\PIMSOrganization\OwnerShip;
@@ -17,11 +17,8 @@ class OrganizationRepository implements OrganizationInterface
 {
     public function getOrganizationAccountByUid($uid)
     {
-        return UserOrganizationRelational::select('organizations.id as orgId', 'organization_details.org_name', 'user_organization_relationals.default_org', 'organizations.pfm_stage_id')
-            ->leftjoin('organizations', 'organizations.id', '=', 'user_organization_relationals.organization_id')
-            ->leftjoin('organization_details', 'organization_details.org_id', '=', 'organizations.id')
-            ->where('uid', $uid)
-            ->get();
+        return UserOrganizationRelational::with('organizationDetail')->where('uid', $uid)->whereNull('deleted_flag')->get();
+           
     }
     // public function saveOrganization($orgModel, $orgDetailModel, $orgEmailModel, $orgWebLinkModel, $propertyAddressModel, $orgDBModel)
     // {
@@ -90,17 +87,17 @@ class OrganizationRepository implements OrganizationInterface
     }
     public function getOrganizationName($uid)
     {
-        
-        return Organization::with('OrganizationDetail','userRelational')
+
+        return Organization::with('OrganizationDetail', 'userRelational')
             ->where('pfm_stage_id', 1)
             ->whereNull('deleted_flag')
             ->whereNull('deleted_at')
             ->whereHas('userRelational', function ($query) use ($uid) {
                 $query->where('uid', $uid);
-            }) ->get();
-        
+            })->get();
+
     }
-    
+
     public function getPerviousDefaultOrganization($uid)
     {
         return UserOrganizationRelational::select('organization_details.org_name', 'user_organization_relationals.organization_id')
